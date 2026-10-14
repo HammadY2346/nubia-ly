@@ -26,8 +26,10 @@ final class ClockColorBackend {
     private static String message = "No clock color preview started.";
     private static int selectedColor = ClockColorPolicy.DEFAULT;
     static int color() { return selectedColor; }
-    static boolean begin(long until, int color) {
-        if (!ClockColorPolicy.valid(color)) return false;
+    static boolean begin(long until, int color) { return begin(until, color, 0, false); }
+    static boolean begin(long until, int color, int size, boolean bold) { return begin(until, color, size, bold, false); }
+    static boolean begin(long until, int color, int size, boolean bold, boolean seconds) {
+        if (!ClockColorPolicy.valid(color) || !com.elitedarkkaiser.nubialy.ClockStylePolicy.valid(size)) return false;
         end();
         if (failed || !states.isEmpty() || until <= SystemClock.elapsedRealtime()
                 || until - SystemClock.elapsedRealtime() > 30000) return false;
@@ -65,6 +67,7 @@ final class ClockColorBackend {
             };
             hooks.add(XposedHelpers.findAndHookMethod(TextView.class, "setTextColor", int.class, callback));
             hooks.add(XposedHelpers.findAndHookMethod(TextView.class, "setTextColor", ColorStateList.class, callback));
+            ClockStyleBackend.begin(size, bold); ClockSecondsBackend.begin(seconds);
             active = true;
             for (TextView view : ClockCaptureBackend.attachedClocks()) if (view.isAttachedToWindow()) track(view);
             if (!active || applied == 0) { end(); message = "No eligible attached clock; preview blocked."; return false; }
@@ -72,9 +75,10 @@ final class ClockColorBackend {
         } catch (Throwable unavailable) { abort("Clock preview installation failed."); return false; }
     }
     static void track(TextView view) {
-        if (!active || failed || Looper.myLooper() != Looper.getMainLooper()) return;
+        if (!active || failed || writing || Looper.myLooper() != Looper.getMainLooper()) return;
         if (SystemClock.elapsedRealtime() >= deadline) { end(); return; }
         if (states.containsKey(view)) {
+            try { ClockStyleBackend.track(view); ClockSecondsBackend.track(view); } catch (Throwable unavailable) { abort("Clock typography reapplication failed."); return; }
             // Reassert after the inspected clock callbacks if an inherited setter was bypassed.
             if (view.getCurrentTextColor() != selectedColor) {
                 states.get(view).stockWrite(view.getTextColors());
@@ -105,7 +109,7 @@ final class ClockColorBackend {
     }
     private static void paint(TextView view) {
         writing = true;
-        try { view.setTextColor(selectedColor); } finally { writing = false; }
+        try { view.setTextColor(selectedColor); ClockStyleBackend.track(view); ClockSecondsBackend.track(view); } finally { writing = false; }
     }
     static void detach(TextView view) { if (states.containsKey(view)) restore(view); }
     private static void restore(TextView view) {
@@ -114,6 +118,7 @@ final class ClockColorBackend {
         try {
             writing = true;
             view.setTextColor(state.target());
+            if (!ClockStyleBackend.restore(view) || !ClockSecondsBackend.restore(view)) throw new IllegalStateException();
             if (!view.getTextColors().equals(state.target())) throw new IllegalStateException();
             state.restored(); states.remove(view); restored++;
         } catch (Throwable unavailable) { failed = true; message = "Clock restoration incomplete. Disable nubia-ly in Vector and reboot."; }
@@ -123,13 +128,13 @@ final class ClockColorBackend {
         generation++; active = false;
         for (TextView view : new ArrayList<>(states.keySet())) restore(view);
         for (XC_MethodHook.Unhook hook : hooks) try { hook.unhook(); } catch (Throwable unavailable) { failed = true; }
-        hooks.clear(); deadline = 0;
+        hooks.clear(); if (!ClockStyleBackend.end()) failed = true; if (!ClockSecondsBackend.end()) failed = true; deadline = 0;
         if (!failed && applied > 0) message = "Latest stock clock colors restored and read back.";
     }
     private static void abort(String reason) {
         if (Looper.myLooper() != Looper.getMainLooper()) { main.post(() -> abort(reason)); return; }
         end(); failed = true; message = reason + " Preview blocked; check restored count. Disable nubia-ly in Vector and reboot if incomplete.";
     }
-    static boolean healthy() { return active && !failed && ClockCaptureBackend.available(); }
-    static String status() { return message + " Applied: " + applied + "; restored: " + restored + "; remaining: " + states.size() + "; dark updates kept: " + darkReapplications + "."; }
+    static boolean healthy() { return active && !failed && ClockStyleBackend.healthy() && ClockSecondsBackend.healthy() && ClockCaptureBackend.available(); }
+    static String status() { return message + " Applied: " + applied + "; restored: " + restored + "; remaining: " + states.size() + "; dark updates kept: " + darkReapplications + ". " + ClockStyleBackend.status() + " " + ClockSecondsBackend.status(); }
 }
