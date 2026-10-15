@@ -73,13 +73,16 @@ public final class MainActivity extends AppCompatActivity {
         vector.addView(label("App activation does not confirm System UI loading. Verify its entry in Vector logs. Enable persistent status-bar styling in its editor.", 14, false));
         spacer(20);
         content.addView(label("Your canvas", 24, true));
-        content.addView(label("Customization features are being developed. This test build includes persistent clock, compatible icon and battery-view styling.", 14, false));
+        content.addView(label("Customization features are being developed. This test build includes persistent status-bar styling, Quick Settings label styling and normal lock-screen clock/date styling.", 14, false));
         spacer(10);
         for (FeatureCatalog.Feature feature : FeatureCatalog.FEATURES) {
             LinearLayout featureCard = card(feature.title(), feature.description());
             TextView badge = label(feature.state() == FeatureCatalog.State.BLOCKED ? "Blocked experiment" : "Coming later", 13, true);
             badge.setTextColor(0xffffbe98);
             featureCard.addView(badge);
+            if("quick_settings".equals(feature.id())||"lock_screen".equals(feature.id())){
+                badge.setText("Appearance editor");featureCard.setOnClickListener(v->startActivity(new android.content.Intent(this,ClockEditorActivity.class).putExtra("surfaces",true)));continue;
+            }
             if ("status_bar".equals(feature.id())) {
                 badge.setText("Status-bar editor");
                 featureCard.setOnClickListener(v -> startActivity(new android.content.Intent(this, ClockEditorActivity.class)));

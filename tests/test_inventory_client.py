@@ -25,6 +25,6 @@ with tempfile.TemporaryDirectory(prefix='nubialy-inventory-') as work:
     work=Path(work)
     for name,content in sources.items():
         p=work/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
-    files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/n) for n in ['SystemUiGuardClient.java','SystemUiGuardProtocol.java','GuardBrokerPolicy.java','ClockColorPolicy.java','StatusBarStyle.java']]
+    files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/n) for n in ['SystemUiGuardClient.java','SystemUiGuardProtocol.java','GuardBrokerPolicy.java','ClockColorPolicy.java','StatusBarStyle.java','SurfaceStyle.java']]
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(work/'classes'),*files],check=True)
     subprocess.run(['java','-cp',str(work/'classes'),'com.elitedarkkaiser.nubialy.InventoryTest'],check=True)

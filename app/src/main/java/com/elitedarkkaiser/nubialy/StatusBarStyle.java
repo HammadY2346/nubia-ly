@@ -2,19 +2,21 @@ package com.elitedarkkaiser.nubialy;
 import java.util.*;
 /** Fixed, bounded view styling. No commands or paths are configuration. */
 public record StatusBarStyle(int mask, int systemScale, int notificationScale, int batteryScale,
-        int systemOpacity, int notificationOpacity, int batteryOpacity, Set<String> hiddenSlots, int systemTransform, int notificationTransform, int batteryTransform, int fanAppearance, int pumpAppearance, int refreshAppearance) {
+        int systemOpacity, int notificationOpacity, int batteryOpacity, Set<String> hiddenSlots, int systemTransform, int notificationTransform, int batteryTransform, int fanAppearance, int pumpAppearance, int refreshAppearance, SurfaceStyle surfaces) {
     public StatusBarStyle { hiddenSlots=hiddenSlots==null?Set.of("invalid\n"):Set.copyOf(hiddenSlots); }
+    public StatusBarStyle(int mask,int systemScale,int notificationScale,int batteryScale,int systemOpacity,int notificationOpacity,int batteryOpacity,Set<String> hiddenSlots,int systemTransform,int notificationTransform,int batteryTransform,int fanAppearance,int pumpAppearance,int refreshAppearance){this(mask,systemScale,notificationScale,batteryScale,systemOpacity,notificationOpacity,batteryOpacity,hiddenSlots,systemTransform,notificationTransform,batteryTransform,fanAppearance,pumpAppearance,refreshAppearance,SurfaceStyle.STOCK);}
     public StatusBarStyle(int mask,int systemScale,int notificationScale,int batteryScale,int systemOpacity,int notificationOpacity,int batteryOpacity,Set<String> hiddenSlots,int systemTransform,int notificationTransform,int batteryTransform){this(mask,systemScale,notificationScale,batteryScale,systemOpacity,notificationOpacity,batteryOpacity,hiddenSlots,systemTransform,notificationTransform,batteryTransform,0,0,0);}
     public StatusBarStyle(int mask,int systemScale,int notificationScale,int batteryScale,int systemOpacity,int notificationOpacity,int batteryOpacity,Set<String> hiddenSlots){this(mask,systemScale,notificationScale,batteryScale,systemOpacity,notificationOpacity,batteryOpacity,hiddenSlots,0,0,0);}
     public StatusBarStyle(int mask,int systemScale,int notificationScale,int batteryScale){this(mask,systemScale,notificationScale,batteryScale,100,100,100,Set.of());}
     public static final int TINT=1, HIDE_SYSTEM=2, HIDE_NOTIFICATIONS=4, HIDE_BATTERY=8, HIDE_PUMP=16, HIDE_FAN=32, HIDE_REFRESH=64;
     public static final StatusBarStyle STOCK = new StatusBarStyle(0,100,100,100);
-    public boolean valid() { return mask >= 0 && mask <= 127 && scale(systemScale) && scale(notificationScale) && scale(batteryScale)
+    public boolean valid() { return surfaces!=null&&surfaces.valid()&&mask >= 0 && mask <= 127 && scale(systemScale) && scale(notificationScale) && scale(batteryScale)
         && appearanceValid(fanAppearance)&&appearanceValid(pumpAppearance)&&appearanceValid(refreshAppearance)
         && transformValid(systemTransform)&&transformValid(notificationTransform)&&transformValid(batteryTransform)
         && opacity(systemOpacity)&&opacity(notificationOpacity)&&opacity(batteryOpacity)&&hiddenSlots.size()<=32&&hiddenSlots.stream().allMatch(StatusBarStyle::slot); }
+    public StatusBarStyle withSurfaces(SurfaceStyle value){return new StatusBarStyle(mask,systemScale,notificationScale,batteryScale,systemOpacity,notificationOpacity,batteryOpacity,hiddenSlots,systemTransform,notificationTransform,batteryTransform,fanAppearance,pumpAppearance,refreshAppearance,value);}
     public boolean selected(int flag) { return (mask & flag) != 0; }
-    public boolean any() { return mask != 0 || systemScale != 100 || notificationScale != 100 || batteryScale != 100
+    public boolean any() { return surfaces.any()||mask != 0 || systemScale != 100 || notificationScale != 100 || batteryScale != 100
         ||fanAppearance!=0||pumpAppearance!=0||refreshAppearance!=0||systemTransform!=0||notificationTransform!=0||batteryTransform!=0||systemOpacity!=100||notificationOpacity!=100||batteryOpacity!=100||!hiddenSlots.isEmpty(); }
     public static int indicatorScale(int value){return 100+(byte)value;}
     public static int indicatorOpacity(int value){return 100+(byte)(value>>8);}

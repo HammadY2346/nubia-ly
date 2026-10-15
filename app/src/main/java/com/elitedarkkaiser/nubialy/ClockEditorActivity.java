@@ -35,6 +35,8 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private boolean bold, seconds, italic;
     private int spacing, fontFamily;
     private int statusMask, systemScale, notificationScale, batteryScale,systemOpacity,notificationOpacity,batteryOpacity,iconColor,dateMode,systemTransform,notificationTransform,batteryTransform,fanAppearance,pumpAppearance,refreshAppearance;
+    private final int[] surfaceAppearance=new int[4],surfacePosition=new int[4];
+    private int surfaceHidden,tileShape;
     private final java.util.Set<String> hiddenSlots=new java.util.TreeSet<>();
     private LinearLayout iconSlots;
     private ChipGroup iconPresets;
@@ -54,6 +56,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         selected = ClockColorPreferences.read(this);
         sizePercent = ClockColorPreferences.size(this); bold = ClockColorPreferences.bold(this); seconds = ClockColorPreferences.seconds(this); italic = ClockColorPreferences.italic(this); spacing = ClockColorPreferences.spacing(this); fontFamily = ClockColorPreferences.family(this); hidden = ClockColorPreferences.hidden(this);
         StatusBarStyle bar = StatusBarPreferences.read(this); statusMask = bar.mask(); systemScale = bar.systemScale(); notificationScale = bar.notificationScale(); batteryScale = bar.batteryScale();systemOpacity=bar.systemOpacity();notificationOpacity=bar.notificationOpacity();batteryOpacity=bar.batteryOpacity();systemTransform=bar.systemTransform();notificationTransform=bar.notificationTransform();batteryTransform=bar.batteryTransform();fanAppearance=bar.fanAppearance();pumpAppearance=bar.pumpAppearance();refreshAppearance=bar.refreshAppearance();hiddenSlots.addAll(bar.hiddenSlots());iconColor=StatusBarPreferences.color(this);dateMode=StatusBarPreferences.date(this);
+        tileShape=bar.surfaces().tileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
         if (state != null && ClockColorPolicy.valid(state.getInt("selection", 0))) selected = state.getInt("selection");
         client = new SystemUiGuardClient(this);
         ScrollView scroll = new ScrollView(this);
@@ -64,8 +67,8 @@ public final class ClockEditorActivity extends AppCompatActivity {
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom); return insets;
         });
         MaterialButton back = button("Back"); back.setOnClickListener(v -> finish()); content.addView(back);
-        content.addView(text("Status bar", 28, true));
-        content.addView(text("Choose your clock color. Choose a color, then Enable to keep it on your status bar.", 15, false));
+        content.addView(text("Customization editor", 28, true));
+        content.addView(text("Saved choices apply together after Enable. Restore stock releases status-bar, Quick Settings and lock-screen appearance.", 15, false));
         LinearLayout colors = card("Clock color");
         swatch = text("12:34", 44, true); colors.addView(swatch);
         selection = text("", 16, true); colors.addView(selection);
@@ -104,11 +107,19 @@ public final class ClockEditorActivity extends AppCompatActivity {
         inventoryButton=button("Load individual system status icons");icons.addView(inventoryButton);inventoryButton.setOnClickListener(v->{enabled(false);client.inventory(slots->{if(alive())showSlots(slots);},result->{if(alive()){enabled(true);saveStatus.setText(result);}});});
         iconSlots=new LinearLayout(this);iconSlots.setOrientation(LinearLayout.VERTICAL);icons.addView(iconSlots);showSlots(java.util.List.of());
         resetIcons=button("Reset icons & battery selections");icons.addView(resetIcons);resetIcons.setOnClickListener(v->{
-            enabled(false);worker.execute(()->{boolean saved=StatusBarPreferences.save(getApplicationContext(),StatusBarStyle.STOCK);runOnUiThread(()->{if(alive()){if(saved){finish();startActivity(new android.content.Intent(this,ClockEditorActivity.class));}else {enabled(true);saveStatus.setText("Reset could not be saved.");}}});});
+            enabled(false);worker.execute(()->{boolean saved=StatusBarPreferences.save(getApplicationContext(),StatusBarStyle.STOCK.withSurfaces(currentSurfaces()));runOnUiThread(()->{if(alive()){if(saved){finish();startActivity(new android.content.Intent(this,ClockEditorActivity.class));}else {enabled(true);saveStatus.setText("Reset could not be saved.");}}});});
         });
         icons.addView(text("Reset clears draft icon/battery controls; press Enable afterward to apply stock icon/battery appearance while keeping your clock choices.",14,false));
         icons.addView(text("100% uses stock size. These controls apply to recognized top-status-bar views; other icons may keep their stock appearance. Press Enable to apply the entire saved style.",14,false));
-        LinearLayout typography = card("Clock style");
+        LinearLayout surfaces=card("Quick Settings & lock screen");
+        surfaces.addView(text("Style the inspected tile labels and normal Nubia lock-screen clock/date. Visual size scales the text view relative to stock; it does not change tile layout or time format. Hidden labels do not disable tiles. AOD/pulsing uses stock. Changes apply together using Enable below.",14,false));
+        surfaces.addView(text("Quick Settings circle tile shape",16,true));ChipGroup shapes=new ChipGroup(this);shapes.setSingleSelection(true);surfaces.addView(shapes);
+        String[] shapeNames={"Stock","Square","Rounded square","Leaf"};for(int i=0;i<shapeNames.length;i++){final int value=i;Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(shapeNames[i]);chip.setCheckable(true);chip.setChecked(tileShape==i);chip.setTag(i);shapes.addView(chip);statusControls.add(chip);chip.setOnClickListener(v->{tileShape=value;for(int n=0;n<shapes.getChildCount();n++){Chip c=(Chip)shapes.getChildAt(n);c.setChecked((Integer)c.getTag()==value);}saveStatusBar();});}
+        surfaces.addView(text("Shapes apply to the smaller circle tiles. Wide top tiles keep their stock shape. Colors and tile actions remain stock. Press Enable to apply.",14,false));
+        surfaceControls(surfaces,"Quick Settings main labels",0);surfaceControls(surfaces,"Quick Settings secondary labels",1);
+        surfaceControls(surfaces,"Lock-screen clock",2);surfaceControls(surfaces,"Lock-screen date",3);
+        if(getIntent().getBooleanExtra("surfaces",false))surfaces.post(()->scroll.smoothScrollTo(0,((View)surfaces.getParent()).getTop()));
+        LinearLayout typography = card("Status-bar clock style");
         TextView sizeLabel = text("", 15, true); typography.addView(sizeLabel);
         Slider size = new Slider(this); sizeControl = size; size.setValueFrom(80); size.setValueTo(120); size.setStepSize(5);
         size.setValue(sizePercent == 0 ? 100 : sizePercent); typography.addView(size);
@@ -181,7 +192,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         swatch.setTextSize(44 * (sizePercent == 0 ? 1f : sizePercent / 100f));
         swatch.setTypeface(android.graphics.Typeface.create(ClockStylePolicy.familyName(fontFamily), (bold ? android.graphics.Typeface.BOLD : 0) | (italic ? android.graphics.Typeface.ITALIC : 0)));
     }
-    private StatusBarStyle currentStatusBar() { return new StatusBarStyle(statusMask,systemScale,notificationScale,batteryScale,systemOpacity,notificationOpacity,batteryOpacity,hiddenSlots,systemTransform,notificationTransform,batteryTransform,fanAppearance,pumpAppearance,refreshAppearance); }
+    private StatusBarStyle currentStatusBar() { return new StatusBarStyle(statusMask,systemScale,notificationScale,batteryScale,systemOpacity,notificationOpacity,batteryOpacity,hiddenSlots,systemTransform,notificationTransform,batteryTransform,fanAppearance,pumpAppearance,refreshAppearance,currentSurfaces()); }
     private void redrawIcon(){iconSelection.setText("Mobile service icon color: "+ClockColorPolicy.hex(iconColor));iconSelection.setTextColor(iconColor);for(int n=0;n<iconPresets.getChildCount();n++){Chip c=(Chip)iconPresets.getChildAt(n);c.setChecked((Integer)c.getTag()==iconColor);}}
     private void chooseIcon(int color){if(!ClockColorPolicy.valid(color))return;iconColor=color;redrawIcon();worker.execute(()->{boolean saved=StatusBarPreferences.saveColor(getApplicationContext(),color);runOnUiThread(()->{if(alive())saveStatus.setText(saved?"Icon color saved. Press Enable to apply it.":"Icon color could not be saved.");});});}
     private void showSlots(java.util.List<String> live){
@@ -365,6 +376,21 @@ public final class ClockEditorActivity extends AppCompatActivity {
         int value=indicatorSelection(category);
         statusScale(box,title+" icon size",StatusBarStyle.indicatorScale(value),n->saveIndicator(category,n,StatusBarStyle.indicatorOpacity(indicatorSelection(category))));
         statusOpacity(box,title+" icon opacity",StatusBarStyle.indicatorOpacity(value),n->saveIndicator(category,StatusBarStyle.indicatorScale(indicatorSelection(category)),n));
+    }
+
+    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape);}
+    private void surfaceControls(LinearLayout parent,String title,int group){
+        MaterialButton open=button(title+" appearance");parent.addView(open);statusControls.add(open);
+        LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setVisibility(View.GONE);parent.addView(box);
+        open.setOnClickListener(v->{boolean expanded=box.getVisibility()!=View.VISIBLE;box.setVisibility(expanded?View.VISIBLE:View.GONE);open.setText(expanded?"Close "+title.toLowerCase(java.util.Locale.ROOT):title+" appearance");});
+        var hide=new com.google.android.material.checkbox.MaterialCheckBox(this);hide.setText("Hide "+title.toLowerCase(java.util.Locale.ROOT));hide.setChecked((surfaceHidden&(1<<group))!=0);box.addView(hide);statusControls.add(hide);
+        hide.setOnCheckedChangeListener((v,value)->{surfaceHidden=value?surfaceHidden|(1<<group):surfaceHidden&~(1<<group);saveStatusBar();});
+        statusScale(box,"Visual size",StatusBarStyle.indicatorScale(surfaceAppearance[group]),n->{surfaceAppearance[group]=StatusBarStyle.appearance(n,StatusBarStyle.indicatorOpacity(surfaceAppearance[group]));});
+        statusOpacity(box,"Opacity",StatusBarStyle.indicatorOpacity(surfaceAppearance[group]),n->{surfaceAppearance[group]=StatusBarStyle.appearance(StatusBarStyle.indicatorScale(surfaceAppearance[group]),n);});
+        for(int part=0;part<3;part++){final int component=part;int old=surfacePosition[group],initial=part==0?StatusBarStyle.horizontal(old):part==1?StatusBarStyle.vertical(old):StatusBarStyle.rotation(old);
+            String titleText=part==0?"Horizontal offset":part==1?"Vertical offset":"Rotation",unit=part==2?"°":" dp";TextView label=text(titleText+": "+initial+unit,15,true);box.addView(label);Slider slider=new Slider(this);slider.setValueFrom(part==2?-20:-8);slider.setValueTo(part==2?20:8);slider.setStepSize(part==2?5:2);slider.setValue(initial);box.addView(slider);statusControls.add(slider);
+            slider.addOnChangeListener((v,value,user)->{if(user){int current=surfacePosition[group],selected=(int)value;surfacePosition[group]=StatusBarStyle.transform(component==0?selected:StatusBarStyle.horizontal(current),component==1?selected:StatusBarStyle.vertical(current),component==2?selected:StatusBarStyle.rotation(current));label.setText(titleText+": "+selected+unit);saveStatusBar();}});
+        }
     }
 
 }

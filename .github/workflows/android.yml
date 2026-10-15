@@ -29,6 +29,7 @@ jobs:
           sh tests/run-policy-tests.sh
           python3 tests/test_clock_backend.py
           python3 tests/test_statusbar_backend.py
+          python3 tests/test_surface_backend.py
           python3 tests/test_statusbar_preferences.py
           python3 tests/test_clock_date_backend.py
           python3 tests/test_inventory_client.py
