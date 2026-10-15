@@ -50,3 +50,14 @@ Lock-screen discovery observes the container lifecycle (inflation, attachment, l
 Install 0.1.26 and reboot to reload hooks. Enable both hide options and verify clock/date disappear on the normal lock screen; check the separate capture counts if they remain visible. Test independent large/small shapes and active/inactive tile states. Verify AOD, unlock, wake and Restore stock. Keep this PR draft until phone results and explicit merge authorization.
 
 Local validation: all policy, production backend, preferences, inventory, recovery/root and guard shell suites pass. Added independent large/small geometry and migration coverage, plus a vendor attachment regression that bypasses the base View callback. Android compilation runs in CI.
+
+
+## 0.1.27 personal-clock targeting and navigation
+
+Phone confirms both QS groups work; clock/date remain visible in 0.1.26. Stock DEX inspection shows a second implementation: ClockContentView creates LockScreenClockDefault and LockScreenClockArtword. The art clock owns four ImageView digits and a DateView, while the default uses a vendor TextClock and DateView. These were outside the older NubiaKeyguardStatusView target.
+
+The backend now validates and targets those exact fields under ClockContentView's SCENE_NORMAL (1); settings (2) and manager (3) previews are excluded. AOD has separate classes and is outside this target. Regression coverage includes all four images, default clock/date, stock reassertion, preview exclusion/scene changes, unrelated widgets and restore. Other personal-clock style classes are not yet supported. Phone validation is still required.
+
+Home now leads with customization categories. Setup and recovery diagnostics are expandable. The editor has Status bar, Quick Settings and Lock screen sections; category cards open their matching section. Technical status is expandable, and shared Enable/Restore controls explain that all saved areas apply together.
+
+Phone checklist: install/reboot, Enable both lock-screen hides and verify normal lock screen. Check capture counts if still visible. Verify Restore stock, lock-screen settings previews, wake and QS functionality. Review category navigation and expandable setup/recovery/details. Remain draft and unmerged.

@@ -67,9 +67,11 @@ public final class ClockEditorActivity extends AppCompatActivity {
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom); return insets;
         });
         MaterialButton back = button("Back"); back.setOnClickListener(v -> finish()); content.addView(back);
-        content.addView(text("Customization editor", 28, true));
+        content.addView(text("Customize", 28, true));
+        ChipGroup sections=new ChipGroup(this);sections.setSingleSelection(true);content.addView(sections);
+        java.util.List<View> statusPanels=new java.util.ArrayList<>(),qsPanels=new java.util.ArrayList<>(),lockPanels=new java.util.ArrayList<>();
         content.addView(text("Saved choices apply together after Enable. Restore stock releases status-bar, Quick Settings and lock-screen appearance.", 15, false));
-        LinearLayout colors = card("Clock color");
+        LinearLayout colors = card("Clock color");statusPanels.add((View)colors.getParent());
         swatch = text("12:34", 44, true); colors.addView(swatch);
         selection = text("", 16, true); colors.addView(selection);
         presets = new ChipGroup(this); presets.setSingleSelection(true); colors.addView(presets);
@@ -82,7 +84,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         MaterialButton custom = button("Custom color"); colors.addView(custom); custom.setOnClickListener(v -> customColor());
         saveStatus = text("Saved selection loaded.", 14, false); colors.addView(saveStatus);
-        LinearLayout icons = card("Icons & battery");
+        LinearLayout icons = card("Icons & battery");statusPanels.add((View)icons.getParent());
         icons.addView(text("Mobile service icon controls style the compatible calling-service indicator, such as VoLTE. Other compatible system indicators can share these settings. App notification icons are separate. Some Wi-Fi and signal icons keep stock appearance. Battery keeps stock charge and warning colors.",14,false));
         iconSelection=text("",16,true);icons.addView(iconSelection);iconPresets=new ChipGroup(this);iconPresets.setSingleSelection(true);icons.addView(iconPresets);
         for(ClockColorPolicy.Preset preset:ClockColorPolicy.PRESETS){
@@ -111,15 +113,16 @@ public final class ClockEditorActivity extends AppCompatActivity {
         });
         icons.addView(text("Reset clears draft icon/battery controls; press Enable afterward to apply stock icon/battery appearance while keeping your clock choices.",14,false));
         icons.addView(text("100% uses stock size. These controls apply to recognized top-status-bar views; other icons may keep their stock appearance. Press Enable to apply the entire saved style.",14,false));
-        LinearLayout surfaces=card("Quick Settings & lock screen");
-        surfaces.addView(text("Style the inspected tile labels and normal Nubia lock-screen clock/date. Visual size scales the text view relative to stock; it does not change tile layout or time format. Hidden labels do not disable tiles. AOD/pulsing uses stock. Changes apply together using Enable below.",14,false));
+        LinearLayout surfaces=card("Quick Settings");qsPanels.add((View)surfaces.getParent());
+        surfaces.addView(text("Choose independent shapes for large and small tiles. Label appearance keeps tile actions unchanged. Press Enable to apply saved choices.",14,false));
         shapeControls(surfaces,"Large QS tiles",true);
         shapeControls(surfaces,"Small QS tiles",false);
         surfaces.addView(text("Large QS tiles are the four wide tiles at the top. Small QS tiles are the tiles below brightness. Each group has its own shape. Press Enable to apply.",14,false));
         surfaceControls(surfaces,"Quick Settings main labels",0);surfaceControls(surfaces,"Quick Settings secondary labels",1);
-        surfaceControls(surfaces,"Lock-screen clock",2);surfaceControls(surfaces,"Lock-screen date",3);
+        LinearLayout lockscreen=card("Lock screen");lockPanels.add((View)lockscreen.getParent());
+        surfaceControls(lockscreen,"Lock-screen clock",2);surfaceControls(lockscreen,"Lock-screen date",3);
         if(getIntent().getBooleanExtra("surfaces",false))surfaces.post(()->scroll.smoothScrollTo(0,((View)surfaces.getParent()).getTop()));
-        LinearLayout typography = card("Status-bar clock style");
+        LinearLayout typography = card("Status-bar clock style");statusPanels.add((View)typography.getParent());
         TextView sizeLabel = text("", 15, true); typography.addView(sizeLabel);
         Slider size = new Slider(this); sizeControl = size; size.setValueFrom(80); size.setValueTo(120); size.setStepSize(5);
         size.setValue(sizePercent == 0 ? 100 : sizePercent); typography.addView(size);
@@ -163,15 +166,20 @@ public final class ClockEditorActivity extends AppCompatActivity {
         dateChoices(typography,"Date separator",ClockDatePolicy.SEPARATOR_LABELS,2);
         dateChoices(typography,"Date letter case",ClockDatePolicy.CASE_LABELS,3);
         typography.addView(text("Date uses your stock locale and timezone. Position, separator and letter case affect only the added date; time keeps its stock format. Long dates add width. Press Enable to apply your saved choices.",14,false));
-        LinearLayout controls = card("Status-bar customization");
-        controls.addView(text("Enable your selected color until you restore stock. Press Enable again to apply a different selection.", 15, false));
+        String initial=getIntent().getStringExtra("section");if(initial==null)initial=getIntent().getBooleanExtra("surfaces",false)?"quick_settings":"status_bar";
+        String[] sectionIds={"status_bar","quick_settings","lock_screen"},sectionNames={"Status bar","Quick Settings","Lock screen"};
+        for(int i=0;i<sectionIds.length;i++){final String id=sectionIds[i];Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(sectionNames[i]);chip.setCheckable(true);sections.addView(chip);chip.setChecked(id.equals(initial));chip.setOnClickListener(v->{for(View panel:statusPanels)panel.setVisibility(id.equals("status_bar")?View.VISIBLE:View.GONE);for(View panel:qsPanels)panel.setVisibility(id.equals("quick_settings")?View.VISIBLE:View.GONE);for(View panel:lockPanels)panel.setVisibility(id.equals("lock_screen")?View.VISIBLE:View.GONE);chip.setChecked(true);});}
+        for(View panel:statusPanels)panel.setVisibility(initial.equals("status_bar")?View.VISIBLE:View.GONE);for(View panel:qsPanels)panel.setVisibility(initial.equals("quick_settings")?View.VISIBLE:View.GONE);for(View panel:lockPanels)panel.setVisibility(initial.equals("lock_screen")?View.VISIBLE:View.GONE);
+        LinearLayout controls = card("Apply your style");
+        controls.addView(text("Enable applies saved choices across all three areas. Restore stock removes the applied style.", 15, false));
         controls.addView(text("Requires root and the updated recovery guard. Your enabled color resumes after wake or reboot. The guard Action independently turns it off.", 14, false));
         previewStatus = text(getSharedPreferences("recovery", MODE_PRIVATE).getBoolean("restart_recovery_stopped", false)
             ? "Clock color was stopped after repeated System UI restarts. Enable again only after checking recovery."
-            : "Check status-bar style to read the current state. Restore stock turns off enabled customization.", 14, false); controls.addView(previewStatus);
-        enable = button("Enable status-bar style"); controls.addView(enable);
-        check = button("Check status-bar style"); controls.addView(check);
-        restore = button("Restore stock status bar"); controls.addView(restore);
+            : "Check customization to read the current state. Restore stock turns off enabled customization.", 14, false);
+        MaterialButton details=button("Show technical details");controls.addView(details);previewStatus.setVisibility(View.GONE);controls.addView(previewStatus);details.setOnClickListener(v->{boolean show=previewStatus.getVisibility()!=View.VISIBLE;previewStatus.setVisibility(show?View.VISIBLE:View.GONE);details.setText(show?"Hide technical details":"Show technical details");});
+        enable = button("Enable customization"); controls.addView(enable);
+        check = button("Check customization"); controls.addView(check);
+        restore = button("Restore stock appearance"); controls.addView(restore);
         enable.setOnClickListener(v -> enableColor());
         check.setOnClickListener(v -> request("status"));
         restore.setOnClickListener(v -> {
