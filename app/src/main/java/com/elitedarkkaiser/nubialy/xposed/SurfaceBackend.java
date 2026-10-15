@@ -11,8 +11,10 @@ import java.util.*;
 /** Scoped view transforms only. No tile state, lock-screen security, text or layout model writes. */
 final class SurfaceBackend {
     private static final String WIDE="com.zte.qs.tileimpl.QSTileViewWide",CIRCLE="com.zte.qs.tileimpl.QSTileViewCircle",LOCK="cn.nubia.lockscreen.NubiaKeyguardStatusView";
-    private static final String CONTENT="com.zte.mifavor.keyguard.personalclock.ClockContentView",BASE="com.zte.mifavor.keyguard.settings.BaseLockScreenClock",ART="com.zte.mifavor.keyguard.settings.LockScreenClockArtword",DEFAULT="com.zte.mifavor.keyguard.settings.LockScreenClockDefault";
-    private static boolean ownerName(String name){return name.equals(WIDE)||name.equals(CIRCLE)||name.equals(LOCK)||name.equals(ART)||name.equals(DEFAULT)||name.equals(CONTENT);}
+    private static final String CLIP="com.zte.mifavor.keyguard.settings.LockScreenClockClip";
+    private static final Set<String> observedClockTypes=new TreeSet<>();
+    private static final String LIVE="com.zte.mifavor.keyguard.KeyguardStatusView",ITEM="com.zte.mifavor.keyguard.settings.LockScreenClockStyleItem",CONTENT="com.zte.mifavor.keyguard.personalclock.ClockContentView",BASE="com.zte.mifavor.keyguard.settings.BaseLockScreenClock",ART="com.zte.mifavor.keyguard.settings.LockScreenClockArtword",DEFAULT="com.zte.mifavor.keyguard.settings.LockScreenClockDefault";
+    private static boolean ownerName(String name){return name.equals(WIDE)||name.equals(CIRCLE)||name.equals(LOCK)||name.equals(ART)||name.equals(DEFAULT)||name.equals(CLIP)||name.equals(CONTENT)||name.equals(LIVE)||name.equals(ITEM);}
     private static final Map<ViewGroup,Boolean> roots=new WeakHashMap<>();
     private static final Map<View,State> states=new WeakHashMap<>();
     private static final List<XC_MethodHook.Unhook> hooks=new ArrayList<>();
@@ -41,6 +43,12 @@ final class SurfaceBackend {
             Class<?> content=XposedHelpers.findClass(CONTENT,loader),base=XposedHelpers.findClass(BASE,loader),art=XposedHelpers.findClass(ART,loader),normal=XposedHelpers.findClass(DEFAULT,loader);
             if(content.getSuperclass()!=LinearLayout.class||content.getDeclaredField("mScence").getType()!=int.class||content.getDeclaredField("SCENE_NORMAL").getType()!=int.class||art.getSuperclass()!=base||normal.getSuperclass()!=base||!TextView.class.isAssignableFrom(art.getDeclaredField("mDateView").getType())||!TextView.class.isAssignableFrom(normal.getDeclaredField("mDateView").getType())||!TextView.class.isAssignableFrom(normal.getDeclaredField("mClockView").getType()))throw new IllegalStateException("Personal clock signatures");
             for(String field:new String[]{"mImageView1","mImageView2","mImageView3","mImageView4"})if(art.getDeclaredField(field).getType()!=ImageView.class)throw new IllegalStateException("Art clock digit signature");
+            Class<?> clip=XposedHelpers.findClass(CLIP,loader);
+            if(clip.getSuperclass()!=base||!TextView.class.isAssignableFrom(clip.getDeclaredField("mDateView").getType()))throw new IllegalStateException("Clip date signature");
+            for(String field:new String[]{"mClockHourView","mClockMinuteView","mClockMinuteMaskView"})if(!TextView.class.isAssignableFrom(clip.getDeclaredField(field).getType()))throw new IllegalStateException("Clip clock signature");
+            stage="live keyguard host fields";
+            Class<?> live=XposedHelpers.findClass(LIVE,loader),item=XposedHelpers.findClass(ITEM,loader);
+            if(live.getSuperclass()!=GridLayout.class||live.getDeclaredField("mClockLayout").getType()!=item||live.getDeclaredField("mDarkAmount").getType()!=float.class||item.getSuperclass()!=LinearLayout.class||item.getDeclaredField("mScene").getType()!=int.class||!item.getDeclaredField("mClock").getType().getName().equals("com.zte.mifavor.keyguard.settings.LockScreenClockStyleInterface"))throw new IllegalStateException("Live keyguard signatures");
             stage="view lifecycle hooks";
             observers.add(XposedBridge.hookMethod(View.class.getDeclaredMethod("onAttachedToWindow"),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(ready&&!p.hasThrowable()&&main()){try{target((View)p.thisObject);if(active)track((View)p.thisObject);}catch(Throwable unavailable){if(active)fail(unavailable);}}}}));
             observers.add(XposedBridge.hookMethod(View.class.getDeclaredMethod("onDetachedFromWindow"),new XC_MethodHook(){@Override protected void beforeHookedMethod(MethodHookParam p){if(!active||!main())return;View view=(View)p.thisObject;restore(view);if(view instanceof ViewGroup root){QsShapeBackend.release(root);for(View v:new ArrayList<>(states.keySet()))if(states.get(v).owner.get()==root)restore(v);roots.remove(root);}}}));
@@ -48,8 +56,8 @@ final class SurfaceBackend {
             observers.add(XposedBridge.hookMethod(lock.getDeclaredMethod("setPulsing",boolean.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(active&&main())refresh();}}));
             // Observe the actual lifecycle implementations as vendor overrides need not
             // dispatch through View.onAttachedToWindow. Inflation also precedes attachment.
-            XC_MethodHook discover=new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(!p.hasThrowable()&&main()&&p.thisObject instanceof ViewGroup root&&(ownerName(root.getClass().getName()))){roots.put(root,true);if(active)refresh();}}};
-            for(Class<?> owner:new Class<?>[]{wide,circle,lock,content,art,normal})for(String name:new String[]{"onFinishInflate","onAttachedToWindow","onLayout","setDarkAmount","setPulsing","loadStyle","setScene"}){
+            XC_MethodHook discover=new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(!p.hasThrowable()&&main()&&p.thisObject instanceof ViewGroup root&&(ownerName(root.getClass().getName()))){roots.put(root,true);liveClockStatus();if(active)refresh();}}};
+            for(Class<?> owner:new Class<?>[]{wide,circle,lock,content,art,normal,clip,live,item})for(String name:new String[]{"onFinishInflate","onAttachedToWindow","onLayout","setDarkAmount","setPulsing","loadStyle","setScene","addClockView","updateClockView"}){
                 for(Class<?> type=owner;type!=null;type=type.getSuperclass()){
                     boolean found=false;for(Method method:type.getDeclaredMethods())if(method.getName().equals(name)){observers.add(XposedBridge.hookMethod(method,discover));found=true;}if(found)break;
                 }
@@ -70,11 +78,12 @@ final class SurfaceBackend {
             String name=current.getClass().getName();
             if(current instanceof ViewGroup root&&ownerName(name)){
                 roots.put(root,true);
-                if(name.equals(CONTENT))return null;
-                if(name.equals(ART)||name.equals(DEFAULT)){
+                if(name.equals(CONTENT)||name.equals(ITEM)||name.equals(LIVE))return null;
+                if(name.equals(ART)||name.equals(DEFAULT)||name.equals(CLIP)){
                     if(!normalPersonalScene(root))return null;
                     if(XposedHelpers.getObjectField(root,"mDateView")==view)return new Target(root,3);
                     if(name.equals(DEFAULT)&&XposedHelpers.getObjectField(root,"mClockView")==view)return new Target(root,2);
+                    if(name.equals(CLIP))for(String field:new String[]{"mClockHourView","mClockMinuteView","mClockMinuteMaskView"})if(XposedHelpers.getObjectField(root,field)==view)return new Target(root,2);
                     if(name.equals(ART))for(String field:new String[]{"mImageView1","mImageView2","mImageView3","mImageView4"})if(XposedHelpers.getObjectField(root,field)==view)return new Target(root,2);
                     return null;
                 }
@@ -91,15 +100,27 @@ final class SurfaceBackend {
         }return null;
     }
     private static boolean normalPersonalScene(ViewGroup root){
-        View current=root;
+        View current=root;ViewGroup item=null;
         for(int depth=0;depth<24&&current!=null;depth++){
-            if(current.getClass().getName().equals(CONTENT))try{
-                var field=current.getClass().getDeclaredField("SCENE_NORMAL");field.setAccessible(true);
-                return ((Number)XposedHelpers.getObjectField(current,"mScence")).intValue()==field.getInt(null);
-            }catch(ReflectiveOperationException invalid){return false;}
+            String name=current.getClass().getName();
+            if(name.equals(ITEM)){
+                if(((Number)XposedHelpers.getObjectField(current,"mScene")).intValue()!=1||XposedHelpers.getObjectField(current,"mClock")!=root)return false;
+                item=(ViewGroup)current;
+            }
+            if(name.equals(LIVE))return item!=null&&XposedHelpers.getObjectField(current,"mClockLayout")==item&&((Number)XposedHelpers.getObjectField(current,"mDarkAmount")).floatValue()==0;
+            // ClockContentView belongs to the personal-clock chooser path. Do not
+            // infer live ownership from its SCENE_NORMAL flag alone.
+            if(name.equals(CONTENT))return false;
             ViewParent parent=current.getParent();current=parent instanceof View v?v:null;
         }
         return false;
+    }
+    private static String liveClockStatus(){
+        int hosts=0;Set<String> types=new TreeSet<>();
+        for(ViewGroup root:new ArrayList<>(roots.keySet()))if(root.isAttachedToWindow()&&root.getClass().getName().equals(LIVE)){
+            hosts++;Object item=XposedHelpers.getObjectField(root,"mClockLayout");if(item!=null){Object clock=XposedHelpers.getObjectField(item,"mClock");types.add(clock==null?"not created":clock.getClass().getSimpleName());if(clock!=null&&observedClockTypes.size()<8)observedClockTypes.add(clock.getClass().getSimpleName());}
+        }
+        return " Live keyguard hosts: "+hosts+"; active clock types: "+(types.isEmpty()?"not observed":String.join(", ",types))+"; observed clock types: "+(observedClockTypes.isEmpty()?"none":String.join(", ",observedClockTypes))+".";
     }
     static void begin(SurfaceStyle selection){
         if(selection==null||!selection.valid()||!main())throw new IllegalArgumentException();if(!end())throw new IllegalStateException("Surface restoration incomplete");style=selection;captured=restored=0;if(!style.any()){message="Stock Quick Settings and lock-screen text appearance.";return;}
@@ -139,5 +160,5 @@ final class SurfaceBackend {
     static void refresh(){if(!active||failed||!main())return;for(View v:new ArrayList<>(states.keySet()))track(v);for(ViewGroup root:new ArrayList<>(roots.keySet()))if(root.isAttachedToWindow()){QsShapeBackend.track(root);ArrayDeque<View> queue=new ArrayDeque<>();queue.add(root);int count=0;while(!queue.isEmpty()&&count++<128){View v=queue.removeFirst();track(v);if(v instanceof ViewGroup group)for(int i=0;i<group.getChildCount()&&queue.size()<128;i++)queue.add(group.getChildAt(i));}}}
     static boolean end(){generation++;active=false;for(View v:new ArrayList<>(states.keySet()))restore(v);for(var h:hooks)try{h.unhook();}catch(Throwable unavailable){failed=true;}hooks.clear();boolean shapeRestored=QsShapeBackend.end();return !failed&&states.isEmpty()&&shapeRestored;}
     static boolean healthy(){return !failed&&QsShapeBackend.healthy();}
-    static String status(){int clock=0,date=0;for(State s:states.values()){if(s.group==2)clock++;if(s.group==3)date++;}return message+" Lock-screen clock captured: "+clock+"; date captured: "+date+"; requested hide clock: "+style.hide(2)+"; requested hide date: "+style.hide(3)+"."+" Surface captures: "+captured+"; restored: "+restored+"; remaining: "+states.size()+". "+QsShapeBackend.status();}
+    static String status(){int clock=0,date=0;for(State s:states.values()){if(s.group==2)clock++;if(s.group==3)date++;}return message+liveClockStatus()+" Lock-screen clock captured: "+clock+"; date captured: "+date+"; requested hide clock: "+style.hide(2)+"; requested hide date: "+style.hide(3)+"."+" Surface captures: "+captured+"; restored: "+restored+"; remaining: "+states.size()+". "+QsShapeBackend.status();}
 }

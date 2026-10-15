@@ -61,3 +61,12 @@ The backend now validates and targets those exact fields under ClockContentView'
 Home now leads with customization categories. Setup and recovery diagnostics are expandable. The editor has Status bar, Quick Settings and Lock screen sections; category cards open their matching section. Technical status is expandable, and shared Enable/Restore controls explain that all saved areas apply together.
 
 Phone checklist: install/reboot, Enable both lock-screen hides and verify normal lock screen. Check capture counts if still visible. Verify Restore stock, lock-screen settings previews, wake and QS functionality. Review category navigation and expandable setup/recovery/details. Remain draft and unmerged.
+
+
+## 0.1.28 live host correction
+
+Phone diagnostics in 0.1.27: both hide requests true, zero surface captures. Stock KeyguardStatusView.onFinishInflate stores LockScreenClockStyleItem in mClockLayout and invokes addClockView. LockScreenClockStyleItem stores the actual clock in mClock and defaults mScene to 1. ClockContentView was the wrong required ancestor for the live host.
+
+Targeting now requires the actual live KeyguardStatusView → mClockLayout identity → mClock identity, scene 1 and zero dark amount. ClockContentView previews are excluded even if their own scene is normal. Lifecycle observation includes addClockView and updateClockView so replacements are discovered after vendor fields are assigned. Live host count and current/observed style class names appear in technical status. Supported clock types are Default, Artword and Clip; Clip includes its hour, minute and minute-mask text views plus DateView. Other styles are reported by class name and not modified.
+
+Backend tests recreate the live host with field ownership, reject chooser previews, restore/reapply during dark transitions, reject stale clock ownership and test replacement with the Clip clock (including mask). Existing policy/preferences/status-bar checks and full CI remain required. Phone test: install/reboot, Enable hides, lock/unlock and check hiding and Restore stock. If still visible, report technical details with active/observed clock type. Keep draft/unmerged.
