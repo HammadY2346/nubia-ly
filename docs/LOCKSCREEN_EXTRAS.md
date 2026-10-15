@@ -1,4 +1,4 @@
-# Lock-screen widgets, fingerprint graphic and clock fonts — 0.1.33
+# Lock-screen widgets, fingerprint graphic and clock fonts — 0.1.34
 
 Separate controls hide the weather, alarm and battery widgets below the clock. Only the inspected vendor widget classes beneath the live KeyguardStatusView are targeted. Chooser previews are excluded. Visibility restores to the latest vendor value through the common Restore/guard stop flow.
 
@@ -26,7 +26,7 @@ Do not merge until phone validation and explicit user authorization.
 
 The uploaded FingerprintSensorUi_ZTE APK owns the normal Redmagic fingerprint graphic in com.fingerprint.sensorservice.view.FloatWindowSensorView.mSensorView. It draws the idle graphic as an ImageView background; press animations, illumination and sensor windows are separate. The new backend runs inside com.fingerprint.sensorservice, while the existing System UI backend leaves externally owned images untouched.
 
-Scope is the existing manager's System UI-created sensor window while keyguard is showing, power is interactive, doze is false, quick-app mode is false, fingerprint-disabled is false, and the vendor state machine is INITIALIZED. Stock source transitions show that INITIALIZED is the idle visible state; READY is part of AOD press preparation and is excluded. Before the state machine processes a press, any custom background is restored, and customization stays suspended through authentication and success. Only the mSensorView background changes: no image/window visibility, touch listener, hit region, driver, illumination, biometric result or vendor binder command is modified. Latest stock background and padding are retained for restoration; null stock backgrounds never receive an invented replacement.
+Scope is the existing manager's System UI-created sensor window while keyguard is showing, power is interactive, doze is false, quick-app mode is false, fingerprint-disabled is false, and the vendor state machine is INITIALIZED. Stock source transitions show that INITIALIZED is the idle visible state; READY is part of AOD press preparation and is excluded. Before the state machine processes a press, any custom background is restored, and customization stays suspended through authentication and success. Only the mSensorView background changes: no image/window visibility, touch listener, hit region, driver, illumination, biometric result or vendor binder command is modified. Latest stock background and padding are retained for restoration; views with no previously observed idle graphic never receive an invented replacement.
 
 SensorService independently calls a fixed fingerprint-only broker method. The provider checks Binder UID and verified package attribution for com.fingerprint.sensorservice and returns only frozen fingerprint choices, permit identity and a bounded health deadline. SensorService cannot call System UI's broker methods. Independent per-process startup counts retain the restart cutoff without consuming System UI's counter. Explicit Enable resets both counters. Root-guard stop, app emergency stop, broker loss, stale/version-invalid replies and deadline expiry restore stock. A busy broker retains only the existing deadline; late workers cannot reapply after revocation.
 
@@ -46,3 +46,16 @@ Phone checklist:
 6. Check Cursive lower strokes and stable fit with independent lock-screen scale at 100% and offsets zero. Send the diagnostic text if either clock or fingerprint graphics differ from the expected result.
 
 Keep the PR draft and unmerged until phone validation and explicit authorization.
+
+
+## 0.1.34 idle background persistence
+
+The phone shows Rings at the correct sensor location, then reports that it disappears with Hide off. A reproducible code path in 0.1.33 dropped a replacement whenever a vendor background update returned null. This follow-up preserves the selected shape across null background updates for the same view after a real, eligible idle graphic has been observed. It still records the actual null stock value for restoration. This addresses that failure path; the phone's exact disappearance trigger remains to be verified.
+
+The backend now observes setBackgroundDrawable in addition to setBackground and setBackgroundResource. Nested callbacks capture only the outer completed stock update, and a no-op assignment of the module's own drawable cannot become the stock rollback value. Prior-graphic knowledge is weakly held, provides no authority, and is discarded on detach/service teardown. New empty views remain untouched until an eligible vendor graphic is observed. Hide off can return a shape even when the saved stock background is currently null.
+
+Window visibility, view/ancestor alpha, authentication state, AOD and guard decisions remain authoritative. Check fingerprint service now includes the current eligibility reason, effective view-tree alpha, background kind and four recent events. Those events distinguish background clearing, vendor fades, explicit vendor hiding, detach/window removal and suspension for security/guard conditions. They do not record biometric data or change visibility/window state.
+
+Regression coverage reproduces null updates through all three setters, repeated refresh, direct Hide-on/off transitions, no-op custom assignments, exact null rollback, empty-view exclusion and preservation of vendor alpha zero. Existing press/AOD/app-auth/guard restoration tests remain in place.
+
+Install signed 0.1.34 and reboot with both Vector scopes retained. With Hide off, select Rings and Enable. Lock/wake and leave the phone untouched long enough to reproduce the disappearance. If it still occurs, unlock, press Check fingerprint service immediately, and send its full result including Recent. Also check Hide on/off, another shape, Restore stock and a normal fingerprint unlock. Do not merge until phone validation.
