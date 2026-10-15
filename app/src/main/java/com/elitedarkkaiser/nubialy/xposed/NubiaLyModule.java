@@ -13,7 +13,10 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 /** Vector-compatible legacy entry point. App activation, clock discovery and explicit transient previews. */
-public final class NubiaLyModule implements IXposedHookLoadPackage {
+public final class NubiaLyModule implements IXposedHookLoadPackage, de.robv.android.xposed.IXposedHookZygoteInit {
+    private static String modulePath;
+    @Override public void initZygote(StartupParam startup){modulePath=startup.modulePath;}
+    private static void loadFingerprintArtwork(){try{if(modulePath!=null)FingerprintGlyphDrawable.artworkResources(de.robv.android.xposed.XModuleResources.createInstance(modulePath,null));}catch(Throwable unavailable){XposedBridge.log("nubia-ly: fingerprint artwork unavailable; imported icons remain blocked.");}}
     @Override public void handleLoadPackage(XC_LoadPackage.LoadPackageParam param) {
         if ("com.elitedarkkaiser.nubialy".equals(param.packageName)
                 && "com.elitedarkkaiser.nubialy".equals(param.processName)) {
@@ -29,7 +32,7 @@ public final class NubiaLyModule implements IXposedHookLoadPackage {
         if("com.fingerprint.sensorservice".equals(param.packageName)&&param.packageName.equals(param.processName)){
             if(!CompatibilityPolicy.isNx809j(Build.MODEL,Build.DEVICE)||Build.VERSION.SDK_INT!=36)return;
             try{XposedHelpers.findAndHookMethod(Application.class,"attach",Context.class,new XC_MethodHook(){
-                @Override protected void afterHookedMethod(MethodHookParam hook){if(hook.hasThrowable())return;try{Application app=(Application)hook.thisObject;if("com.fingerprint.sensorservice".equals(app.getPackageName()))SensorFingerprintRuntime.install(app);}catch(Throwable unavailable){XposedBridge.log("nubia-ly: fingerprint appearance unavailable; stock retained.");}}
+                @Override protected void afterHookedMethod(MethodHookParam hook){if(hook.hasThrowable())return;try{Application app=(Application)hook.thisObject;if("com.fingerprint.sensorservice".equals(app.getPackageName())){loadFingerprintArtwork();SensorFingerprintRuntime.install(app);}}catch(Throwable unavailable){XposedBridge.log("nubia-ly: fingerprint appearance unavailable; stock retained.");}}
             });}catch(Throwable unavailable){XposedBridge.log("nubia-ly: SensorService attachment unavailable; stock retained.");}return;
         }
         if (!"com.android.systemui".equals(param.packageName) || !"com.android.systemui".equals(param.processName)) return;
@@ -42,6 +45,7 @@ public final class NubiaLyModule implements IXposedHookLoadPackage {
                     try {
                         Application application = (Application) hook.thisObject;
                         if (!"com.android.systemui".equals(application.getPackageName())) return;
+                        loadFingerprintArtwork();
                         ClockCaptureBackend.install(application.getClassLoader());
                         StatusBarBackend.install(application.getClassLoader());
                         SystemUiGuardReceiver.install(application);

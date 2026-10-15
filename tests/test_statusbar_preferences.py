@@ -32,5 +32,6 @@ with tempfile.TemporaryDirectory(prefix='nubialy-status-prefs-') as work:
     for name,content in sources.items():
         p=work/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
     files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/n) for n in ['StatusBarPreferences.java','StatusBarStyle.java','SurfaceStyle.java','LockClockFonts.java','ClockColorPolicy.java','ClockDatePolicy.java','PreviewPolicy.java']]
+    files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintStyles.java'))
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(work/'classes'),*files],check=True)
     subprocess.run(['java','-cp',str(work/'classes'),'com.elitedarkkaiser.nubialy.PreferencesTest'],check=True)

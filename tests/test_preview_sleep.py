@@ -38,5 +38,6 @@ with tempfile.TemporaryDirectory() as folder:
         p=folder/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
     names=['PreviewLifecycle','PreviewPolicy','ClockEnabledPolicy','ClockColorPolicy','ClockStylePolicy','ClockDatePolicy','SystemUiGuardProtocol','GuardBrokerPolicy','StatusBarStyle','SurfaceStyle','LockClockFonts']
     files=[str(p) for p in folder.rglob('*.java')]+[str(root/'app/src/main/java'/pkg/(n+'.java')) for n in names]+[str(root/'app/src/main/java'/pkg/'xposed/PreviewRuntime.java')]
+    files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintStyles.java'))
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(folder/'classes'),*files],check=True)
     subprocess.run(['java','-cp',str(folder/'classes'),'com.elitedarkkaiser.nubialy.xposed.SleepTest'],check=True)

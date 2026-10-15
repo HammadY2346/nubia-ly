@@ -44,7 +44,7 @@ final class SensorFingerprintRuntime {
                 long now=SystemClock.elapsedRealtime();boolean valid=result!=null&&now-started<=2000&&SystemUiGuardProtocol.accepts(nonce,result.getString("nonce"),BuildConfig.VERSION_CODE,result.getInt("version",-1),now-started)&&result.getInt("status",-1)==GuardBrokerPolicy.READABLE&&PreviewPolicy.uuid(result.getString("permit_id"));
                 if(result!=null&&SystemUiGuardProtocol.accepts(nonce,result.getString("nonce"),BuildConfig.VERSION_CODE,result.getInt("version",-1),now-started)&&result.getInt("status",-1)==GuardBrokerPolicy.BUSY){authority="busy; existing deadline retained";SensorFingerprintBackend.refresh();return;}
                 long until=valid?result.getLong("deadline_ms",0):0;int style=valid?result.getInt("fingerprint_style",-1):-1;
-                valid=valid&&until>now&&until-now<=ClockEnabledPolicy.HEALTH_MS&&style>=0&&style<=4;
+                valid=valid&&until>now&&until-now<=ClockEnabledPolicy.HEALTH_MS&&com.elitedarkkaiser.nubialy.FingerprintStyles.valid(style);
                 if(!valid){authority="blocked or stale";revoke();}else if(!SensorFingerprintBackend.apply(style,result.getBoolean("fingerprint_hidden",false),until)){authority="backend unavailable";revoke();}else{authority="readable";
                     if(expiry!=null)main.removeCallbacks(expiry);long epoch=generation;expiry=()->{if(epoch==generation){authority="expired";revoke();}};main.postDelayed(expiry,until-now);
                 }

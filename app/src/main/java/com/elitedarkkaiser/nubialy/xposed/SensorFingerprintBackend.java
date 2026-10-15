@@ -58,7 +58,7 @@ final class SensorFingerprintBackend {
         gate=value.name().equals("INITIALIZED")?"idle":"state "+value.name();return gate.equals("idle");
     }catch(Throwable unavailable){gate="state read unavailable";return false;}}
     static boolean apply(int selection,boolean hide,long until){
-        if(!main()||selection<0||selection>4||until<=SystemClock.elapsedRealtime()||until-SystemClock.elapsedRealtime()>ClockEnabledPolicy.HEALTH_MS)return false;
+        if(!main()||!com.elitedarkkaiser.nubialy.FingerprintStyles.valid(selection)||until<=SystemClock.elapsedRealtime()||until-SystemClock.elapsedRealtime()>ClockEnabledPolicy.HEALTH_MS)return false;
         if(failed||!ready)return false;
         if(active&&style==selection&&hidden==hide){deadline=until;refresh();return !failed;}
         if(!end())return false;style=selection;hidden=hide;deadline=until;captured=restored=0;

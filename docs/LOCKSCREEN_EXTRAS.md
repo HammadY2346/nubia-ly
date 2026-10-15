@@ -59,3 +59,12 @@ Window visibility, view/ancestor alpha, authentication state, AOD and guard deci
 Regression coverage reproduces null updates through all three setters, repeated refresh, direct Hide-on/off transitions, no-op custom assignments, exact null rollback, empty-view exclusion and preservation of vendor alpha zero. Existing press/AOD/app-auth/guard restoration tests remain in place.
 
 Install signed 0.1.34 and reboot with both Vector scopes retained. With Hide off, select Rings and Enable. Lock/wake and leave the phone untouched long enough to reproduce the disappearance. If it still occurs, unlock, press Check fingerprint service immediately, and send its full result including Recent. Also check Hide on/off, another shape, Restore stock and a normal fingerprint unlock. Do not merge until phone validation.
+
+
+## Full-page UDFPS gallery (0.1.35)
+
+Tap **UDFPS icon** in the lock-screen editor to open a separate three-column, scrolling icon picker. A brighter outline marks the current selection; Back keeps the old selection. Selecting a card returns to the editor and saves that draft. Press **Enable customization** to apply it. Stock (ID 0) and the four existing shape IDs remain unchanged; all 184 entries from RisingOS Revived's UdfpsIcons catalog are appended in upstream order. Full-color artwork is not tinted. Credits and the upstream license are available in the gallery menu and shipped in the APK.
+
+Phone validation: choose a monochrome fingerprint, a colored/glowing design, and a character icon; apply each, lock/wake and verify its position matches the stock sensor graphic. Normal fingerprint unlock must work. Test Hide on/off and Restore stock. Face unlock naturally removes the fingerprint graphic when it recognizes the face; preserve that vendor behavior. Back from the picker must not alter the draft; reopening it must outline the selected card. Check scrolling, rotation, and return to the editor.
+
+User confirmed that the earlier disappearance follows natural face-unlock behavior; it is not a reason to override vendor visibility, disabled state, or window removal. No biometric animation pack is installed by this gallery.

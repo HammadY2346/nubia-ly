@@ -17,7 +17,7 @@ sources['com/elitedarkkaiser/nubialy/xposed/RuntimeTest.java']='''package com.el
 import android.os.*;import android.content.*;import java.util.concurrent.*;import java.util.function.*;
 public class RuntimeTest {
 static void check(boolean b){if(!b)throw new AssertionError();}
-static Bundle response(Bundle request,int status){Bundle b=new Bundle();b.putString("nonce",request.getString("nonce"));b.putInt("version",19);b.putInt("status",status);b.putString("permit_id","12345678-1234-4234-8234-123456789abc");b.putLong("deadline_ms",SystemClock.now+10000);b.putInt("fingerprint_style",3);return b;}
+static Bundle response(Bundle request,int status){Bundle b=new Bundle();b.putString("nonce",request.getString("nonce"));b.putInt("version",19);b.putInt("status",status);b.putString("permit_id","12345678-1234-4234-8234-123456789abc");b.putLong("deadline_ms",SystemClock.now+10000);b.putInt("fingerprint_style",188);return b;}
 static Object field(Object o,String n)throws Exception{var f=o.getClass().getDeclaredField(n);f.setAccessible(true);return f.get(o);}
 static void revoke(Object runtime)throws Exception{var m=runtime.getClass().getDeclaredMethod("revoke");m.setAccessible(true);m.invoke(runtime);}
 static CountDownLatch request(Object runtime)throws Exception{var done=new CountDownLatch(1);var m=runtime.getClass().getDeclaredMethod("read",Consumer.class);m.setAccessible(true);m.invoke(runtime,(Consumer<String>)s->done.countDown());return done;}
@@ -26,7 +26,7 @@ public static void main(String[] args)throws Exception{var context=new Context()
 context.answer=b->response(b,2);await(request(runtime));check(SensorFingerprintBackend.applies==1);long deadline=SensorFingerprintBackend.deadline;Object expiry=field(runtime,"expiry");
 context.answer=b->response(b,3);await(request(runtime));check(SensorFingerprintBackend.applies==1&&SensorFingerprintBackend.deadline==deadline&&field(runtime,"expiry")==expiry);
 context.answer=b->response(b,1);int ends=SensorFingerprintBackend.ends;await(request(runtime));check(SensorFingerprintBackend.ends>ends);
-for(int mode=0;mode<5;mode++){final int type=mode;context.answer=b->{Bundle r=response(b,2);if(type==0)r.putString("nonce","bad");if(type==1)r.putInt("version",18);if(type==2)r.putInt("fingerprint_style",5);if(type==3)r.putLong("deadline_ms",SystemClock.now+15001);if(type==4)SystemClock.now+=2001;return r;};int applied=SensorFingerprintBackend.applies;await(request(runtime));check(SensorFingerprintBackend.applies==applied);}
+for(int mode=0;mode<5;mode++){final int type=mode;context.answer=b->{Bundle r=response(b,2);if(type==0)r.putString("nonce","bad");if(type==1)r.putInt("version",18);if(type==2)r.putInt("fingerprint_style",189);if(type==3)r.putLong("deadline_ms",SystemClock.now+15001);if(type==4)SystemClock.now+=2001;return r;};int applied=SensorFingerprintBackend.applies;await(request(runtime));check(SensorFingerprintBackend.applies==applied);}
 context.answer=b->response(b,2);await(request(runtime));check(SensorFingerprintBackend.applies==2);
 CountDownLatch entered=new CountDownLatch(1),release=new CountDownLatch(1);context.answer=b->{entered.countDown();try{release.await();}catch(Exception e){throw new RuntimeException(e);}return response(b,2);};var done=request(runtime);await(entered);ends=SensorFingerprintBackend.ends;((Runnable)field(runtime,"expiry")).run();check(SensorFingerprintBackend.ends>ends);release.countDown();await(done);check(SensorFingerprintBackend.applies==2);
 System.out.println("Sensor runtime passed: fresh authority, busy without renewal, blocked/replayed/version/size/latency rejection, independent expiry and stale-worker fencing");
@@ -38,5 +38,6 @@ with tempfile.TemporaryDirectory(prefix='nubialy-sensor-runtime-') as temp:
         p=temp/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
     names=['GuardBrokerPolicy','SystemUiGuardProtocol','PreviewPolicy','ClockEnabledPolicy']
     files=[str(p) for p in temp.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/(n+'.java')) for n in names]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/SensorFingerprintRuntime.java')]
+    files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintStyles.java'))
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(temp/'classes'),*files],check=True)
     subprocess.run(['java','-cp',str(temp/'classes'),'com.elitedarkkaiser.nubialy.xposed.RuntimeTest'],check=True)

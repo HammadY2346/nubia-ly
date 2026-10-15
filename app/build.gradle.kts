@@ -20,8 +20,8 @@ android {
         targetSdk = 35
         buildConfigField("String", "BASELINE_FINGERPRINT", baselineLiteral("fingerprint"))
         buildConfigField("String", "BASELINE_SYSTEM_UI_SHA256", baselineLiteral("systemUiSha256"))
-        versionCode = 35
-        versionName = "0.1.34-fingerprint-persistence"
+        versionCode = 36
+        versionName = "0.1.35-udfps-gallery"
     }
     signingConfigs {
         if (releaseSigning) create("persistent") {
