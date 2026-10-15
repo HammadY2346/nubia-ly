@@ -1,4 +1,4 @@
-# Lock-screen widgets, fingerprint graphic and clock fonts — 0.1.31
+# Lock-screen widgets, fingerprint graphic and clock fonts — 0.1.32
 
 Separate controls hide the weather, alarm and battery widgets below the clock. Only the inspected vendor widget classes beneath the live KeyguardStatusView are targeted. Chooser previews are excluded. Visibility restores to the latest vendor value through the common Restore/guard stop flow.
 
@@ -12,7 +12,7 @@ Validation: production surface tests cover scoped widget hiding, fonts, latest v
 
 Phone checklist:
 
-1. Install signed 0.1.31 and reboot to reload hooks; retain the existing recovery guard.
+1. Install signed 0.1.32 and reboot to reload hooks; retain the existing recovery guard.
 2. Hide each widget separately, Enable, lock/unlock and verify only that widget disappears. Restore stock and confirm all return.
 3. Hide fingerprint icon, Enable, and test unlock at the same physical sensor location. Restore stock.
 4. Test each fingerprint glyph; verify fingerprint unlock, app biometric prompts and AOD continue using their expected behavior. Enrollment UI should remain stock.
@@ -22,18 +22,14 @@ Phone checklist:
 Do not merge until phone validation and explicit user authorization.
 
 
-## 0.1.31 fixes awaiting phone validation
+## 0.1.32 fixes awaiting phone validation
 
-The fingerprint backend now also reads existing objects from the inspected Feature.sFeatures registry and FloatWindowManager.floatWindowManager singleton. This covers objects whose initialization callbacks ran before hook installation. It reads the existing floating sensor owner and direct keyguard image; it does not call factories, construct windows, or change sensor interaction. Status reports registry feature count and whether the existing floating owner was found.
+Clock fonts fit within the clock's stock content allocation captured before font application. Full font metrics and padding include lower strokes; the selected size never exceeds the latest vendor text size. Later animation bounds do not replace the captured fit area, and refresh always calculates from vendor size rather than the previous fitted result. Widest-digit advances avoid minute-to-minute sizing changes. Parent layout dimensions, widget positions and security state remain untouched. Stock/Restore returns the latest vendor typeface, text size and padding. Technical details report the captured area and fitted pixel size.
 
-Clock font selection preserves the vendor text size and includeFontPadding. It no longer fits text to transient layout bounds, which previously shrank the clock during wake. Custom size/offset controls remain independent: choose 100% and zero offsets to keep stock geometry. Different fonts still have different glyph proportions at the same vendor text size; Cursive clipping and wake appearance need phone confirmation.
+Persistent enabled sessions retain existing bounded health authority over sleep. Sleep does not renew authority: broker validation, identity checks, expiry, explicit stop and independent guard revocation remain active. Temporary rehearsals still stop at screen-off.
 
-Persistent enabled sessions retain their existing bounded health authority over screen sleep rather than restoring all styles and asynchronously applying them after screen-on. Vendor dark/pulsing callbacks still restore AOD targets. Sleep does not renew authority: broker validation, identity checks, expiry, explicit stop and independent guard revocation remain active. Temporary rehearsals still stop at screen-off.
+The stock System UI source also binds a separate com.fingerprint.sensorservice.UdfpsMessageService. The in-process backend now leaves graphics unchanged when that external renderer is connected, and reports that its appearance path is unsupported. Legacy images are restored if external ownership becomes active. There are no SensorService calls or window/sensor-state changes. The separate APK is required to inspect its rendering path before implementing support. This build does not claim to fix external-renderer fingerprint styles.
 
-Regression checks cover discovery without initialization callbacks, source/background restoration, font size/padding preservation even at 1-pixel animation bounds, vendor text-size updates, AOD restoration, and persistent sleep without deadline renewal. The runtime check also exercises expired authority, temporary sessions, surface failure and explicit-stop suppression.
+Regression checks cover legacy/direct image restoration and exclusions, external delegation without graphic writes, restoration when legacy ownership transfers to the external service, fixed-area font fitting across transient bounds, latest vendor updates, AOD restoration, failure rollback, and sleep without authority renewal.
 
-Install signed 0.1.31 and reboot, then:
-
-1. Leave lock-screen clock size at 100% and offsets at zero. Choose Cursive and Enable. Wake several times and compare size/position to Stock. There should be no bounds-driven shrinking or delayed stock-to-custom swap while the session remains healthy.
-2. Select Hide fingerprint, Enable, lock and wake. Unlock using the same sensor position. Restore, then try Hexagon and Enable. If still unchanged, send expanded technical status including the new registry/floating discovery counts.
-3. Check AOD and an app biometric prompt, Restore stock, and the independent guard Action. Confirm stock returns and a stopped style does not restart on wake.
+Install signed 0.1.32 and reboot. Keep fingerprint Stock while external-renderer support is investigated. Set independent lock-screen scale to 100% and offsets to zero, choose Cursive, Enable, and check that lower strokes fit the clock area across wake. Verify Stock/Restore, AOD and guard Action. Report the Font fit dimensions and pixel sizes if clipping remains. Phone validation and explicit merge authorization are still pending.

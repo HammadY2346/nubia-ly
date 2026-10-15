@@ -8,7 +8,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.util.*;
-/** Appearance of the vendor's sensorView background only; never hide its touch view/window. */
+/** Appearance of inspected in-process images only; never change biometric service commands. */
 final class FingerprintBackend {
     private static final String OWNER="com.zte.feature.fingerprintlcd.FloatWindowSensorView",FEATURE="com.zte.feature.fingerprintlcd.FingerprintUnderLcdFeature";
     private static final Map<Object,WeakReference<Object>> owners=new WeakHashMap<>();
@@ -38,7 +38,11 @@ final class FingerprintBackend {
     private static boolean main(){return Looper.myLooper()==Looper.getMainLooper();}
     private static ImageView image(Object owner){Object value=XposedHelpers.getObjectField(owner,owner.getClass().getName().equals(FEATURE)?"mFingerprintIcon":"sensorView");return value instanceof ImageView view?view:null;}
     private static boolean eligible(Object owner){
-        WeakReference<Object> ref=owners.get(owner);Object feature=ref==null?null:ref.get();if(feature==null||Boolean.TRUE.equals(XposedHelpers.callMethod(feature,"isSensorUIAODStatus")))return false;
+        WeakReference<Object> ref=owners.get(owner);Object feature=ref==null?null:ref.get();
+        // Modern firmware delegates drawing to a separate SensorService process.
+        // Its graphics cannot safely be replaced through legacy System UI images.
+        if(feature!=null&&XposedHelpers.getObjectField(feature,"mSensorUIService")!=null)return false;
+        if(feature==null||Boolean.TRUE.equals(XposedHelpers.callMethod(feature,"isSensorUIAODStatus")))return false;
         if(owner.getClass().getName().equals(FEATURE)){
             Object bar=XposedHelpers.getObjectField(feature,"mStatusBar");if(bar==null||!Boolean.TRUE.equals(XposedHelpers.callMethod(bar,"isKeyguardShowing")))return false;
             Object monitor=XposedHelpers.callMethod(feature,"getKeyguardUpdateMonitor");return monitor!=null&&Boolean.TRUE.equals(XposedHelpers.callMethod(monitor,"isDeviceInteractive"));
@@ -54,11 +58,11 @@ final class FingerprintBackend {
     private static void paint(ImageView image,State state){writing=true;try{Drawable selected=hidden?null:state.direct?state.stock:state.custom;background(image,selected);if(state.direct){image.setImageDrawable(hidden?null:style==0?state.stockImage:state.custom);if(image.getDrawable()!=(hidden?null:style==0?state.stockImage:state.custom))throw new IllegalStateException("Fingerprint image apply incomplete");}if(image.getBackground()!=selected)throw new IllegalStateException("Fingerprint background apply incomplete");}finally{writing=false;}}
     // Read existing vendor objects. Never call the manager factory or create a sensor window.
     private static void discover()throws IllegalAccessException{
-        Object existing=registry.get(null);int features=0;
-        if(existing instanceof Map<?,?> values)for(Object feature:new ArrayList<>(values.values()))if(feature!=null&&feature.getClass().getName().equals(FEATURE)){owners.put(feature,new WeakReference<>(feature));features++;}
+        Object existing=registry.get(null);int features=0;boolean external=false;
+        if(existing instanceof Map<?,?> values)for(Object feature:new ArrayList<>(values.values()))if(feature!=null&&feature.getClass().getName().equals(FEATURE)){owners.put(feature,new WeakReference<>(feature));features++;if(XposedHelpers.getObjectField(feature,"mSensorUIService")!=null)external=true;}
         Object manager=managerInstance.get(null);boolean floating=false;
         if(manager!=null){Object feature=managerFeature.get(manager),owner=managerOwner.get(manager);if(feature!=null&&feature.getClass().getName().equals(FEATURE)){owners.put(feature,new WeakReference<>(feature));if(owner!=null&&owner.getClass().getName().equals(OWNER)){owners.put(owner,new WeakReference<>(feature));floating=true;}}}
-        discovery="registry features: "+features+"; floating window found: "+floating;
+        discovery="registry features: "+features+"; floating window found: "+floating+(external?"; external SensorService connected: appearance unsupported, stock graphics left unchanged":"");
     }
     static void refresh(){if(!active||failed||!main())return;try{
         discover();

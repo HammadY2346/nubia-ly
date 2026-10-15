@@ -1,6 +1,7 @@
 package com.elitedarkkaiser.nubialy.xposed;
 import android.os.Looper;
 import android.graphics.Typeface;
+import android.graphics.Paint;
 import android.util.TypedValue;
 import com.elitedarkkaiser.nubialy.LockClockFonts;
 import android.view.*;
@@ -30,7 +31,7 @@ final class SurfaceBackend {
     private record Frame(long generation,State state){}
     private static final class State {
         final WeakReference<ViewGroup> owner;final int group,scale,opacity,position;final boolean hide;
-        float x,y,a,tx,ty,r;int visibility,fontDepth;Typeface fontStock,fontSelected;float textSize;boolean fontPadding;
+        float x,y,a,tx,ty,r;int visibility,fontDepth;Typeface fontStock,fontSelected;float textSize,fontFittedSize;boolean fontPadding;int fontAreaWidth,fontAreaHeight;
         State(View v,Target target){owner=new WeakReference<>(target.owner());group=target.group();int appearance=style.appearance(group);scale=StatusBarStyle.indicatorScale(appearance);opacity=StatusBarStyle.indicatorOpacity(appearance);position=style.position(group);hide=style.hide(group);
             x=v.getScaleX();y=v.getScaleY();a=v.getAlpha();tx=v.getTranslationX();ty=v.getTranslationY();r=v.getRotation();visibility=v.getVisibility();if(group==2&&v instanceof TextView text&&style.clockFont()!=0){fontStock=text.getTypeface();textSize=text.getTextSize();fontPadding=text.getIncludeFontPadding();var face=LockClockFonts.FACES[style.clockFont()];fontSelected=Typeface.create(face.family(),face.style());}}
     }
@@ -165,9 +166,27 @@ final class SurfaceBackend {
         if(s.position!=0){float density=v.getResources().getDisplayMetrics().density;if(!Float.isFinite(density)||density<=0||!Float.isFinite(s.tx)||!Float.isFinite(s.ty)||!Float.isFinite(s.r))throw new IllegalStateException();if(StatusBarStyle.horizontal(s.position)!=0)v.setTranslationX(s.tx+StatusBarStyle.horizontal(s.position)*density);if(StatusBarStyle.vertical(s.position)!=0)v.setTranslationY(s.ty+StatusBarStyle.vertical(s.position)*density);if(StatusBarStyle.rotation(s.position)!=0)v.setRotation(s.r+StatusBarStyle.rotation(s.position));}if(s.hide)v.setVisibility(View.GONE);if(s.fontSelected!=null)fitFont((TextView)v,s);
     }finally{writing=false;}}
     private static void fitFont(TextView view,State state){
+        // Capture the stock layout allocation before changing its font. Do not
+        // chase later animation/layout bounds or compound a previous fitted size.
+        if(state.fontAreaHeight==0&&view.getHeight()>0&&view.getWidth()>0){
+            int h=view.getHeight()-view.getPaddingTop()-view.getPaddingBottom(),w=view.getWidth()-view.getPaddingLeft()-view.getPaddingRight();
+            if(h>0&&w>0){state.fontAreaHeight=h;state.fontAreaWidth=w;}
+        }
+        if(state.fontAreaHeight<=0||state.fontAreaWidth<=0)return;
+        Paint measure=new Paint(view.getPaint());measure.setTypeface(state.fontSelected);measure.setTextSize(state.textSize);
+        Paint.FontMetrics metrics=measure.getFontMetrics();float height=metrics.bottom-metrics.top;
+        // Reserve the widest numeral for every digit, so minute changes cannot
+        // resize the clock. Preserve separators and the vendor's time format.
+        float digitWidth=0;for(int digit=0;digit<10;digit++)digitWidth=Math.max(digitWidth,measure.measureText(Integer.toString(digit)));
+        float width=0;String text=view.getText().toString();for(int i=0;i<text.length();i++){char c=text.charAt(i);width+=Character.isDigit(c)?digitWidth:measure.measureText(String.valueOf(c));}
+        if(!Float.isFinite(height)||height<=0||!Float.isFinite(width))throw new IllegalStateException("Clock font metrics unavailable");
+        float factor=Math.min(1,state.fontAreaHeight/height);if(width>0)factor=Math.min(factor,state.fontAreaWidth/width);
+        float size=state.textSize*factor;state.fontFittedSize=size;if(!Float.isFinite(size)||size<=0)throw new IllegalStateException("Clock font fit unavailable");
         if(!Objects.equals(view.getTypeface(),state.fontSelected))view.setTypeface(state.fontSelected);
-        // A font choice never resizes the vendor clock or changes its padding.
-        // Wake/doze animation bounds are transient and must not be used for fitting.
+        // Full font padding keeps lower strokes inside the fixed allocation.
+        // Only text rendering changes: parent dimensions and transforms stay stock.
+        if(!view.getIncludeFontPadding())view.setIncludeFontPadding(true);
+        if(!near(view.getTextSize(),size))view.setTextSize(TypedValue.COMPLEX_UNIT_PX,size);
     }
     private static boolean near(float a,float b){return Float.isFinite(a)&&Float.isFinite(b)&&Math.abs(a-b)<0.00001f;}
     private static boolean restore(View v){State s=states.get(v);if(s==null)return true;writing=true;try{
@@ -182,5 +201,5 @@ final class SurfaceBackend {
     static void refresh(){FingerprintBackend.refresh();if(!active||failed||!main())return;for(View v:new ArrayList<>(states.keySet()))track(v);for(ViewGroup root:new ArrayList<>(roots.keySet()))if(root.isAttachedToWindow()){QsShapeBackend.track(root);ArrayDeque<View> queue=new ArrayDeque<>();queue.add(root);int count=0;while(!queue.isEmpty()&&count++<128){View v=queue.removeFirst();track(v);if(v instanceof ViewGroup group)for(int i=0;i<group.getChildCount()&&queue.size()<128;i++)queue.add(group.getChildAt(i));}}}
     static boolean end(){generation++;active=false;for(View v:new ArrayList<>(states.keySet()))restore(v);for(var h:hooks)try{h.unhook();}catch(Throwable unavailable){failed=true;}hooks.clear();boolean shapeRestored=QsShapeBackend.end(),fingerprintRestored=FingerprintBackend.end();return !failed&&states.isEmpty()&&shapeRestored&&fingerprintRestored;}
     static boolean healthy(){return !failed&&QsShapeBackend.healthy()&&FingerprintBackend.healthy();}
-    static String status(){int clock=0,date=0,weather=0,alarm=0,battery=0;for(State s:states.values()){if(s.group==2)clock++;if(s.group==3)date++;if(s.group==4)weather++;if(s.group==5)alarm++;if(s.group==6)battery++;}return message+" Widgets captured — weather: "+weather+"; alarm: "+alarm+"; battery: "+battery+"."+liveClockStatus()+" Lock-screen clock captured: "+clock+"; date captured: "+date+"; requested hide clock: "+style.hide(2)+"; requested hide date: "+style.hide(3)+"."+" Surface captures: "+captured+"; restored: "+restored+"; remaining: "+states.size()+". "+QsShapeBackend.status()+" "+FingerprintBackend.status()+" Lock-screen font: "+LockClockFonts.FACES[style.clockFont()].name()+" (text clock views only).";}
+    static String status(){String fit="";int clock=0,date=0,weather=0,alarm=0,battery=0;for(State s:states.values()){if(s.fontSelected!=null)fit=" Font fit: "+s.fontAreaWidth+"x"+s.fontAreaHeight+" px; vendor size: "+s.textSize+" px; fitted size: "+s.fontFittedSize+" px.";if(s.group==2)clock++;if(s.group==3)date++;if(s.group==4)weather++;if(s.group==5)alarm++;if(s.group==6)battery++;}return message+" Widgets captured — weather: "+weather+"; alarm: "+alarm+"; battery: "+battery+"."+liveClockStatus()+" Lock-screen clock captured: "+clock+"; date captured: "+date+"; requested hide clock: "+style.hide(2)+"; requested hide date: "+style.hide(3)+"."+" Surface captures: "+captured+"; restored: "+restored+"; remaining: "+states.size()+". "+QsShapeBackend.status()+" "+FingerprintBackend.status()+" Lock-screen font: "+LockClockFonts.FACES[style.clockFont()].name()+" (text clock views only)."+fit;}
 }
