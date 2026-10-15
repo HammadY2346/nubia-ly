@@ -1,4 +1,4 @@
-# Lock-screen widgets, fingerprint graphic and clock fonts — 0.1.29
+# Lock-screen widgets, fingerprint graphic and clock fonts — 0.1.30
 
 Separate controls hide the weather, alarm and battery widgets below the clock. Only the inspected vendor widget classes beneath the live KeyguardStatusView are targeted. Chooser previews are excluded. Visibility restores to the latest vendor value through the common Restore/guard stop flow.
 
@@ -12,7 +12,7 @@ Validation: production surface tests cover scoped widget hiding, fonts, latest v
 
 Phone checklist:
 
-1. Install signed 0.1.29 and reboot to reload hooks; retain the existing recovery guard.
+1. Install signed 0.1.30 and reboot to reload hooks; retain the existing recovery guard.
 2. Hide each widget separately, Enable, lock/unlock and verify only that widget disappears. Restore stock and confirm all return.
 3. Hide fingerprint icon, Enable, and test unlock at the same physical sensor location. Restore stock.
 4. Test each fingerprint glyph; verify fingerprint unlock, app biometric prompts and AOD continue using their expected behavior. Enrollment UI should remain stock.
@@ -20,3 +20,14 @@ Phone checklist:
 6. Check wake, clock-style changes, existing clock/date hides and both QS groups. Send technical status if a requested element has zero captures.
 
 Do not merge until phone validation and explicit user authorization.
+
+
+## Phone follow-up
+
+0.1.29 phone status showed zero fingerprint captures and visible font clipping with Cursive on LockScreenClockDefault. The static lock-screen image is FingerprintUnderLcdFeature.mFingerprintIcon, populated by tryInflateFingerprintIcon; it is separate from FloatWindowSensorView.sensorView. Stock refreshFillLightLayoutFingerColor updates both its background and image resource.
+
+0.1.30 observes that direct image path, tracks source and background separately, and observes both setImageDrawable and setImageResource. Only the graphic changes; source backgrounds/images are retained through nested updates for restoration. Direct targeting requires keyguard showing and an interactive device, and excludes the vendor AOD flag. The existing floating sensor path remains available. Technical status includes observed owner count.
+
+Font overrides now enable font padding and fit the selected face to the clock's available content height/width using full font metrics and text advance. Font size never grows beyond the latest vendor size, and repeated refresh does not compound shrinking. Vendor text-size and includeFontPadding updates are tracked and restored alongside the typeface. No parent clipping, widgets or sensor hit regions are changed.
+
+Regression tests add direct lock-screen source/background restoration, nested resource updates, interactive/keyguard gates, font-fitting across bound changes, non-compounding refresh and latest size/padding restoration. Phone validation remains required, especially Cursive's lower strokes and fingerprint hiding/replacement while unlocking.

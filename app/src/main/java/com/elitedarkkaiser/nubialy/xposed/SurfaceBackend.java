@@ -1,6 +1,8 @@
 package com.elitedarkkaiser.nubialy.xposed;
 import android.os.Looper;
 import android.graphics.Typeface;
+import android.graphics.Paint;
+import android.util.TypedValue;
 import com.elitedarkkaiser.nubialy.LockClockFonts;
 import android.view.*;
 import android.widget.*;
@@ -29,9 +31,9 @@ final class SurfaceBackend {
     private record Frame(long generation,State state){}
     private static final class State {
         final WeakReference<ViewGroup> owner;final int group,scale,opacity,position;final boolean hide;
-        float x,y,a,tx,ty,r;int visibility,fontDepth;Typeface fontStock,fontSelected;
+        float x,y,a,tx,ty,r;int visibility,fontDepth;Typeface fontStock,fontSelected;float textSize;boolean fontPadding;
         State(View v,Target target){owner=new WeakReference<>(target.owner());group=target.group();int appearance=style.appearance(group);scale=StatusBarStyle.indicatorScale(appearance);opacity=StatusBarStyle.indicatorOpacity(appearance);position=style.position(group);hide=style.hide(group);
-            x=v.getScaleX();y=v.getScaleY();a=v.getAlpha();tx=v.getTranslationX();ty=v.getTranslationY();r=v.getRotation();visibility=v.getVisibility();if(group==2&&v instanceof TextView text&&style.clockFont()!=0){fontStock=text.getTypeface();var face=LockClockFonts.FACES[style.clockFont()];fontSelected=Typeface.create(face.family(),face.style());}}
+            x=v.getScaleX();y=v.getScaleY();a=v.getAlpha();tx=v.getTranslationX();ty=v.getTranslationY();r=v.getRotation();visibility=v.getVisibility();if(group==2&&v instanceof TextView text&&style.clockFont()!=0){fontStock=text.getTypeface();textSize=text.getTextSize();fontPadding=text.getIncludeFontPadding();var face=LockClockFonts.FACES[style.clockFont()];fontSelected=Typeface.create(face.family(),face.style());}}
     }
     static synchronized void install(ClassLoader loader){
         if(attempted)return;attempted=true;List<XC_MethodHook.Unhook> observers=new ArrayList<>();
@@ -143,12 +145,12 @@ final class SurfaceBackend {
         XC_MethodHook callback=new XC_MethodHook(){
             @Override protected void beforeHookedMethod(MethodHookParam p){if(!active||writing)return;State state=states.get(p.thisObject);if(state==null)return;if(!main()){failed=true;return;}if(((Method)p.method).getName().equals("setTypeface"))state.fontDepth++;p.setObjectExtra("nubia-ly:surface",new Frame(generation,state));}
             @Override protected void afterHookedMethod(MethodHookParam p){Object extra=p.getObjectExtra("nubia-ly:surface");if(!(extra instanceof Frame frame)||!active||writing||frame.generation()!=generation||states.get(p.thisObject)!=frame.state())return;View v=(View)p.thisObject;State s=frame.state();
-                try{if(((Method)p.method).getName().equals("setTypeface")&&--s.fontDepth>0)return;if(p.hasThrowable())throw new IllegalStateException();switch(((Method)p.method).getName()){case "setTypeface"->s.fontStock=((TextView)v).getTypeface();case "setScaleX"->s.x=v.getScaleX();case "setScaleY"->s.y=v.getScaleY();case "setAlpha"->s.a=v.getAlpha();case "setTranslationX"->s.tx=v.getTranslationX();case "setTranslationY"->s.ty=v.getTranslationY();case "setRotation"->s.r=v.getRotation();case "setVisibility"->s.visibility=v.getVisibility();}
-                    Target t=target(v);if(t==null||t.owner()!=s.owner.get()||t.group()!=s.group)restore(v);else paint(v,s);
+                try{if(((Method)p.method).getName().equals("setTypeface")&&--s.fontDepth>0)return;if(p.hasThrowable())throw new IllegalStateException();switch(((Method)p.method).getName()){case "setTextSize"->s.textSize=((TextView)v).getTextSize();case "setIncludeFontPadding"->s.fontPadding=((TextView)v).getIncludeFontPadding();case "setTypeface"->s.fontStock=((TextView)v).getTypeface();case "setScaleX"->s.x=v.getScaleX();case "setScaleY"->s.y=v.getScaleY();case "setAlpha"->s.a=v.getAlpha();case "setTranslationX"->s.tx=v.getTranslationX();case "setTranslationY"->s.ty=v.getTranslationY();case "setRotation"->s.r=v.getRotation();case "setVisibility"->s.visibility=v.getVisibility();}
+                    if(s.fontDepth>0)return;Target t=target(v);if(t==null||t.owner()!=s.owner.get()||t.group()!=s.group)restore(v);else paint(v,s);
                 }catch(Throwable unavailable){fail(unavailable);}
             }
         };
-        try{for(String property:new String[]{"setScaleX","setScaleY","setAlpha","setTranslationX","setTranslationY","setRotation"})hooks.add(XposedHelpers.findAndHookMethod(View.class,property,float.class,callback));hooks.add(XposedHelpers.findAndHookMethod(View.class,"setVisibility",int.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setTypeface",Typeface.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setTypeface",Typeface.class,int.class,callback));FingerprintBackend.begin(style.fingerprintStyle(),style.fingerprintHidden()!=0);QsShapeBackend.begin(style.tileShape(),style.largeTileShape());active=true;refresh();if(failed||!QsShapeBackend.healthy()||!FingerprintBackend.healthy())throw new IllegalStateException("Surface apply failed");message="Quick Settings and lock-screen styling active.";}
+        try{for(String property:new String[]{"setScaleX","setScaleY","setAlpha","setTranslationX","setTranslationY","setRotation"})hooks.add(XposedHelpers.findAndHookMethod(View.class,property,float.class,callback));hooks.add(XposedHelpers.findAndHookMethod(View.class,"setVisibility",int.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setTypeface",Typeface.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setTypeface",Typeface.class,int.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setTextSize",int.class,float.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setIncludeFontPadding",boolean.class,callback));FingerprintBackend.begin(style.fingerprintStyle(),style.fingerprintHidden()!=0);QsShapeBackend.begin(style.tileShape(),style.largeTileShape());active=true;refresh();if(failed||!QsShapeBackend.healthy()||!FingerprintBackend.healthy())throw new IllegalStateException("Surface apply failed");message="Quick Settings and lock-screen styling active.";}
         catch(Throwable unavailable){end();throw new IllegalStateException("Surface activation unavailable",unavailable);}
     }
     private static void fail(Throwable failure){failed=true;message="Surface callback failed ("+failure.getClass().getSimpleName()+"); restoration required.";}
@@ -161,8 +163,20 @@ final class SurfaceBackend {
     }
     private static void paint(View v,State s){writing=true;try{
         if(s.scale!=100){v.setScaleX(s.x*s.scale/100f);v.setScaleY(s.y*s.scale/100f);}if(s.opacity!=100)v.setAlpha(s.a*s.opacity/100f);
-        if(s.position!=0){float density=v.getResources().getDisplayMetrics().density;if(!Float.isFinite(density)||density<=0||!Float.isFinite(s.tx)||!Float.isFinite(s.ty)||!Float.isFinite(s.r))throw new IllegalStateException();if(StatusBarStyle.horizontal(s.position)!=0)v.setTranslationX(s.tx+StatusBarStyle.horizontal(s.position)*density);if(StatusBarStyle.vertical(s.position)!=0)v.setTranslationY(s.ty+StatusBarStyle.vertical(s.position)*density);if(StatusBarStyle.rotation(s.position)!=0)v.setRotation(s.r+StatusBarStyle.rotation(s.position));}if(s.hide)v.setVisibility(View.GONE);if(s.fontSelected!=null)((TextView)v).setTypeface(s.fontSelected);
+        if(s.position!=0){float density=v.getResources().getDisplayMetrics().density;if(!Float.isFinite(density)||density<=0||!Float.isFinite(s.tx)||!Float.isFinite(s.ty)||!Float.isFinite(s.r))throw new IllegalStateException();if(StatusBarStyle.horizontal(s.position)!=0)v.setTranslationX(s.tx+StatusBarStyle.horizontal(s.position)*density);if(StatusBarStyle.vertical(s.position)!=0)v.setTranslationY(s.ty+StatusBarStyle.vertical(s.position)*density);if(StatusBarStyle.rotation(s.position)!=0)v.setRotation(s.r+StatusBarStyle.rotation(s.position));}if(s.hide)v.setVisibility(View.GONE);if(s.fontSelected!=null)fitFont((TextView)v,s);
     }finally{writing=false;}}
+    private static void fitFont(TextView view,State state){
+        if(!Objects.equals(view.getTypeface(),state.fontSelected))view.setTypeface(state.fontSelected);
+        if(!view.getIncludeFontPadding())view.setIncludeFontPadding(true);
+        Paint measure=new Paint(view.getPaint());measure.setTextSize(state.textSize);
+        Paint.FontMetrics metrics=measure.getFontMetrics();float height=metrics.bottom-metrics.top;
+        float width=measure.measureText(view.getText().toString());
+        int availableHeight=view.getHeight()-view.getPaddingTop()-view.getPaddingBottom();
+        int availableWidth=view.getWidth()-view.getPaddingLeft()-view.getPaddingRight();
+        float factor=1;if(availableHeight>0&&height>0)factor=Math.min(factor,availableHeight/height);if(availableWidth>0&&width>0)factor=Math.min(factor,availableWidth/width);
+        float size=state.textSize*factor;if(!Float.isFinite(size)||size<=0)throw new IllegalStateException("Clock font bounds unavailable");
+        if(!near(view.getTextSize(),size))view.setTextSize(TypedValue.COMPLEX_UNIT_PX,size);
+    }
     private static boolean near(float a,float b){return Float.isFinite(a)&&Float.isFinite(b)&&Math.abs(a-b)<0.00001f;}
     private static boolean restore(View v){State s=states.get(v);if(s==null)return true;writing=true;try{
         if(s.scale!=100){v.setScaleX(s.x);v.setScaleY(s.y);if(!near(v.getScaleX(),s.x)||!near(v.getScaleY(),s.y))throw new IllegalStateException();}
@@ -170,7 +184,7 @@ final class SurfaceBackend {
         if(StatusBarStyle.horizontal(s.position)!=0){v.setTranslationX(s.tx);if(!near(v.getTranslationX(),s.tx))throw new IllegalStateException();}
         if(StatusBarStyle.vertical(s.position)!=0){v.setTranslationY(s.ty);if(!near(v.getTranslationY(),s.ty))throw new IllegalStateException();}
         if(StatusBarStyle.rotation(s.position)!=0){v.setRotation(s.r);if(!near(v.getRotation(),s.r))throw new IllegalStateException();}
-        if(s.fontSelected!=null){((TextView)v).setTypeface(s.fontStock);if(!Objects.equals(((TextView)v).getTypeface(),s.fontStock))throw new IllegalStateException();}
+        if(s.fontSelected!=null){((TextView)v).setTypeface(s.fontStock);((TextView)v).setTextSize(TypedValue.COMPLEX_UNIT_PX,s.textSize);((TextView)v).setIncludeFontPadding(s.fontPadding);if(!near(((TextView)v).getTextSize(),s.textSize)||((TextView)v).getIncludeFontPadding()!=s.fontPadding||!Objects.equals(((TextView)v).getTypeface(),s.fontStock))throw new IllegalStateException();}
         if(s.hide){v.setVisibility(s.visibility);if(v.getVisibility()!=s.visibility)throw new IllegalStateException();}states.remove(v);restored++;return true;
     }catch(Throwable unavailable){failed=true;message="Surface restoration incomplete. Disable nubia-ly in Vector and reboot.";return false;}finally{writing=false;}}
     static void refresh(){FingerprintBackend.refresh();if(!active||failed||!main())return;for(View v:new ArrayList<>(states.keySet()))track(v);for(ViewGroup root:new ArrayList<>(roots.keySet()))if(root.isAttachedToWindow()){QsShapeBackend.track(root);ArrayDeque<View> queue=new ArrayDeque<>();queue.add(root);int count=0;while(!queue.isEmpty()&&count++<128){View v=queue.removeFirst();track(v);if(v instanceof ViewGroup group)for(int i=0;i<group.getChildCount()&&queue.size()<128;i++)queue.add(group.getChildAt(i));}}}
