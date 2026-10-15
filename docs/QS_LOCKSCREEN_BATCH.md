@@ -1,4 +1,4 @@
-# Quick Settings and lock-screen style batch — 0.1.24
+# Quick Settings and lock-screen style batch — 0.1.25
 
 NX809J only. Install the signed update over the current app, then reboot so Vector loads the new observers. Existing guard needs no update. The runtime stays in System UI; it does not modify lock-screen authentication or stock APKs.
 
@@ -36,3 +36,6 @@ No timed session is required. Report the failing surface and displayed diagnosti
 ## Automated scope
 
 Production backends are exercised together for four text targets, unrelated-view exclusion, latest stock property tracking, non-compounding refresh, late attachments/root detach, pulsing/dark suspension, common restoration and apply/restore failure fences. Shape checks cover all three overrides, retained drawable/color identity, stock corner updates, replacement-background restoration and shape failure fences. Private preferences test frozen surface snapshots and malformed-selection fallback. Existing clock/status-bar/inventory/root/recovery suites remain in CI.
+
+
+The initial 0.1.24 phone attempt was blocked before any view/shape captures by the surface signature check. Inspection confirmed stock QSTileViewImpl publishes covariant View bridge and TextView getter descriptors with identical names/parameters. Version 0.1.25 checks the explicit TextView descriptor instead of Android's ambiguous name-only lookup and reports the exact signature stage if another check fails. The harness now generates both bridge/getter variants and also rejects a View-only getter. Phone retesting is pending.

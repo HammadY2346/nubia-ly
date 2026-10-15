@@ -26,16 +26,28 @@ final class SurfaceBackend {
     }
     static synchronized void install(ClassLoader loader){
         if(attempted)return;attempted=true;List<XC_MethodHook.Unhook> observers=new ArrayList<>();
+        String stage="class lookup";
         try{
             Class<?> wide=XposedHelpers.findClass(WIDE,loader),circle=XposedHelpers.findClass(CIRCLE,loader),lock=XposedHelpers.findClass(LOCK,loader);
+            stage="circle background getter";
             if(circle.getMethod("getColorBackgroundDrawable").getReturnType()!=android.graphics.drawable.GradientDrawable.class)throw new IllegalStateException("Circle background signature");
-            for(Class<?> tile:new Class<?>[]{wide,circle})if(!tile.getSuperclass().getName().equals("com.zte.qs.tileimpl.QSTileViewBase")||tile.getMethod("getLabel").getReturnType()!=TextView.class||tile.getMethod("getSecondaryLabel").getReturnType()!=TextView.class)throw new IllegalStateException("Tile signatures");
+            stage="tile label descriptors";
+            for(Class<?> tile:new Class<?>[]{wide,circle})if(!tile.getSuperclass().getName().equals("com.zte.qs.tileimpl.QSTileViewBase")||!hasTextGetter(tile,"getLabel")||!hasTextGetter(tile,"getSecondaryLabel"))throw new IllegalStateException("Tile signatures");
+            stage="keyguard fields";
             if(lock.getSuperclass()!=GridLayout.class||lock.getDeclaredField("mClockView").getType()!=TextClock.class||!TextView.class.isAssignableFrom(lock.getDeclaredField("mDateView").getType())||lock.getDeclaredField("mDarkAmount").getType()!=float.class||lock.getDeclaredField("mPulsing").getType()!=boolean.class)throw new IllegalStateException("Keyguard signatures");
+            stage="view lifecycle hooks";
             observers.add(XposedBridge.hookMethod(View.class.getDeclaredMethod("onAttachedToWindow"),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(ready&&!p.hasThrowable()&&main()){try{target((View)p.thisObject);if(active)track((View)p.thisObject);}catch(Throwable unavailable){if(active)fail(unavailable);}}}}));
             observers.add(XposedBridge.hookMethod(View.class.getDeclaredMethod("onDetachedFromWindow"),new XC_MethodHook(){@Override protected void beforeHookedMethod(MethodHookParam p){if(!active||!main())return;View view=(View)p.thisObject;restore(view);if(view instanceof ViewGroup root){QsShapeBackend.release(root);for(View v:new ArrayList<>(states.keySet()))if(states.get(v).owner.get()==root)restore(v);roots.remove(root);}}}));
+            stage="keyguard pulsing hook";
             observers.add(XposedBridge.hookMethod(lock.getDeclaredMethod("setPulsing",boolean.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(active&&main())refresh();}}));
             ready=true;message="Surface observers ready.";
-        }catch(Throwable unavailable){for(var h:observers)try{h.unhook();}catch(Throwable ignored){}message="Surface source unavailable ("+unavailable.getClass().getSimpleName()+").";}
+        }catch(Throwable unavailable){for(var h:observers)try{h.unhook();}catch(Throwable ignored){}message="Surface source unavailable at "+stage+" ("+unavailable.getClass().getSimpleName()+").";}
+    }
+    private static boolean hasTextGetter(Class<?> owner,String name){
+        // NX809J publishes both View bridge and TextView getter descriptors. Android's
+        // name-only getMethod lookup may return the bridge; require the actual descriptor.
+        for(Method method:owner.getMethods())if(method.getName().equals(name)&&method.getParameterCount()==0&&method.getReturnType()==TextView.class)return true;
+        return false;
     }
     private static boolean main(){return Looper.myLooper()==Looper.getMainLooper();}
     private static Target target(View view){

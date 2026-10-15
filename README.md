@@ -198,6 +198,6 @@ A dedicated Hide cooling pump icon switch and nine independent controls adjust h
 Individual fan, pump and refresh-rate hide options are grouped under Load individual system status icons, alongside the live alarm and other icon entries. A collapsed Fan, pump & refresh-rate appearance section contains six independent size/opacity controls. Existing pump hiding survives the move. All three vendor views are identified from the uploaded NX809J stock System UI and stay scoped to PhoneStatusBarView; no cooling settings, hardware controls or display-rate settings are written. See [combined checklist](docs/VENDOR_INDICATOR_BATCH.md). Phone results are pending.
 
 
-### Quick Settings and lock-screen style batch — 0.1.24
+### Quick Settings and lock-screen style batch — 0.1.25
 
 Quick Settings circle tiles now offer Stock, Square, Rounded square and Leaf shapes by changing only the inspected gradient's shape/corners. Wide top tiles retain stock shape and colors, tile state/actions and layout remain stock. Main/secondary tile labels and normal Nubia lock-screen clock/date each gain visual size, opacity, horizontal/vertical offset, rotation and hiding. The Quick Settings and Lock screen cards open the grouped appearance editor. These selections share the existing frozen identity-bound Enable/Restore flow. AOD/pulsing suspends lock-screen changes. See [combined checklist](docs/QS_LOCKSCREEN_BATCH.md). Phone testing is pending.
