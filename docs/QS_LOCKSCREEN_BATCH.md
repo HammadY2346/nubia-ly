@@ -39,3 +39,14 @@ Production backends are exercised together for four text targets, unrelated-view
 
 
 The initial 0.1.24 phone attempt was blocked before any view/shape captures by the surface signature check. Inspection confirmed stock QSTileViewImpl publishes covariant View bridge and TextView getter descriptors with identical names/parameters. Version 0.1.25 checks the explicit TextView descriptor instead of Android's ambiguous name-only lookup and reports the exact signature stage if another check fails. The harness now generates both bridge/getter variants and also rejects a View-only getter. Phone retesting is pending.
+
+
+## 0.1.26 phone follow-up
+
+The editor now names independent shape groups **Large QS tiles** (four wide top tiles) and **Small QS tiles** (below brightness). Existing small-tile selections migrate unchanged; the new large-tile group defaults to Stock. Both retain the original gradient, colors and actions.
+
+Lock-screen discovery observes the container lifecycle (inflation, attachment, layout and dark/pulsing updates), including vendor overrides that bypass the base View attachment hook. Status lists clock/date captures separately from requested hiding. AOD/pulsing suspension remains in place. This addresses a reproduced discovery gap; the exact phone failure remains unconfirmed until retesting.
+
+Install 0.1.26 and reboot to reload hooks. Enable both hide options and verify clock/date disappear on the normal lock screen; check the separate capture counts if they remain visible. Test independent large/small shapes and active/inactive tile states. Verify AOD, unlock, wake and Restore stock. Keep this PR draft until phone results and explicit merge authorization.
+
+Local validation: all policy, production backend, preferences, inventory, recovery/root and guard shell suites pass. Added independent large/small geometry and migration coverage, plus a vendor attachment regression that bypasses the base View callback. Android compilation runs in CI.

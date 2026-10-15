@@ -36,7 +36,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private int spacing, fontFamily;
     private int statusMask, systemScale, notificationScale, batteryScale,systemOpacity,notificationOpacity,batteryOpacity,iconColor,dateMode,systemTransform,notificationTransform,batteryTransform,fanAppearance,pumpAppearance,refreshAppearance;
     private final int[] surfaceAppearance=new int[4],surfacePosition=new int[4];
-    private int surfaceHidden,tileShape;
+    private int surfaceHidden,tileShape,largeTileShape;
     private final java.util.Set<String> hiddenSlots=new java.util.TreeSet<>();
     private LinearLayout iconSlots;
     private ChipGroup iconPresets;
@@ -56,7 +56,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         selected = ClockColorPreferences.read(this);
         sizePercent = ClockColorPreferences.size(this); bold = ClockColorPreferences.bold(this); seconds = ClockColorPreferences.seconds(this); italic = ClockColorPreferences.italic(this); spacing = ClockColorPreferences.spacing(this); fontFamily = ClockColorPreferences.family(this); hidden = ClockColorPreferences.hidden(this);
         StatusBarStyle bar = StatusBarPreferences.read(this); statusMask = bar.mask(); systemScale = bar.systemScale(); notificationScale = bar.notificationScale(); batteryScale = bar.batteryScale();systemOpacity=bar.systemOpacity();notificationOpacity=bar.notificationOpacity();batteryOpacity=bar.batteryOpacity();systemTransform=bar.systemTransform();notificationTransform=bar.notificationTransform();batteryTransform=bar.batteryTransform();fanAppearance=bar.fanAppearance();pumpAppearance=bar.pumpAppearance();refreshAppearance=bar.refreshAppearance();hiddenSlots.addAll(bar.hiddenSlots());iconColor=StatusBarPreferences.color(this);dateMode=StatusBarPreferences.date(this);
-        tileShape=bar.surfaces().tileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
+        tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
         if (state != null && ClockColorPolicy.valid(state.getInt("selection", 0))) selected = state.getInt("selection");
         client = new SystemUiGuardClient(this);
         ScrollView scroll = new ScrollView(this);
@@ -113,9 +113,9 @@ public final class ClockEditorActivity extends AppCompatActivity {
         icons.addView(text("100% uses stock size. These controls apply to recognized top-status-bar views; other icons may keep their stock appearance. Press Enable to apply the entire saved style.",14,false));
         LinearLayout surfaces=card("Quick Settings & lock screen");
         surfaces.addView(text("Style the inspected tile labels and normal Nubia lock-screen clock/date. Visual size scales the text view relative to stock; it does not change tile layout or time format. Hidden labels do not disable tiles. AOD/pulsing uses stock. Changes apply together using Enable below.",14,false));
-        surfaces.addView(text("Quick Settings circle tile shape",16,true));ChipGroup shapes=new ChipGroup(this);shapes.setSingleSelection(true);surfaces.addView(shapes);
-        String[] shapeNames={"Stock","Square","Rounded square","Leaf"};for(int i=0;i<shapeNames.length;i++){final int value=i;Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(shapeNames[i]);chip.setCheckable(true);chip.setChecked(tileShape==i);chip.setTag(i);shapes.addView(chip);statusControls.add(chip);chip.setOnClickListener(v->{tileShape=value;for(int n=0;n<shapes.getChildCount();n++){Chip c=(Chip)shapes.getChildAt(n);c.setChecked((Integer)c.getTag()==value);}saveStatusBar();});}
-        surfaces.addView(text("Shapes apply to the smaller circle tiles. Wide top tiles keep their stock shape. Colors and tile actions remain stock. Press Enable to apply.",14,false));
+        shapeControls(surfaces,"Large QS tiles",true);
+        shapeControls(surfaces,"Small QS tiles",false);
+        surfaces.addView(text("Large QS tiles are the four wide tiles at the top. Small QS tiles are the tiles below brightness. Each group has its own shape. Press Enable to apply.",14,false));
         surfaceControls(surfaces,"Quick Settings main labels",0);surfaceControls(surfaces,"Quick Settings secondary labels",1);
         surfaceControls(surfaces,"Lock-screen clock",2);surfaceControls(surfaces,"Lock-screen date",3);
         if(getIntent().getBooleanExtra("surfaces",false))surfaces.post(()->scroll.smoothScrollTo(0,((View)surfaces.getParent()).getTop()));
@@ -378,7 +378,11 @@ public final class ClockEditorActivity extends AppCompatActivity {
         statusOpacity(box,title+" icon opacity",StatusBarStyle.indicatorOpacity(value),n->saveIndicator(category,StatusBarStyle.indicatorScale(indicatorSelection(category)),n));
     }
 
-    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape);}
+    private void shapeControls(LinearLayout parent,String title,boolean large){
+        parent.addView(text(title,16,true));ChipGroup shapes=new ChipGroup(this);shapes.setSingleSelection(true);parent.addView(shapes);
+        String[] names={"Stock","Square","Rounded square","Leaf"};for(int i=0;i<names.length;i++){final int value=i;Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(names[i]);chip.setCheckable(true);chip.setChecked((large?largeTileShape:tileShape)==i);chip.setTag(i);shapes.addView(chip);statusControls.add(chip);chip.setOnClickListener(v->{if(large)largeTileShape=value;else tileShape=value;for(int n=0;n<shapes.getChildCount();n++){Chip c=(Chip)shapes.getChildAt(n);c.setChecked((Integer)c.getTag()==value);}saveStatusBar();});}
+    }
+    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape);}
     private void surfaceControls(LinearLayout parent,String title,int group){
         MaterialButton open=button(title+" appearance");parent.addView(open);statusControls.add(open);
         LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setVisibility(View.GONE);parent.addView(box);

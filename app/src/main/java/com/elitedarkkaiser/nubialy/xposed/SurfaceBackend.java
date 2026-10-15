@@ -30,7 +30,7 @@ final class SurfaceBackend {
         try{
             Class<?> wide=XposedHelpers.findClass(WIDE,loader),circle=XposedHelpers.findClass(CIRCLE,loader),lock=XposedHelpers.findClass(LOCK,loader);
             stage="circle background getter";
-            if(circle.getMethod("getColorBackgroundDrawable").getReturnType()!=android.graphics.drawable.GradientDrawable.class)throw new IllegalStateException("Circle background signature");
+            if(circle.getMethod("getColorBackgroundDrawable").getReturnType()!=android.graphics.drawable.GradientDrawable.class||wide.getMethod("getColorBackgroundDrawable").getReturnType()!=android.graphics.drawable.GradientDrawable.class)throw new IllegalStateException("Circle background signature");
             stage="tile label descriptors";
             for(Class<?> tile:new Class<?>[]{wide,circle})if(!tile.getSuperclass().getName().equals("com.zte.qs.tileimpl.QSTileViewBase")||!hasTextGetter(tile,"getLabel")||!hasTextGetter(tile,"getSecondaryLabel"))throw new IllegalStateException("Tile signatures");
             stage="keyguard fields";
@@ -40,6 +40,14 @@ final class SurfaceBackend {
             observers.add(XposedBridge.hookMethod(View.class.getDeclaredMethod("onDetachedFromWindow"),new XC_MethodHook(){@Override protected void beforeHookedMethod(MethodHookParam p){if(!active||!main())return;View view=(View)p.thisObject;restore(view);if(view instanceof ViewGroup root){QsShapeBackend.release(root);for(View v:new ArrayList<>(states.keySet()))if(states.get(v).owner.get()==root)restore(v);roots.remove(root);}}}));
             stage="keyguard pulsing hook";
             observers.add(XposedBridge.hookMethod(lock.getDeclaredMethod("setPulsing",boolean.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(active&&main())refresh();}}));
+            // Observe the actual lifecycle implementations as vendor overrides need not
+            // dispatch through View.onAttachedToWindow. Inflation also precedes attachment.
+            XC_MethodHook discover=new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(!p.hasThrowable()&&main()&&p.thisObject instanceof ViewGroup root&&(root.getClass().getName().equals(WIDE)||root.getClass().getName().equals(CIRCLE)||root.getClass().getName().equals(LOCK))){roots.put(root,true);if(active)refresh();}}};
+            for(Class<?> owner:new Class<?>[]{wide,circle,lock})for(String name:new String[]{"onFinishInflate","onAttachedToWindow","onLayout","setDarkAmount","setPulsing"}){
+                for(Class<?> type=owner;type!=null;type=type.getSuperclass()){
+                    boolean found=false;for(Method method:type.getDeclaredMethods())if(method.getName().equals(name)){observers.add(XposedBridge.hookMethod(method,discover));found=true;}if(found)break;
+                }
+            }
             ready=true;message="Surface observers ready.";
         }catch(Throwable unavailable){for(var h:observers)try{h.unhook();}catch(Throwable ignored){}message="Surface source unavailable at "+stage+" ("+unavailable.getClass().getSimpleName()+").";}
     }
@@ -79,7 +87,7 @@ final class SurfaceBackend {
                 }catch(Throwable unavailable){fail(unavailable);}
             }
         };
-        try{for(String property:new String[]{"setScaleX","setScaleY","setAlpha","setTranslationX","setTranslationY","setRotation"})hooks.add(XposedHelpers.findAndHookMethod(View.class,property,float.class,callback));hooks.add(XposedHelpers.findAndHookMethod(View.class,"setVisibility",int.class,callback));QsShapeBackend.begin(style.tileShape());active=true;refresh();if(failed||!QsShapeBackend.healthy())throw new IllegalStateException("Surface apply failed");message="Quick Settings and lock-screen styling active.";}
+        try{for(String property:new String[]{"setScaleX","setScaleY","setAlpha","setTranslationX","setTranslationY","setRotation"})hooks.add(XposedHelpers.findAndHookMethod(View.class,property,float.class,callback));hooks.add(XposedHelpers.findAndHookMethod(View.class,"setVisibility",int.class,callback));QsShapeBackend.begin(style.tileShape(),style.largeTileShape());active=true;refresh();if(failed||!QsShapeBackend.healthy())throw new IllegalStateException("Surface apply failed");message="Quick Settings and lock-screen styling active.";}
         catch(Throwable unavailable){end();throw new IllegalStateException("Surface activation unavailable",unavailable);}
     }
     private static void fail(Throwable failure){failed=true;message="Surface callback failed ("+failure.getClass().getSimpleName()+"); restoration required.";}
@@ -106,5 +114,5 @@ final class SurfaceBackend {
     static void refresh(){if(!active||failed||!main())return;for(View v:new ArrayList<>(states.keySet()))track(v);for(ViewGroup root:new ArrayList<>(roots.keySet()))if(root.isAttachedToWindow()){QsShapeBackend.track(root);ArrayDeque<View> queue=new ArrayDeque<>();queue.add(root);int count=0;while(!queue.isEmpty()&&count++<128){View v=queue.removeFirst();track(v);if(v instanceof ViewGroup group)for(int i=0;i<group.getChildCount()&&queue.size()<128;i++)queue.add(group.getChildAt(i));}}}
     static boolean end(){generation++;active=false;for(View v:new ArrayList<>(states.keySet()))restore(v);for(var h:hooks)try{h.unhook();}catch(Throwable unavailable){failed=true;}hooks.clear();boolean shapeRestored=QsShapeBackend.end();return !failed&&states.isEmpty()&&shapeRestored;}
     static boolean healthy(){return !failed&&QsShapeBackend.healthy();}
-    static String status(){return message+" Surface captures: "+captured+"; restored: "+restored+"; remaining: "+states.size()+". "+QsShapeBackend.status();}
+    static String status(){int clock=0,date=0;for(State s:states.values()){if(s.group==2)clock++;if(s.group==3)date++;}return message+" Lock-screen clock captured: "+clock+"; date captured: "+date+"; requested hide clock: "+style.hide(2)+"; requested hide date: "+style.hide(3)+"."+" Surface captures: "+captured+"; restored: "+restored+"; remaining: "+states.size()+". "+QsShapeBackend.status();}
 }
