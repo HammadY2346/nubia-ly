@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import de.robv.android.xposed.*;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.*;
 /** Appearance of the vendor's sensorView background only; never hide its touch view/window. */
 final class FingerprintBackend {
@@ -13,6 +14,9 @@ final class FingerprintBackend {
     private static final Map<Object,WeakReference<Object>> owners=new WeakHashMap<>();
     private static final Map<ImageView,State> states=new WeakHashMap<>();
     private static final List<XC_MethodHook.Unhook> hooks=new ArrayList<>();
+    private static Field registry,managerInstance,managerFeature,managerOwner;
+    private static String discovery="not checked";
+    private static Field field(Class<?> type,String name)throws ReflectiveOperationException{Field f=type.getDeclaredField(name);f.setAccessible(true);return f;}
     private static boolean attempted,ready,active,writing,failed;private static int style,captured,restored;private static boolean hidden;private static long generation;
     private static final class State {final WeakReference<Object> owner;final boolean direct;Drawable stock,stockImage,custom;int updateDepth;State(Object owner,ImageView image){this.owner=new WeakReference<>(owner);direct=owner.getClass().getName().equals(FEATURE);stock=image.getBackground();stockImage=image.getDrawable();}}
     private record Frame(long generation,State state){}
@@ -20,6 +24,9 @@ final class FingerprintBackend {
         Class<?> owner=XposedHelpers.findClass(OWNER,loader),feature=XposedHelpers.findClass(FEATURE,loader);
         if(owner.getSuperclass()!=View.class||owner.getDeclaredField("sensorView").getType()!=ImageView.class||owner.getDeclaredField("enrollState").getType()!=boolean.class||feature.getDeclaredMethod("isSensorUIKeyguard").getReturnType()!=boolean.class||feature.getDeclaredMethod("isSensorUIAODStatus").getReturnType()!=boolean.class||feature.getDeclaredMethod("getKeyguardColor").getReturnType()!=int.class)throw new IllegalStateException();
         if(feature.getDeclaredField("mFingerprintIcon").getType()!=ImageView.class)throw new IllegalStateException("Lock-screen fingerprint image signature");
+        Class<?> base=XposedHelpers.findClass("com.zte.base.Feature",loader),manager=XposedHelpers.findClass("com.zte.feature.fingerprintlcd.FloatWindowManager",loader);
+        registry=field(base,"sFeatures");managerInstance=field(manager,"floatWindowManager");managerFeature=field(manager,"mFingerprintUnderLcdFeature");managerOwner=field(manager,"floatWindowAuthenticateSensorView");
+        if(!Map.class.isAssignableFrom(registry.getType())||managerInstance.getType()!=manager||managerFeature.getType()!=feature||managerOwner.getType()!=owner)throw new IllegalStateException("Fingerprint registry signature");
         XC_MethodHook directObserver=new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(p.hasThrowable()||!main())return;owners.put(p.thisObject,new WeakReference<>(p.thisObject));if(active)refresh();}};
         for(Method method:feature.getDeclaredMethods())if(Set.of("tryInflateFingerprintIcon","handleShowFingerprintIcon","refreshFillLightLayoutFingerColor","setFingerprintIconVisibility").contains(method.getName()))pending.add(XposedBridge.hookMethod(method,directObserver));
         XC_MethodHook observer=new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(p.hasThrowable()||!main())return;try{View root=(View)p.thisObject;for(Object arg:p.args)if(arg!=null&&arg.getClass().getName().equals(FEATURE))owners.put(root,new WeakReference<>(arg));if(active)refresh();}catch(Throwable failure){if(active)failed=true;}}};
@@ -45,12 +52,21 @@ final class FingerprintBackend {
         try{hooks.add(XposedHelpers.findAndHookMethod(View.class,"setBackground",Drawable.class,background));hooks.add(XposedHelpers.findAndHookMethod(ImageView.class,"setImageDrawable",Drawable.class,background));hooks.add(XposedHelpers.findAndHookMethod(ImageView.class,"setImageResource",int.class,background));active=true;refresh();if(failed)throw new IllegalStateException();}catch(Throwable failure){end();throw new IllegalStateException("Fingerprint appearance unavailable",failure);}}
     private static void background(ImageView image,Drawable value){int l=image.getPaddingLeft(),t=image.getPaddingTop(),r=image.getPaddingRight(),b=image.getPaddingBottom();image.setBackground(value);image.setPadding(l,t,r,b);}
     private static void paint(ImageView image,State state){writing=true;try{Drawable selected=hidden?null:state.direct?state.stock:state.custom;background(image,selected);if(state.direct){image.setImageDrawable(hidden?null:style==0?state.stockImage:state.custom);if(image.getDrawable()!=(hidden?null:style==0?state.stockImage:state.custom))throw new IllegalStateException("Fingerprint image apply incomplete");}if(image.getBackground()!=selected)throw new IllegalStateException("Fingerprint background apply incomplete");}finally{writing=false;}}
+    // Read existing vendor objects. Never call the manager factory or create a sensor window.
+    private static void discover()throws IllegalAccessException{
+        Object existing=registry.get(null);int features=0;
+        if(existing instanceof Map<?,?> values)for(Object feature:new ArrayList<>(values.values()))if(feature!=null&&feature.getClass().getName().equals(FEATURE)){owners.put(feature,new WeakReference<>(feature));features++;}
+        Object manager=managerInstance.get(null);boolean floating=false;
+        if(manager!=null){Object feature=managerFeature.get(manager),owner=managerOwner.get(manager);if(feature!=null&&feature.getClass().getName().equals(FEATURE)){owners.put(feature,new WeakReference<>(feature));if(owner!=null&&owner.getClass().getName().equals(OWNER)){owners.put(owner,new WeakReference<>(feature));floating=true;}}}
+        discovery="registry features: "+features+"; floating window found: "+floating;
+    }
     static void refresh(){if(!active||failed||!main())return;try{
+        discover();
         for(ImageView image:new ArrayList<>(states.keySet())){Object owner=states.get(image).owner.get();if(owner==null||!image.isAttachedToWindow()||!eligible(owner)||image(owner)!=image)restore(image);}
         for(Object owner:new ArrayList<>(owners.keySet())){ImageView image=image(owner);if(image==null||!image.isAttachedToWindow()||!eligible(owner))continue;State state=states.get(image);if(state!=null&&state.owner.get()!=owner)throw new IllegalStateException("Shared sensor image");if(state==null){state=new State(owner,image);states.put(image,state);captured++;}Object feature=owners.get(owner).get();int color=((Number)XposedHelpers.callMethod(feature,"getKeyguardColor")).intValue();state.custom=style==0?state.stock:new FingerprintGlyphDrawable(style,color);paint(image,state);}
     }catch(Throwable failure){failed=true;}}
     private static boolean restore(ImageView image){State state=states.get(image);if(state==null)return true;writing=true;try{background(image,state.stock);if(state.direct)image.setImageDrawable(state.stockImage);if(image.getBackground()!=state.stock||(state.direct&&image.getDrawable()!=state.stockImage))throw new IllegalStateException();states.remove(image);restored++;return true;}catch(Throwable failure){failed=true;return false;}finally{writing=false;}}
     static boolean end(){generation++;active=false;for(ImageView image:new ArrayList<>(states.keySet()))restore(image);for(var hook:hooks)try{hook.unhook();}catch(Throwable failure){failed=true;}hooks.clear();return !failed&&states.isEmpty();}
     static boolean healthy(){return !failed;}
-    static String status(){return "Fingerprint: "+(hidden?"Hidden":FingerprintGlyphDrawable.NAMES[style])+"; observed owners: "+owners.size()+"; captured: "+captured+"; restored: "+restored+"; remaining: "+states.size()+(failed?"; restoration required.":".");}
+    static String status(){return "Fingerprint: "+(hidden?"Hidden":FingerprintGlyphDrawable.NAMES[style])+"; "+discovery+"; observed owners: "+owners.size()+"; captured: "+captured+"; restored: "+restored+"; remaining: "+states.size()+(failed?"; restoration required.":".");}
 }

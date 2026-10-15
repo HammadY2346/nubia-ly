@@ -1,7 +1,6 @@
 package com.elitedarkkaiser.nubialy.xposed;
 import android.os.Looper;
 import android.graphics.Typeface;
-import android.graphics.Paint;
 import android.util.TypedValue;
 import com.elitedarkkaiser.nubialy.LockClockFonts;
 import android.view.*;
@@ -167,15 +166,8 @@ final class SurfaceBackend {
     }finally{writing=false;}}
     private static void fitFont(TextView view,State state){
         if(!Objects.equals(view.getTypeface(),state.fontSelected))view.setTypeface(state.fontSelected);
-        if(!view.getIncludeFontPadding())view.setIncludeFontPadding(true);
-        Paint measure=new Paint(view.getPaint());measure.setTextSize(state.textSize);
-        Paint.FontMetrics metrics=measure.getFontMetrics();float height=metrics.bottom-metrics.top;
-        float width=measure.measureText(view.getText().toString());
-        int availableHeight=view.getHeight()-view.getPaddingTop()-view.getPaddingBottom();
-        int availableWidth=view.getWidth()-view.getPaddingLeft()-view.getPaddingRight();
-        float factor=1;if(availableHeight>0&&height>0)factor=Math.min(factor,availableHeight/height);if(availableWidth>0&&width>0)factor=Math.min(factor,availableWidth/width);
-        float size=state.textSize*factor;if(!Float.isFinite(size)||size<=0)throw new IllegalStateException("Clock font bounds unavailable");
-        if(!near(view.getTextSize(),size))view.setTextSize(TypedValue.COMPLEX_UNIT_PX,size);
+        // A font choice never resizes the vendor clock or changes its padding.
+        // Wake/doze animation bounds are transient and must not be used for fitting.
     }
     private static boolean near(float a,float b){return Float.isFinite(a)&&Float.isFinite(b)&&Math.abs(a-b)<0.00001f;}
     private static boolean restore(View v){State s=states.get(v);if(s==null)return true;writing=true;try{

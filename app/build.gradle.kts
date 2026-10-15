@@ -20,8 +20,8 @@ android {
         targetSdk = 35
         buildConfigField("String", "BASELINE_FINGERPRINT", baselineLiteral("fingerprint"))
         buildConfigField("String", "BASELINE_SYSTEM_UI_SHA256", baselineLiteral("systemUiSha256"))
-        versionCode = 31
-        versionName = "0.1.30-lockscreen-extras"
+        versionCode = 32
+        versionName = "0.1.31-lockscreen-fixes"
     }
     signingConfigs {
         if (releaseSigning) create("persistent") {

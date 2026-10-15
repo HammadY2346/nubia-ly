@@ -42,7 +42,13 @@ final class PreviewRuntime {
                     case "clock_resume" -> {
                         PreviewLifecycle.Phase phase = session.state(now());
                         if (resumeSuppressed) { reply.accept(snapshot()); break; }
-                        if (enabledMode && (phase == PreviewLifecycle.Phase.ACTIVE || phase == PreviewLifecycle.Phase.CHECKING)) reply.accept(snapshot());
+                        if (enabledMode && (phase == PreviewLifecycle.Phase.ACTIVE || phase == PreviewLifecycle.Phase.CHECKING)) {
+                            if (phase == PreviewLifecycle.Phase.ACTIVE) {
+                                SurfaceBackend.refresh();
+                                if (!SurfaceBackend.healthy()) stop("Surface wake transition failed.");
+                            }
+                            reply.accept(snapshot());
+                        }
                         else start(true, true, true, requestDeadline, color, reply);
                     }
                     case "inventory" -> {
@@ -54,7 +60,17 @@ final class PreviewRuntime {
                         if (session.state(now()) == PreviewLifecycle.Phase.ACTIVE) validate(session.generation(), reply);
                         else { cancelTimers(); reply.accept(snapshot()); }
                     }
-                    case "screen_off" -> { stop("Screen off; stock restored until wake."); reply.accept(snapshot()); }
+                    case "screen_off" -> {
+                        // Persistent styles retain their existing, bounded authority across
+                        // display sleep. Vendor doze callbacks restore AOD-owned views.
+                        // Keep broker validation and the health deadline running; sleep
+                        // neither creates nor extends a permit.
+                        if (enabledMode && session.state(now()) == PreviewLifecycle.Phase.ACTIVE) {
+                            SurfaceBackend.refresh();
+                            if (!SurfaceBackend.healthy()) stop("Surface sleep transition failed.");
+                        } else stop("Screen off; temporary preview restored.");
+                        reply.accept(snapshot());
+                    }
                     case "stop" -> { resumeSuppressed = true; stop("Stopped by request."); reply.accept(snapshot()); }
                     default -> { stop("Unknown operation rejected."); reply.accept(snapshot()); }
                 }
