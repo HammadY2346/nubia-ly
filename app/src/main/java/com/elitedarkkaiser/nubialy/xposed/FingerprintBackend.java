@@ -62,7 +62,7 @@ final class FingerprintBackend {
         if(existing instanceof Map<?,?> values)for(Object feature:new ArrayList<>(values.values()))if(feature!=null&&feature.getClass().getName().equals(FEATURE)){owners.put(feature,new WeakReference<>(feature));features++;if(XposedHelpers.getObjectField(feature,"mSensorUIService")!=null)external=true;}
         Object manager=managerInstance.get(null);boolean floating=false;
         if(manager!=null){Object feature=managerFeature.get(manager),owner=managerOwner.get(manager);if(feature!=null&&feature.getClass().getName().equals(FEATURE)){owners.put(feature,new WeakReference<>(feature));if(owner!=null&&owner.getClass().getName().equals(OWNER)){owners.put(owner,new WeakReference<>(feature));floating=true;}}}
-        discovery="registry features: "+features+"; floating window found: "+floating+(external?"; external SensorService connected: appearance unsupported, stock graphics left unchanged":"");
+        discovery="registry features: "+features+"; floating window found: "+floating+(external?"; external SensorService connected: use Check fingerprint service for renderer status":"");
     }
     static void refresh(){if(!active||failed||!main())return;try{
         discover();

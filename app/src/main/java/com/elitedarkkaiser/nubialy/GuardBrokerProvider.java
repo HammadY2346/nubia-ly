@@ -18,8 +18,8 @@ public final class GuardBrokerProvider extends ContentProvider {
         return CompatibilityPolicy.isNx809j(Build.MODEL, Build.DEVICE) && Build.VERSION.SDK_INT == 36;
     }
     @Override public Bundle call(String method, String arg, Bundle extras) {
-        enforceSystemUi();
-        if ((!GuardBrokerPolicy.METHOD.equals(method) && !GuardBrokerPolicy.PREVIEW_METHOD.equals(method) && !GuardBrokerPolicy.CLOCK_METHOD.equals(method) && !GuardBrokerPolicy.ENABLED_METHOD.equals(method) && !GuardBrokerPolicy.STARTUP_METHOD.equals(method))
+        if(GuardBrokerPolicy.FINGERPRINT_METHOD.equals(method)) enforceFingerprint(); else enforceSystemUi();
+        if ((!GuardBrokerPolicy.FINGERPRINT_METHOD.equals(method) && !GuardBrokerPolicy.METHOD.equals(method) && !GuardBrokerPolicy.PREVIEW_METHOD.equals(method) && !GuardBrokerPolicy.CLOCK_METHOD.equals(method) && !GuardBrokerPolicy.ENABLED_METHOD.equals(method) && !GuardBrokerPolicy.STARTUP_METHOD.equals(method))
                 || arg != null || extras == null)
             throw new IllegalArgumentException("Unsupported guard request");
         String nonce = extras.getString("nonce");
@@ -37,7 +37,13 @@ public final class GuardBrokerProvider extends ContentProvider {
         int callerPid = Binder.getCallingPid();
         long identity = Binder.clearCallingIdentity();
         try {
-            if (GuardBrokerPolicy.ENABLED_METHOD.equals(method) || GuardBrokerPolicy.STARTUP_METHOD.equals(method)) {
+            if(GuardBrokerPolicy.FINGERPRINT_METHOD.equals(method)) {
+                String id=GuardReader.inspectEnabled();boolean allowed=RecoveryStore.enabledAllowed(getContext(),id);
+                SurfaceStyle style=allowed?StatusBarPreferences.active(getContext(),id).surfaces():SurfaceStyle.STOCK;
+                if(allowed&&(style.fingerprintStyle()!=0||style.fingerprintHidden()!=0))allowed=RecoveryStore.claimSensorStartup(getContext(),callerPid);
+                reply.putInt("status",allowed?GuardBrokerPolicy.READABLE:GuardBrokerPolicy.BLOCKED);
+                if(allowed){reply.putString("permit_id",id);reply.putLong("deadline_ms",android.os.SystemClock.elapsedRealtime()+ClockEnabledPolicy.HEALTH_MS);reply.putInt("fingerprint_style",style.fingerprintStyle());reply.putBoolean("fingerprint_hidden",style.fingerprintHidden()!=0);}
+            } else if (GuardBrokerPolicy.ENABLED_METHOD.equals(method) || GuardBrokerPolicy.STARTUP_METHOD.equals(method)) {
                 String id = GuardReader.inspectEnabled();
                 boolean allowed = RecoveryStore.enabledAllowed(getContext(), id);
                 if (allowed && GuardBrokerPolicy.STARTUP_METHOD.equals(method)) allowed = RecoveryStore.claimStartup(getContext(), callerPid);
@@ -80,6 +86,10 @@ public final class GuardBrokerProvider extends ContentProvider {
             Binder.restoreCallingIdentity(identity);
             busy.set(false);
         }
+    }
+    private void enforceFingerprint(){
+        int uid;try{uid=getContext().getPackageManager().getApplicationInfo(GuardBrokerPolicy.SENSOR_PACKAGE,0).uid;}catch(Exception unavailable){throw new SecurityException("Fingerprint identity unavailable");}
+        if(!GuardBrokerPolicy.permitsFingerprint(Binder.getCallingUid(),uid,getCallingPackage()))throw new SecurityException("Fingerprint caller required");
     }
     private void enforceSystemUi() {
         int systemUiUid;

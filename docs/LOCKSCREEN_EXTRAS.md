@@ -1,4 +1,4 @@
-# Lock-screen widgets, fingerprint graphic and clock fonts — 0.1.32
+# Lock-screen widgets, fingerprint graphic and clock fonts — 0.1.33
 
 Separate controls hide the weather, alarm and battery widgets below the clock. Only the inspected vendor widget classes beneath the live KeyguardStatusView are targeted. Chooser previews are excluded. Visibility restores to the latest vendor value through the common Restore/guard stop flow.
 
@@ -12,7 +12,7 @@ Validation: production surface tests cover scoped widget hiding, fonts, latest v
 
 Phone checklist:
 
-1. Install signed 0.1.32 and reboot to reload hooks; retain the existing recovery guard.
+1. Install signed 0.1.33 and reboot to reload hooks; retain the existing recovery guard.
 2. Hide each widget separately, Enable, lock/unlock and verify only that widget disappears. Restore stock and confirm all return.
 3. Hide fingerprint icon, Enable, and test unlock at the same physical sensor location. Restore stock.
 4. Test each fingerprint glyph; verify fingerprint unlock, app biometric prompts and AOD continue using their expected behavior. Enrollment UI should remain stock.
@@ -22,14 +22,27 @@ Phone checklist:
 Do not merge until phone validation and explicit user authorization.
 
 
-## 0.1.32 fixes awaiting phone validation
+## 0.1.33 SensorService support awaiting phone validation
 
-Clock fonts fit within the clock's stock content allocation captured before font application. Full font metrics and padding include lower strokes; the selected size never exceeds the latest vendor text size. Later animation bounds do not replace the captured fit area, and refresh always calculates from vendor size rather than the previous fitted result. Widest-digit advances avoid minute-to-minute sizing changes. Parent layout dimensions, widget positions and security state remain untouched. Stock/Restore returns the latest vendor typeface, text size and padding. Technical details report the captured area and fitted pixel size.
+The uploaded FingerprintSensorUi_ZTE APK owns the normal Redmagic fingerprint graphic in com.fingerprint.sensorservice.view.FloatWindowSensorView.mSensorView. It draws the idle graphic as an ImageView background; press animations, illumination and sensor windows are separate. The new backend runs inside com.fingerprint.sensorservice, while the existing System UI backend leaves externally owned images untouched.
 
-Persistent enabled sessions retain existing bounded health authority over sleep. Sleep does not renew authority: broker validation, identity checks, expiry, explicit stop and independent guard revocation remain active. Temporary rehearsals still stop at screen-off.
+Scope is the existing manager's System UI-created sensor window while keyguard is showing, power is interactive, doze is false, quick-app mode is false, fingerprint-disabled is false, and the vendor state machine is INITIALIZED. Stock source transitions show that INITIALIZED is the idle visible state; READY is part of AOD press preparation and is excluded. Before the state machine processes a press, any custom background is restored, and customization stays suspended through authentication and success. Only the mSensorView background changes: no image/window visibility, touch listener, hit region, driver, illumination, biometric result or vendor binder command is modified. Latest stock background and padding are retained for restoration; null stock backgrounds never receive an invented replacement.
 
-The stock System UI source also binds a separate com.fingerprint.sensorservice.UdfpsMessageService. The in-process backend now leaves graphics unchanged when that external renderer is connected, and reports that its appearance path is unsupported. Legacy images are restored if external ownership becomes active. There are no SensorService calls or window/sensor-state changes. The separate APK is required to inspect its rendering path before implementing support. This build does not claim to fix external-renderer fingerprint styles.
+SensorService independently calls a fixed fingerprint-only broker method. The provider checks Binder UID and verified package attribution for com.fingerprint.sensorservice and returns only frozen fingerprint choices, permit identity and a bounded health deadline. SensorService cannot call System UI's broker methods. Independent per-process startup counts retain the restart cutoff without consuming System UI's counter. Explicit Enable resets both counters. Root-guard stop, app emergency stop, broker loss, stale/version-invalid replies and deadline expiry restore stock. A busy broker retains only the existing deadline; late workers cannot reapply after revocation.
 
-Regression checks cover legacy/direct image restoration and exclusions, external delegation without graphic writes, restoration when legacy ownership transfers to the external service, fixed-area font fitting across transient bounds, latest vendor updates, AOD restoration, failure rollback, and sleep without authority renewal.
+Vector scope now includes both System UI and FingerprintSensorUi. The editor has a signature-protected Check fingerprint service diagnostic; broadcasts do not carry appearance authority. The service obtains saved active choices from the broker, not from broadcast extras. It rechecks every three seconds and on wake. Diagnostic checks also request a fresh read.
 
-Install signed 0.1.32 and reboot. Keep fingerprint Stock while external-renderer support is investigated. Set independent lock-screen scale to 100% and offsets to zero, choose Cursive, Enable, and check that lower strokes fit the clock area across wake. Verify Stock/Restore, AOD and guard Action. Report the Font fit dimensions and pixel sizes if clipping remains. Phone validation and explicit merge authorization are still pending.
+The 0.1.32 stable clock-area fitting is retained: full font metrics and padding fit within the content allocation captured before font application, without chasing later animation bounds. Parent layout dimensions and widget positions remain unchanged. Stock/Restore recovers latest vendor size, typeface and padding.
+
+Local regression tests cover the production sensor backend, runtime, broker and diagnostic client, including hide/replacement, all four glyphs, nested stock writes, pre-press restoration, AOD/app/quick-app/disabled exclusions, detach/replacement, expiry, service teardown, failure rollback, shared-UID package attribution, method isolation, narrow responses, independent startup counts, late-worker fencing and cancelled diagnostics. Android build/signature checks run in CI. Device validation is pending.
+
+Phone checklist:
+
+1. Install signed 0.1.33. In Vector, select System UI and FingerprintSensorUi / com.fingerprint.sensorservice for nubia-ly. Reboot once after scope selection. Keep the existing recovery guard.
+2. Leave Hide fingerprint off. Choose Rings, press Enable customization, then Check fingerprint service. It should report a readable guard and observed service; captures may remain zero while unlocked.
+3. Lock and wake the phone: Rings should replace the idle graphic. Unlock at the same physical location. Return and Check fingerprint service to inspect captured/restored counts.
+4. Try Hexagon and another shape. Then enable Hide, Enable customization, and verify the graphic disappears while sensor unlock still works. Uncheck Hide, choose a shape and Enable again: the shape must return.
+5. Verify stock press animation, AOD, an app biometric prompt and existing widgets/QS/clock controls. Restore stock and test guard Action or emergency stop once. No stopped style should resume on wake.
+6. Check Cursive lower strokes and stable fit with independent lock-screen scale at 100% and offsets zero. Send the diagnostic text if either clock or fingerprint graphics differ from the expected result.
+
+Keep the PR draft and unmerged until phone validation and explicit authorization.

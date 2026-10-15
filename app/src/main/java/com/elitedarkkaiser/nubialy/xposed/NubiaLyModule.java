@@ -26,6 +26,12 @@ public final class NubiaLyModule implements IXposedHookLoadPackage {
             }
             return;
         }
+        if("com.fingerprint.sensorservice".equals(param.packageName)&&param.packageName.equals(param.processName)){
+            if(!CompatibilityPolicy.isNx809j(Build.MODEL,Build.DEVICE)||Build.VERSION.SDK_INT!=36)return;
+            try{XposedHelpers.findAndHookMethod(Application.class,"attach",Context.class,new XC_MethodHook(){
+                @Override protected void afterHookedMethod(MethodHookParam hook){if(hook.hasThrowable())return;try{Application app=(Application)hook.thisObject;if("com.fingerprint.sensorservice".equals(app.getPackageName()))SensorFingerprintRuntime.install(app);}catch(Throwable unavailable){XposedBridge.log("nubia-ly: fingerprint appearance unavailable; stock retained.");}}
+            });}catch(Throwable unavailable){XposedBridge.log("nubia-ly: SensorService attachment unavailable; stock retained.");}return;
+        }
         if (!"com.android.systemui".equals(param.packageName) || !"com.android.systemui".equals(param.processName)) return;
         if (!CompatibilityPolicy.isNx809j(Build.MODEL, Build.DEVICE)) return;
         if (Build.VERSION.SDK_INT != 36) return;
