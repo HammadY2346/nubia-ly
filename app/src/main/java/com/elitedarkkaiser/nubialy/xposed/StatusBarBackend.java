@@ -37,6 +37,7 @@ final class StatusBarBackend {
     private record Frame(long generation, State state) {}
     private record DarkFrame(long generation, State state, long revision) {}
     static synchronized void install(ClassLoader loader) {
+        SurfaceBackend.install(loader);
         if(attempted)return;attempted=true;
         List<XC_MethodHook.Unhook> observers=new ArrayList<>();
         try {
@@ -138,8 +139,8 @@ final class StatusBarBackend {
             activeHooks.add(XposedHelpers.findAndHookMethod(View.class,"setAlpha",float.class,callback));
             activeHooks.add(XposedHelpers.findAndHookMethod(View.class,"setVisibility",int.class,callback));
             if(style.selected(StatusBarStyle.TINT))activeHooks.add(XposedHelpers.findAndHookMethod(ImageView.class,"setImageTintList",ColorStateList.class,callback));
-            active=true;refresh();
-            if(failed)throw new IllegalStateException("Status-bar apply failed");
+            SurfaceBackend.begin(style.surfaces());active=true;refresh();
+            if(failed||!SurfaceBackend.healthy())throw new IllegalStateException("Status-bar apply failed");
             if(roots.isEmpty())throw new IllegalStateException("No attached stock status bar.");
             message="Status-bar styling active.";
         }catch(Throwable unavailable){end();throw new IllegalStateException("Status-bar activation unavailable",unavailable);}
@@ -167,6 +168,7 @@ final class StatusBarBackend {
     }
     static void refresh(){
         if(!active||failed||Looper.myLooper()!=Looper.getMainLooper())return;
+        SurfaceBackend.refresh();
         for(ViewGroup root:new ArrayList<>(roots.keySet()))if(root.isAttachedToWindow())scan(root);
     }
     private static void track(View v){
@@ -255,7 +257,7 @@ final class StatusBarBackend {
         generation++;active=false;
         for(View v:new ArrayList<>(states.keySet()))restore(v);
         for(var h:activeHooks)try{h.unhook();}catch(Throwable unavailable){failed=true;}
-        activeHooks.clear();if(!failed&&captured>0)message="Latest stock status-bar properties restored.";return !failed&&states.isEmpty();
+        activeHooks.clear();boolean surfaceRestored=SurfaceBackend.end();if(!failed&&captured>0)message="Latest stock status-bar properties restored.";return !failed&&states.isEmpty()&&surfaceRestored;
     }
     static ArrayList<String> inventory(){
         TreeSet<String> slots=new TreeSet<>();if(!ready||Looper.myLooper()!=Looper.getMainLooper())return new ArrayList<>();
@@ -267,6 +269,6 @@ final class StatusBarBackend {
             }
         }return new ArrayList<>(slots);
     }
-    static boolean healthy(){return !failed;}
-    static String status(){return message+" Captured: "+captured+"; restored: "+restored+"; status-bar remaining: "+states.size()+".";}
+    static boolean healthy(){return !failed&&SurfaceBackend.healthy();}
+    static String status(){return message+" Captured: "+captured+"; restored: "+restored+"; status-bar remaining: "+states.size()+". "+SurfaceBackend.status();}
 }

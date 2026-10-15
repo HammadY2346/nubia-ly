@@ -7,9 +7,9 @@ public final class FeatureCatalog {
     public enum State { PLANNED, BLOCKED }
     public record Feature(String id, String title, String description, State state) {}
     public static final List<Feature> FEATURES = List.of(
-        new Feature("status_bar", "Status bar", "Explore icon, clock and battery appearance.", State.PLANNED),
-        new Feature("quick_settings", "Quick Settings", "Explore tile styling and panel appearance.", State.PLANNED),
-        new Feature("lock_screen", "Lock screen", "Explore clock styling and positioning.", State.PLANNED),
+        new Feature("status_bar", "Status bar", "Clock, mobile service icons and battery appearance.", State.PLANNED),
+        new Feature("quick_settings", "Quick Settings", "Independent large and small tile shapes, labels and placement.", State.PLANNED),
+        new Feature("lock_screen", "Lock screen", "Clock and date visibility, size and placement.", State.PLANNED),
         new Feature("notifications", "Notifications", "Explore notification panel styling.", State.PLANNED),
         new Feature("qs_four_rows", "Four-row Quick Settings", "This layout has not passed compatibility validation. No row override is available.", State.BLOCKED)
     );

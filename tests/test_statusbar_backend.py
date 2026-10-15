@@ -3,6 +3,7 @@ from pathlib import Path
 import subprocess,tempfile
 root=Path(__file__).resolve().parents[1]
 sources={
+'com/elitedarkkaiser/nubialy/xposed/SurfaceBackend.java':'package com.elitedarkkaiser.nubialy.xposed;final class SurfaceBackend {static void install(ClassLoader l){}static void begin(com.elitedarkkaiser.nubialy.SurfaceStyle s){}static void refresh(){}static boolean end(){return true;}static boolean healthy(){return true;}static String status(){return "";}}',
 'android/content/res/ColorStateList.java': 'package android.content.res;public record ColorStateList(int color){public static ColorStateList valueOf(int c){return new ColorStateList(c);}public int getDefaultColor(){return color;}}',
 'android/util/DisplayMetrics.java':'package android.util;public class DisplayMetrics {public float density=2;} ',
 'android/content/res/Resources.java':'package android.content.res;public class Resources {public static class NotFoundException extends RuntimeException{}public String getResourcePackageName(int id){if(id==999)return "another.package";return "com.android.systemui";}public String getResourceEntryName(int id){if(id==100||id==999)return "liquid_cooling_view";if(id==101)return "cooling_fan_view";if(id==102)return "refresh_rate_view";throw new NotFoundException();}public android.util.DisplayMetrics getDisplayMetrics(){return new android.util.DisplayMetrics();}}',
@@ -97,7 +98,7 @@ with tempfile.TemporaryDirectory(prefix='nubialy-statusbar-') as work:
     work=Path(work)
     for name,content in sources.items():
         p=work/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
-    files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/StatusBarStyle.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/StatusBarBackend.java')]
+    files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/StatusBarStyle.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/SurfaceStyle.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/StatusBarBackend.java')]
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(work/'classes'),*files],check=True)
     for mode in [[],['apply'],['restore'],['transform-apply'],['transform-restore']]:
         subprocess.run(['java','-cp',str(work/'classes'),'com.elitedarkkaiser.nubialy.xposed.StatusBarTest',*mode],check=True)

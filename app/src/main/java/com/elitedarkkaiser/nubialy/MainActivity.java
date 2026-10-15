@@ -55,6 +55,7 @@ public final class MainActivity extends AppCompatActivity {
             content.addView(close);
             return;
         }
+        int setupStart=content.getChildCount();
         LinearLayout device = card("Your device", "REDMAGIC 11 Pro · NX809J");
         compatibility = label("Firmware has not been checked.", 15, false);
         device.addView(compatibility);
@@ -71,17 +72,21 @@ public final class MainActivity extends AppCompatActivity {
         activationStatus = label("", 14, false);
         vector.addView(activationStatus);
         vector.addView(label("App activation does not confirm System UI loading. Verify its entry in Vector logs. Enable persistent status-bar styling in its editor.", 14, false));
+        int setupEnd=content.getChildCount();
         spacer(20);
-        content.addView(label("Your canvas", 24, true));
-        content.addView(label("Customization features are being developed. This test build includes persistent clock, compatible icon and battery-view styling.", 14, false));
+        content.addView(label("Customize", 24, true));
+        content.addView(label("Choose an area to make it yours. Save your choices, then Enable to apply.", 14, false));
         spacer(10);
         for (FeatureCatalog.Feature feature : FeatureCatalog.FEATURES) {
-            LinearLayout featureCard = card(feature.title(), feature.description());
+            LinearLayout featureCard = card(feature.title()+"  ›", feature.description());
             TextView badge = label(feature.state() == FeatureCatalog.State.BLOCKED ? "Blocked experiment" : "Coming later", 13, true);
             badge.setTextColor(0xffffbe98);
             featureCard.addView(badge);
+            if("quick_settings".equals(feature.id())||"lock_screen".equals(feature.id())){
+                badge.setText("Customize");badge.setTextColor(0xffc0a8ff);featureCard.setOnClickListener(v->startActivity(new android.content.Intent(this,ClockEditorActivity.class).putExtra("section",feature.id())));continue;
+            }
             if ("status_bar".equals(feature.id())) {
-                badge.setText("Status-bar editor");
+                badge.setText("Customize");badge.setTextColor(0xffc0a8ff);
                 featureCard.setOnClickListener(v -> startActivity(new android.content.Intent(this, ClockEditorActivity.class)));
                 continue;
             }
@@ -90,6 +95,7 @@ public final class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Got it", null).show());
         }
         spacer(12);
+        int recoveryStart=content.getChildCount();
         LinearLayout recovery = card("Restore & recovery", "Recovery must be ready before the first customization is enabled.");
         recoveryStatus = label("", 14, false);
         recovery.addView(recoveryStatus);
@@ -175,8 +181,14 @@ public final class MainActivity extends AppCompatActivity {
                 });
             });
         });
+        // Keep tools available while letting customization lead the home screen.
+        java.util.List<View> setupViews=new java.util.ArrayList<>();for(int i=setupStart;i<setupEnd;i++)setupViews.add(content.getChildAt(i));
+        java.util.List<View> recoveryViews=new java.util.ArrayList<>();for(int i=recoveryStart;i<content.getChildCount();i++)recoveryViews.add(content.getChildAt(i));
+        for(View v:setupViews)content.removeView(v);for(View v:recoveryViews)content.removeView(v);
+        LinearLayout setup=foldout("Setup & device", "Firmware, root access and Vector",false);for(View v:setupViews)setup.addView(v);
+        LinearLayout tools=foldout("Recovery & diagnostics", "Restore tools, guard checks and technical details",false);for(View v:recoveryViews)tools.addView(v);
         refreshSafetyStatus();
-        content.addView(label("0.1.13 · Independent from Redmagic 11 Toolbox", 12, false));
+        content.addView(label(BuildConfig.VERSION_NAME+" · nubia-ly", 12, false));
     }
 
     @Override protected void onResume() {
@@ -239,6 +251,10 @@ public final class MainActivity extends AppCompatActivity {
                 rootStatus.setText(result);
             });
         });
+    }
+    private LinearLayout foldout(String title,String subtitle,boolean expanded){
+        LinearLayout card=card(title,subtitle),body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setVisibility(expanded?View.VISIBLE:View.GONE);
+        MaterialButton toggle=button(expanded?"Hide details":"Show details");card.addView(toggle);card.addView(body);toggle.setOnClickListener(v->{boolean show=body.getVisibility()!=View.VISIBLE;body.setVisibility(show?View.VISIBLE:View.GONE);toggle.setText(show?"Hide details":"Show details");});return body;
     }
     private LinearLayout card(String title, String description) {
         MaterialCardView card = new MaterialCardView(this);

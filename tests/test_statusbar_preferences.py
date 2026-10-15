@@ -3,6 +3,7 @@ from pathlib import Path
 import subprocess,tempfile
 root=Path(__file__).resolve().parents[1]
 sources={
+'com/elitedarkkaiser/nubialy/xposed/SurfaceBackend.java':'package com.elitedarkkaiser.nubialy.xposed;final class SurfaceBackend {static void install(ClassLoader l){}static void begin(com.elitedarkkaiser.nubialy.SurfaceStyle s){}static void refresh(){}static boolean end(){return true;}static boolean healthy(){return true;}static String status(){return "";}}',
 'android/content/Context.java': '''package android.content;public class Context {public static final int MODE_PRIVATE=0;public final Prefs prefs=new Prefs();public Prefs getSharedPreferences(String n,int m){return prefs;}
  public static class Prefs {public java.util.Map<String,Object> values=new java.util.HashMap<>();public boolean fail;public int getInt(String k,int d){return (Integer)values.getOrDefault(k,d);}public String getString(String k,String d){return (String)values.getOrDefault(k,d);}public Editor edit(){return new Editor(this);}}
  public static class Editor {Prefs p;java.util.Map<String,Object> writes=new java.util.HashMap<>();Editor(Prefs p){this.p=p;}public Editor putInt(String k,int v){writes.put(k,v);return this;}public Editor putString(String k,String v){writes.put(k,v);return this;}public boolean commit(){if(p.fail)return false;p.values.putAll(writes);return true;}}
@@ -16,6 +17,9 @@ sources={
  check(StatusBarPreferences.activate(c,id,details,0xffabcdef,2));check(StatusBarPreferences.active(c,id).equals(details));check(StatusBarPreferences.activeDate(c,id)==2);check(StatusBarPreferences.activeDate(c,other)==0);check(StatusBarPreferences.color(c)==0xffabcdef);check(StatusBarPreferences.activeColor(c,id)==0xffabcdef);
  check(StatusBarPreferences.save(c,StatusBarStyle.STOCK));check(StatusBarPreferences.active(c,id).equals(details));
  c.prefs.values.put("active_system_transform",1);check(StatusBarPreferences.active(c,id).equals(StatusBarStyle.STOCK));
+ var surfaces=new SurfaceStyle(8,StatusBarStyle.appearance(110,75),0,StatusBarStyle.appearance(120,50),0,0,0,StatusBarStyle.transform(2,-2,5),0,3);var full=details.withSurfaces(surfaces);
+ check(StatusBarPreferences.save(c,full));check(StatusBarPreferences.read(c).equals(full));check(StatusBarPreferences.activate(c,id,full,0xffabcdef,2));check(StatusBarPreferences.active(c,id).equals(full));check(StatusBarPreferences.save(c,selected));check(StatusBarPreferences.active(c,id).equals(full));
+ c.prefs.values.put("active_surfaces","bad");check(StatusBarPreferences.active(c,id).equals(StatusBarStyle.STOCK));
  check(StatusBarPreferences.activate(c,id,selected,0xff112233));
  c.prefs.fail=true;check(!StatusBarPreferences.activate(c,other,StatusBarStyle.STOCK,0xff445566));check(StatusBarPreferences.active(c,id).equals(selected));check(StatusBarPreferences.active(c,other).equals(StatusBarStyle.STOCK));c.prefs.fail=false;
  check(!StatusBarPreferences.activate(c,"bad",selected,0xff112233));check(!StatusBarPreferences.activate(c,id,new StatusBarStyle(128,100,100,100),0xff112233));check(!StatusBarPreferences.activate(c,id,selected,0x00112233));
@@ -27,6 +31,6 @@ with tempfile.TemporaryDirectory(prefix='nubialy-status-prefs-') as work:
     work=Path(work)
     for name,content in sources.items():
         p=work/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
-    files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/n) for n in ['StatusBarPreferences.java','StatusBarStyle.java','ClockColorPolicy.java','ClockDatePolicy.java','PreviewPolicy.java']]
+    files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/n) for n in ['StatusBarPreferences.java','StatusBarStyle.java','SurfaceStyle.java','ClockColorPolicy.java','ClockDatePolicy.java','PreviewPolicy.java']]
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(work/'classes'),*files],check=True)
     subprocess.run(['java','-cp',str(work/'classes'),'com.elitedarkkaiser.nubialy.PreferencesTest'],check=True)
