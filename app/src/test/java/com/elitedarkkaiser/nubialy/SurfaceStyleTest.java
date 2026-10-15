@@ -13,6 +13,10 @@ public final class SurfaceStyleTest {
             assertTrue(split.valid());assertEquals(split,SurfaceStyle.decode(split.encode()));
             assertEquals(small,split.tileShape());assertEquals(large,split.largeTileShape());
         }
+        var extra=new SurfaceStyle(12,0,0,0,0,0,0,0,0,2,3,7,4,1,25);
+        assertTrue(extra.valid());assertEquals(extra,SurfaceStyle.decode(extra.encode()));
+        for(String bad:new String[]{"0,0,0,0,0,0,0,0,0,0,0,8,0,0,0","0,0,0,0,0,0,0,0,0,0,0,0,5,0,0","0,0,0,0,0,0,0,0,0,0,0,0,0,2,0","0,0,0,0,0,0,0,0,0,0,0,0,0,0,26"})assertNull(SurfaceStyle.decode(bad));
+        java.util.Set<String> names=new java.util.HashSet<>();for(var face:LockClockFonts.FACES){assertTrue(names.add(face.name()));assertFalse(face.category().isEmpty());}assertEquals(26,names.size());
         assertFalse(StatusBarStyle.STOCK.withSurfaces(null).valid());assertEquals(SurfaceStyle.STOCK,StatusBarStyle.STOCK.surfaces());
     }
 }
