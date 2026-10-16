@@ -2,6 +2,12 @@ package com.elitedarkkaiser.nubialy;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public final class SurfaceStyleTest {
+    @Test public void brightnessMigrationAndBounds(){
+        for(int style=0;style<=3;style++){var value=new SurfaceStyle(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,style);assertTrue(value.valid());assertEquals(value,SurfaceStyle.decode(value.encode()));}
+        assertEquals(0,SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7").brightnessStyle());
+        assertNull(SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,4"));
+    }
+
     @Test public void layeredIdsAreAppendOnly(){for(int id=0;id<8;id++){var value=new SurfaceStyle(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,id);assertTrue(value.valid());assertEquals(value,SurfaceStyle.decode(value.encode()));}assertEquals("Outline",QsTileEffects.NAMES[1]);}
     @Test public void outlineStyleRoundTripsAndLegacyUsesStock(){
         for(int shape=0;shape<4;shape++){var value=new SurfaceStyle(0,0,0,0,0,0,0,0,0,shape,3,0,0,0,0,0,1);assertTrue(value.valid());assertEquals(value,SurfaceStyle.decode(value.encode()));}
