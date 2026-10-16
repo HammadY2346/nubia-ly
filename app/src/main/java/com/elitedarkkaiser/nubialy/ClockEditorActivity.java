@@ -458,8 +458,23 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private void redrawClockFont(){if(lockFontPreview==null)return;var face=LockClockFonts.FACES[lockClockFont];lockFontPreview.setTypeface(android.graphics.Typeface.create(face.family(),face.style()));lockFontPicker.setText("Clock font styles · "+face.name());}
     @Override protected void onActivityResult(int request,int result,android.content.Intent data){super.onActivityResult(request,result,data);if(request==PICK_CLOCK_FONT&&result==RESULT_OK&&data!=null){int value=data.getIntExtra("selection",-1);if(LockClockFonts.valid(value)){lockClockFont=value;redrawClockFont();saveStatusBar();}}if(request==PICK_ANIMATION&&result==RESULT_OK&&data!=null){int value=data.getIntExtra("selection",-1);if(FingerprintAnimations.valid(value)){fingerprintAnimation=value;animationPicker.setText("Fingerprint animation · "+FingerprintAnimations.NAMES[value]);saveStatusBar();}}if(request==PICK_FINGERPRINT&&result==RESULT_OK&&data!=null){int value=data.getIntExtra("selection",-1);if(FingerprintStyles.valid(value)){fingerprintStyle=value;redrawFingerprint();saveStatusBar();}}}
     private void shapeControls(LinearLayout parent,String title,boolean large){
-        parent.addView(text(title,16,true));ChipGroup shapes=new ChipGroup(this);shapes.setSingleSelection(true);parent.addView(shapes);
-        String[] names={"Stock","Square","Rounded square","Leaf"};for(int i=0;i<names.length;i++){final int value=i;Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(names[i]);chip.setCheckable(true);chip.setChecked((large?largeTileShape:tileShape)==i);chip.setTag(i);shapes.addView(chip);statusControls.add(chip);chip.setOnClickListener(v->{if(large)largeTileShape=value;else tileShape=value;for(int n=0;n<shapes.getChildCount();n++){Chip c=(Chip)shapes.getChildAt(n);c.setChecked((Integer)c.getTag()==value);}saveStatusBar();});}
+        parent.addView(text(title,18,true));
+        String[] names={"Stock","Square","Rounded square","Leaf"};
+        java.util.List<MaterialCardView> cards=new java.util.ArrayList<>();
+        boolean stacked=getResources().getConfiguration().fontScale>1.3f||getResources().getConfiguration().screenWidthDp<360;
+        LinearLayout row=null;
+        for(int i=0;i<names.length;i++){
+            final int value=i;
+            if(stacked||i%2==0){row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);parent.addView(row,new LinearLayout.LayoutParams(-1,-2));}
+            MaterialCardView card=new MaterialCardView(this);card.setRadius(dp(24));card.setCardElevation(0);card.setCardBackgroundColor(getColor(R.color.surface_container_high));card.setClickable(true);card.setFocusable(true);card.setTag("tile-shape:"+(large?"large:":"small:")+value);
+            LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setGravity(Gravity.CENTER);body.setPadding(dp(14),dp(16),dp(14),dp(10));body.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+            View sample=new View(this);GradientDrawable shape=new GradientDrawable();shape.setColor(getColor(R.color.primary));
+            if(i==3)shape.setCornerRadii(new float[]{dp(22),dp(22),dp(2),dp(2),dp(22),dp(22),dp(2),dp(2)});else shape.setCornerRadius(dp(i==1?2:i==2?12:28));sample.setBackground(shape);body.addView(sample,new LinearLayout.LayoutParams(dp(large?90:48),dp(48)));
+            TextView label=text(names[i],14,false);label.setGravity(Gravity.CENTER);body.addView(label);card.addView(body);cards.add(card);statusControls.add(card);
+            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(stacked?-1:0,-2,stacked?0:1);params.setMargins(dp(4),dp(4),dp(4),dp(4));row.addView(card,params);
+            card.setOnClickListener(v->{if(large)largeTileShape=value;else tileShape=value;for(int n=0;n<cards.size();n++){MaterialCardView option=cards.get(n);boolean checked=n==value;option.setStrokeWidth(dp(checked?3:0));option.setStrokeColor(getColor(R.color.primary));option.setSelected(checked);option.setContentDescription(names[n]+(checked?", selected":""));}saveStatusBar();});
+        }
+        int selection=large?largeTileShape:tileShape;for(int i=0;i<cards.size();i++){MaterialCardView card=cards.get(i);card.setStrokeWidth(dp(i==selection?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==selection);card.setContentDescription(title+", "+names[i]+(i==selection?", selected":""));}
     }
     private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation);}
     private void surfaceControls(LinearLayout parent,String title,int group){
