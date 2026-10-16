@@ -4,7 +4,7 @@ import tempfile,subprocess
 root=Path(__file__).resolve().parents[1]
 env={'__file__':str(root/'tests/test_fingerprint_backend.py')}
 exec((root/'tests/test_fingerprint_backend.py').read_text().split('with tempfile.TemporaryDirectory')[0],env)
-sources=env['sources'];sources.pop('com/elitedarkkaiser/nubialy/xposed/FingerprintTest.java')
+sources=env['sources'];sources['com/elitedarkkaiser/nubialy/xposed/SensorAnimationBackend.java']='package com.elitedarkkaiser.nubialy.xposed;class SensorAnimationBackend {static void refresh(){}static void end(){}}';sources.pop('com/elitedarkkaiser/nubialy/xposed/FingerprintTest.java')
 sources['android/os/SystemClock.java']='package android.os;public class SystemClock {public static long time=1000;public static long elapsedRealtime(){return time;}}'
 sources['android/view/View.java']=sources['android/view/View.java'].replace('public static final int VISIBLE=', 'public void setBackgroundResource(int r){XposedBridge.run(this,View.class,"setBackgroundResource",new Class<?>[]{int.class},new Object[]{r},()->setBackground(r==0?null:new android.graphics.drawable.Drawable()));}public static final int VISIBLE=')
 sources['android/view/View.java']=sources['android/view/View.java'].replace('background=d;setPadding(0,0,0,0);','setBackgroundDrawable(d);').replace('public static final int VISIBLE=', 'public void setBackgroundDrawable(android.graphics.drawable.Drawable d){XposedBridge.run(this,View.class,"setBackgroundDrawable",new Class<?>[]{android.graphics.drawable.Drawable.class},new Object[]{d},()->{background=d;setPadding(0,0,0,0);});}public static final int VISIBLE=')
@@ -51,5 +51,6 @@ with tempfile.TemporaryDirectory(prefix='nubialy-sensor-') as temp:
         p=temp/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
     files=[str(p) for p in temp.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/SensorFingerprintBackend.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/ClockEnabledPolicy.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/PreviewPolicy.java')]
     files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintStyles.java'))
+    files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintAnimations.java'))
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(temp/'classes'),*files],check=True)
     for mode in [[],['apply'],['restore']]:subprocess.run(['java','-cp',str(temp/'classes'),'com.elitedarkkaiser.nubialy.xposed.SensorTest',*mode],check=True)
