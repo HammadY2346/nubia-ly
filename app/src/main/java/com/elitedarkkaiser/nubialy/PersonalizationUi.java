@@ -31,6 +31,9 @@ final class PersonalizationUi {
         side.addView(tile(a,"Quick Settings","Tiles & labels",1,()->open.accept("quick_settings"),62),new LinearLayout.LayoutParams(-1,-2));
         LinearLayout.LayoutParams lower=new LinearLayout.LayoutParams(-1,-2);lower.topMargin=dp(a,12);
         side.addView(tile(a,"Status bar","Clock, icons & battery",2,()->open.accept("status_bar"),62),lower);
+        LinearLayout volumeRow=new LinearLayout(a);volumeRow.setOrientation(LinearLayout.HORIZONTAL);LinearLayout.LayoutParams volumeRowParams=new LinearLayout.LayoutParams(-1,-2);volumeRowParams.topMargin=dp(a,12);dashboard.addView(volumeRow,volumeRowParams);
+        LinearLayout.LayoutParams volume=new LinearLayout.LayoutParams(stacked?-1:0,-2,stacked?0:1);volume.setMargins(0,0,stacked?0:dp(a,12),dp(a,12));volumeRow.addView(tile(a,"Volume","Slider styles",3,()->open.accept("volume"),stacked?120:238),volume);
+        if(!stacked)volumeRow.addView(new View(a),new LinearLayout.LayoutParams(0,0,1));
         return dashboard;
     }
     private static MaterialCardView tile(Activity a,String title,String summary,int kind,Runnable action,int previewHeight){
@@ -46,7 +49,8 @@ final class PersonalizationUi {
         private final int kind;private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
         Artwork(Context c,int kind){super(c);this.kind=kind;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
         @Override protected void onDraw(Canvas canvas){super.onDraw(canvas);float w=getWidth(),h=getHeight();if(w<=0||h<=0)return;
-            canvas.save();canvas.scale(w/160f,h/(kind==0?238f:62f));
+            if(kind==3){VolumeStylePreview.paint(canvas,0,w,h,getResources().getDisplayMetrics().density);return;}
+            canvas.save();canvas.scale(w/160f,h/((kind==0||kind==3)?238f:62f));
             if(kind==0){
                 p.setShader(new LinearGradient(0,0,160,238,new int[]{0xff5d567d,0xff302d43,0xff444c54},null,Shader.TileMode.CLAMP));canvas.drawRoundRect(0,0,160,238,26,26,p);p.setShader(null);
                 p.setColor(0xff9c91bf);canvas.drawCircle(133,195,72,p);p.setColor(0xff6f7c84);canvas.drawCircle(13,243,67,p);
