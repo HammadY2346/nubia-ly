@@ -1,208 +1,174 @@
+<div align="center">
+
+<img src=".github/resources/banner.svg" width="100%" alt="nubia-ly — Your REDMAGIC. Your style." />
+
 # nubia-ly
 
-**A standalone customization app for stock Nubia/REDMAGIC firmware, starting with the REDMAGIC 11 Pro (NX809J).**
+### Personalize stock REDMAGIC, your way.
 
-The goal is an Iconify-style customization experience built around Nubia's own System UI: status-bar appearance, Quick Settings styling, lock-screen clocks and notification visuals. nubia-ly is independent of Redmagic 11 Toolbox, with its own Android package, repository and release lifecycle.
+[![Android CI](https://github.com/austineyoung2000/nubia-ly/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/austineyoung2000/nubia-ly/actions/workflows/android.yml)
+![Device](https://img.shields.io/badge/REDMAGIC_11_Pro-NX809J-bdb1ff?style=flat-square)
+![Android](https://img.shields.io/badge/Android-16-3DDC84?style=flat-square&logo=android&logoColor=white)
+![Root](https://img.shields.io/badge/Root-required-ffbe98?style=flat-square)
+![Framework](https://img.shields.io/badge/Framework-Vector-bdb1ff?style=flat-square)
 
-> **Current state: working NX809J clock, compatible-icon and battery-view customization, with another details batch in testing.** Merged clock controls include persistent color, size, bold, seconds, italic, spacing, built-in font families and hiding. The user has confirmed these batches on the phone. Compatible status-icon tint/size/hiding, notification-icon size/hiding and battery-view size/hiding are merged after the user reported more than ten minutes of full-batch testing. The next signed test adds independent icon colors, opacity, individual hiding and clock dates. Root and Vector are required for styling; an independent guard supports revocation and bounded health recovery. Full device boot-loop recovery is not claimed.
+[**Download builds**](https://github.com/austineyoung2000/nubia-ly/actions/workflows/android.yml) · [**Installation**](#installation) · [**Features**](#features) · [**Report an issue**](https://github.com/austineyoung2000/nubia-ly/issues)
 
-Development uses test branches, draft PRs and GitHub Actions signed APKs. Phone testing and explicit user authorization precede merges into `main`.
+</div>
 
-## Inspiration and technical foundation
+**nubia-ly brings an Iconify-inspired customization experience to stock Nubia/REDMAGIC System UI**, with a RisingOS-inspired Material interface. Make the status bar, Quick Settings, lock screen, notifications, volume panel and power menu feel like yours—then finish with a systemless boot animation.
 
-| Project / source | Role in nubia-ly |
+Built and phone-tested on the **REDMAGIC 11 Pro (NX809J), running stock Android 16**. Each area has its own dashboard entry and focused editor, with visual choices, saved drafts and explicit application.
+
+nubia-ly is a standalone app. [Redmagic 11 Toolbox](https://github.com/austineyoung2000/Redmagic-11-Toolbox) handles hardware, gaming, cooling and lighting; nubia-ly handles personalization. They have separate packages, modules and release lifecycles.
+
+> [!IMPORTANT]
+> Support currently targets **NX809J stock Android 16 only**. Other REDMAGIC models, custom ROMs and firmware revisions need separate validation. Root access and Vector are required for System UI customization. The boot-animation loader additionally checks the supported KernelSU setup and exact firmware player.
+
+## Features
+
+| Area | Make it yours |
 | --- | --- |
-| [Iconify](https://github.com/Mahmud0808/Iconify) | Product and architectural inspiration: an app that organizes Android UI customization through overlays and Xposed features. Iconify's Pixel/AOSP backends are not assumed compatible with Nubia firmware. |
-| [Vector by JingMatrix](https://github.com/JingMatrix/Vector) | Selected Xposed framework for future Nubia-specific runtime hooks. Vector supports legacy Xposed and modern libxposed APIs. |
-| [Xposed API](https://api.xposed.info/) | The foundation module uses Vector's supported legacy API 82 entry point, as a compile-only dependency supplied by the framework at runtime. |
-| User-provided NX809J stock System UI | Device-specific static research baseline for locating Nubia classes, resources and feature gates. The proprietary APK and private device research are not distributed in this repository. |
-| Android and Material Components | Native Android application and Material 3 interface. |
+| **Status bar** | Clock fonts, color, size, weight, seconds, spacing and dates; individual icon visibility; icon colors, opacity and placement; Wi-Fi and mobile signal artwork. |
+| **Battery** | Stock plus 24 alternatives, inside/outside/hidden percentage, charging-symbol visibility and adjustable size. |
+| **Quick Settings** | Separate large/small tile shapes, outline and layered visual treatments, label appearance and brightness-slider styles. |
+| **Lock screen** | Clock/date appearance, built-in clock fonts, fingerprint icons and animations, plus measured charging diagnostics beneath the stock charging message. |
+| **Notifications** | Notification surface styles, corners and opacity, automatic heads-up suppression, overflow counts and notification-icon limits. |
+| **Volume** | A dedicated page with visual slider styles, including outline, gradient, neumorphic and layered treatments. |
+| **Power menu** | Duoline, CyberPunk, Fluid, iOS and Layers treatments around the native power/restart controls. |
+| **Boot animations** | Rising, Cyberpunk, Valorant, Google and Google Monet, with source-frame previews and explicit next-boot application. |
 
-This is an original scaffold, not an Iconify fork. No Iconify source, assets or Vector framework implementation are bundled. If code is reused from another project later, its attribution and license requirements must be addressed with that change.
+### Designed around your phone
 
-## Initial scope
+- **One consistent interface:** dark tonal surfaces, rounded cards, visual pickers and dedicated detail pages.
+- **Draft first, apply when ready:** browsing and saving ordinary style choices does not enable them. Enable applies the shared saved customization choices.
+- **Saved enabled features resume:** the guard wakes the app in the background after first unlock, without opening the dashboard. Later draft edits stay unapplied.
+- **Independent recovery controls:** Restore stock, Emergency stop and the Recovery Guard module's Action revoke nubia-ly customization.
+- **Systemless boot artwork:** the original animation archive stays untouched. A verified file bind supplies the chosen archive for the next boot.
 
-- Device: **REDMAGIC 11 Pro, NX809J only**.
-- Firmware research: stock REDMAGIC Android 16. Build-specific baseline values are optional local configuration, not published source data.
-- Android package: **`com.elitedarkkaiser.nubialy`**.
-- Vector's recommended module scope: **`com.android.systemui` only**.
-- Root: an explicit `su -c 'id -u'` check in this prototype. Root-manager compatibility and the installed Vector/Zygisk combination still require phone testing.
-- Other Nubia/REDMAGIC devices: possible future ports, each requiring its own firmware inspection, backend and device verification. They are not supported by this build.
+Tile actions, volume levels, biometric authentication and power actions remain controlled by the native firmware. Quick Settings grid/layout replacement is not exposed.
 
-A firmware/hash match identifies an explicitly configured baseline. **It does not certify a customization as safe or enable a feature.** A changed firmware, SDK or System UI APK requires fresh validation.
+## Requirements
 
-## What exists now
-
-- Material 3 dark interface with device inspection, feature catalog and recovery planning information.
-- Explicit System UI APK hashing outside the UI thread, with an inspection deadline.
-- A bounded, user-initiated root check; no root request on startup.
-- Vector/Xposed module metadata and `assets/xposed_init` registration.
-- An inert module entry point that checks package, main process, model and Android version, then logs loading without installing any hooks.
-- Pure compatibility-policy tests and Android unit-test sources.
-- GitHub Actions workflow for unit tests, a debug APK, a permanent-key test APK and a signed release APK when signing secrets are configured.
-
-There is no settings write, overlay fabrication, System UI restart, boot receiver, automatic enforcement, framework installer or module installation in the current app. It does not change Toolbox's cooling, lighting, triggers or recovery services.
-
-## Planned customization areas
-
-These are development goals, not currently available features.
-
-| Area | Planned investigations |
+| Component | Supported setup |
 | --- | --- |
-| Status bar | Icon appearance/visibility, clock styling and battery presentation. |
-| Quick Settings | Tile shapes/colors, spacing, header appearance and resource/hook-specific layouts. |
-| Lock screen | Clock appearance, positioning and appropriate shortcuts. |
-| Notifications | Panel appearance and notification presentation. |
-| Profiles | Save and restore only validated customizations with explicit application. |
-| Recovery | Scoped emergency disable, recorded original state and failure-aware activation. |
+| Phone | REDMAGIC 11 Pro / **NX809J** |
+| Firmware | Validated stock REDMAGIC **Android 16** |
+| Root | Root access; current boot-animation support is validated on **KernelSU** |
+| Runtime framework | [Vector](https://github.com/JingMatrix/Vector) with a compatible Zygisk environment |
+| Companion module | **nubia-ly Recovery Guard**, installed through your root manager |
+| App package | `com.elitedarkkaiser.nubialy` |
+| Current app / guard | `0.1.55-systemless-boot` (56) / `0.1.15` (16) |
 
-Changes must use proven NX809J paths, classes and firmware behavior. An AOSP feature name or bundled class is not enough to assume a Nubia implementation works.
+Recommended Vector scopes are **System UI** (`com.android.systemui`) and **Fingerprint SensorService** (`com.fingerprint.sensorservice`). The latter is used for the firmware's separate fingerprint renderer. These are the app's declared scopes.
 
-## Development roadmap
+## Installation
 
-1. **Build and test the foundation.** Establish the GitHub repository, run Android CI, install the app, verify model refusal and firmware/root inspection, then confirm Vector can load the inert entry point.
-2. **Implement the recovery foundation.** Prepare an independently disableable customization backend, durable transaction state and a recovery path that does not depend on a healthy modified System UI. Test disabling while cosmetic hooks remain inactive.
-3. **Validate one cosmetic feature.** Select a small status-bar appearance change after tracing the exact Nubia implementation. Verify apply, restore, process recreation and recovery before enabling it for users.
-4. **Expand one feature at a time.** Add supported status-bar, Quick Settings, lock-screen and notification changes with per-build gates and rollback behavior.
-5. **Add profiles and broader device support.** Only after feature-specific behavior is proven; new models need separate testing.
+1. Open [GitHub Actions](https://github.com/austineyoung2000/nubia-ly/actions/workflows/android.yml) and select a **successful build from `main`**.
+2. Download `nubia-ly-signed-test-apk` or `nubia-ly-signed-release-apk`, plus `nubia-ly-guard-test-module` from that run. GitHub may require sign-in to download artifacts.
+3. Extract the downloaded artifact archives. Install the **APK**, then install the **inner guard module ZIP** through your root manager. Do not flash GitHub's outer artifact ZIP.
+4. Enable nubia-ly in Vector, keep its declared scopes selected, grant root access in your root manager and **reboot**.
+5. Open nubia-ly and check **Setup & device**. Choose styles, then press **Enable customization** to apply them.
 
-Vector is selected for runtime hooking. Whether particular changes also need resource overlays or a separate root companion remains a feature-specific decision. A working Vector framework alone does not make an arbitrary System UI hook compatible.
+For an existing installation upgraded to the first-unlock resume build, press Enable once to capture the enabled clock settings. Later boots restore the saved enabled state without requiring another Apply.
 
-## Quick Settings layout validation
+<details>
+<summary><b>Applying a boot animation</b></summary>
 
-Quick Settings grid changes are blocked until the active vendor layout, pagination, animations and recovery behavior have been validated together. A row-count resource by itself is insufficient evidence that a larger grid is supported. No grid override is exposed in this prototype. See [research policy](docs/RESEARCH.md).
+Open **Boot animations**, check module compatibility, choose a card and press **Apply on next boot**. Reboot to see it. Selection alone saves a draft; it does not stage the archive.
 
-## Recovery and change policy
+The loader verifies the firmware player, target file and selected archive. On the validated KernelSU setup it binds only that animation file, without replacing stock files or installing a general mounting metamodule. Unsupported paths or competing fallback archives block application.
 
-- No activation until the feature's backend and scoped recovery mechanism are implemented and tested.
-- Every feature starts disabled and is applied only through an explicit user action.
-- Capture original state before changes and retain a durable operation identity.
-- Unknown completion cannot authorize automatic replay or be reported as success.
-- Recovery must disable only nubia-ly changes, preserving stock overlays and unrelated user modules.
-- Do not disable Rescue Party, clear System UI data, replace stock APKs or edit package registries as shortcuts.
-- Do not promise that an in-app restore button can recover every crash loop.
+**Restore stock on next boot**, or the guard's Action, disarms the animation for the next boot. An existing bind lasts until reboot. Source archives retain their original proportions and may letterbox; dynamic playback colors can differ from the preview.
 
-The independently revokeable guard, private authorization, freshness watchdog and scoped restoration are implemented for status-bar styling. The broader recovery roadmap remains incomplete; see [recovery design](docs/RECOVERY_DESIGN.md).
+</details>
 
-## Local compatibility baseline
+<details>
+<summary><b>Updating the app and guard</b></summary>
 
-For device research, optionally create an ignored `local-baseline.properties` with `fingerprint` and `systemUiSha256` values obtained from the build being inspected. Do not commit that file or private device logs. Without this configuration, the app still performs inspection but reports the firmware as unvalidated. A configured match never enables a customization automatically.
+Use APKs signed with the same persistent project key to update in place. Install the matching guard when its version changes, then reboot to load updated hooks and module scripts.
 
-## Build and APKs
+Secretless fork builds use an ephemeral debug key and are not reliable in-place updates to official signed builds. See [signing documentation](docs/SIGNING.md).
 
-Requirements: **JDK 17**, Android SDK **platform 35 / build-tools 35.0.0**, and **Gradle 8.7**. Runtime validation targets the observed Android 16 firmware. SDK location belongs in ignored `local.properties`.
+</details>
+
+## Recovery
+
+Use **Restore stock appearance** for normal restoration, or **Emergency stop** to revoke active customization. The root-manager **Recovery Guard → Action** provides an independent stop. If the app is unavailable, its fixed Termux command is:
 
 ```sh
-./gradlew testDebugUnitTest assembleDebug
+su -c 'sh /data/adb/modules/nubia_ly_guard/guardctl.sh stop'
 ```
 
-The wrapper downloads Gradle 8.7 on first use. Alternatively use an installed Gradle 8.7 with the same task names.
+For manual recovery, disable nubia-ly in Vector and disable its Recovery Guard module through your root manager, then reboot. Boot-animation restoration takes effect after reboot.
 
-To run compatibility-policy checks without Android SDK:
+The boot loader disarms an unconfirmed animation attempt for the following boot. This is conservative recovery, **not a guarantee against every boot loop**. Keep a working root-manager recovery method available. See [recovery design](docs/RECOVERY_DESIGN.md) and [boot/resume implementation](docs/BOOT_RESUME_AND_ANIMATIONS.md).
+
+## FAQ
+
+<details>
+<summary><b>Is this a ROM, an Iconify fork or part of Toolbox?</b></summary>
+
+It is a standalone Android app with Nubia-specific runtime backends. Iconify inspires the customization experience; RisingOS inspires the visual design and supplies credited artwork. Toolbox is a separate companion project for hardware and gaming controls.
+
+</details>
+
+<details>
+<summary><b>Will it work on another phone or an AOSP ROM?</b></summary>
+
+Only NX809J stock Android 16 is currently supported. An Android version match alone is insufficient: the vendor views, resources, separate fingerprint renderer and boot player must match validated implementations.
+
+</details>
+
+<details>
+<summary><b>Does it replace system APKs or boot-animation files?</b></summary>
+
+No stock APK is replaced. Cosmetic features use scoped runtime hooks. Boot artwork uses a systemless file bind while the original archive remains unchanged. Restore revokes runtime styling; boot binds expire on reboot.
+
+</details>
+
+<details>
+<summary><b>Why did changing a card not change my phone?</b></summary>
+
+Most cards save the shared editor draft. Press **Enable customization** to apply it. Boot animations have a separate **Apply on next boot** action and require a reboot. Use the setup checks if the framework, guard or firmware is not recognized.
+
+</details>
+
+<details>
+<summary><b>Do notification counts show unread messages?</b></summary>
+
+They count eligible notification icon entries represented by the overflow indicator. They are not unread-message counts. Grouping, available space and the native icon maximum still apply.
+
+</details>
+
+<details>
+<summary><b>Can I use other customization modules too?</b></summary>
+
+Modules that style the same views or replace the same boot archive can conflict. When investigating a problem, test with overlapping customization disabled and include the active module list in your report.
+
+</details>
+
+## Development & contributions
+
+Bug reports should include the device model, firmware/Android version, app and guard versions, root/framework versions, affected feature, reproduction steps and screenshots where helpful. Remove personal information from logs before sharing.
+
+Development uses **test branches and draft pull requests**. GitHub Actions runs policy/backend tests, guard shell tests, Android unit tests, APK builds and signature verification. Device testing and explicit owner approval precede merging. Android builds run through GitHub Actions; device diagnostics use Termux and `su -c`.
+
+Host policy checks:
 
 ```sh
 sh tests/run-policy-tests.sh
 ```
 
-GitHub Actions produces `nubia-ly-signed-test-apk` and `nubia-ly-signed-release-apk` using the dedicated persistent key. These repository secrets are configured:
+Pinned boot assets are prepared by CI before Android compilation. See [asset provenance](third_party/rising-bootanimations/README.md), [research policy](docs/RESEARCH.md), and the feature implementation notes in [`docs/`](docs/). Older milestone documents record their state at the time; this README summarizes the current merged feature set.
 
-- `RELEASE_KEYSTORE_BASE64`
-- `SIGNING_STORE_PASSWORD`
-- `SIGNING_KEY_ALIAS`
-- `SIGNING_KEY_PASSWORD`
+## Credits
 
-The public certificate digest is pinned in `docs/SIGNING_CERT_SHA256.txt`; CI verifies both APKs before publishing. Secretless fork CI produces an explicitly ephemeral debug artifact. Incomplete signing configuration fails. See [signing notes](docs/SIGNING.md).
+- **[RisingOS Revived](https://github.com/RisingOS-Revived)** — Personalizations UI inspiration, fingerprint assets/animations, connectivity and battery artwork, style references and boot animations. See [Personalizations](https://github.com/RisingOS-Revived/android_packages_apps_Personalizations), [vendor addons](https://github.com/RisingOS-Revived/android_vendor_addons) and [vendor rising](https://github.com/RisingOS-Revived/android_vendor_rising).
+- **[Iconify / Mahmud0808](https://github.com/Mahmud0808/Iconify)** — inspiration for an organized Android customization experience and this README's presentation.
+- **[Redmagic 11 Toolbox](https://github.com/austineyoung2000/Redmagic-11-Toolbox)** — companion project and inspiration for device-specific documentation.
+- **[Vector / JingMatrix](https://github.com/JingMatrix/Vector)** and the **[Xposed API](https://api.xposed.info/)** — runtime framework and hook API.
+- **[Android Open Source Project](https://source.android.com/)** and **[Material Components](https://github.com/material-components/material-components-android)** — platform and native interface components.
+- **EliteDarkKaiser / Austin Young** and device testers — NX809J research, implementation and phone validation.
 
-**Validation at scaffold creation:** pure Java policy smoke tests passed; manifest/resource XML, workflow structure, module registration and source archive were checked. Android compilation, policy checks and unit tests subsequently passed in [GitHub Actions](https://github.com/austineyoung2000/nubia-ly/actions/runs/38456648254) at `6d892d4376fa6420eb50addac79c52996bba5751`; a [debug test APK](https://github.com/austineyoung2000/nubia-ly/actions/runs/38456648254/artifacts/11842337147) is available. [PR1](https://github.com/austineyoung2000/nubia-ly/pull/1) was merged after user phone checks for app activation and emergency stop. Independent System UI loading and boot recovery remain unverified. Permanent signing is configured for the 0.1.2 test branch.
-
-## Phone testing and contribution workflow
-
-- Test branches and draft PRs; no automatic merge.
-- The owner tests APKs on their NX809J and explicitly authorizes merges.
-- Before editing, inspect current remote HEAD and preserve dirty worktrees.
-- Device commands use **Termux and `su -c`**, never adb.
-- Commit messages use an area prefix and explain the problem, implementation, behavior and safeguards. Testing evidence belongs in the PR description.
-- Do not claim successful phone verification without supplied results.
-
-For the first APK, test app launch, firmware/root inspection and optional inert Vector module loading. There are no cosmetic toggles to test yet. See [Vector integration](docs/VECTOR.md).
-
-## Development history
-
-The following entries describe earlier milestones; the current feature summary is above.
-
-### Recovery foundation update (0.1.1, merged)
-
-The app now shows Vector activation detected by an app-only probe. This does not prove System UI injection; check the separate module log after selecting System UI and rebooting. System UI continues to register zero customization hooks.
-
-A persistent emergency-stop latch defaults to stopped. The app can save the stop, but cannot arm or apply any feature. The prerequisite policy fails closed unless activation, baseline, recovery and feature validation all pass. Full independent boot recovery remains pending; this milestone does not claim boot-loop protection. Disable nubia-ly in Vector and reboot for the manual fallback.
-
-## Independent guard test (0.1.2, draft)
-
-A separate probe-only root-manager ZIP provides an independent Action/Termux stop and boot invalidation. A root-owned atomic probe is bound to the current boot and expires within 60 seconds. Rootless app/System UI readers fail closed on missing, malformed, unsafe or unreadable state. No SELinux policy is changed, and no customization can be activated. See the [phone checklist and limits](docs/GUARD_TEST.md). This is a prerequisite transport test; complete recovery from future cosmetic hooks still requires validation before those features ship.
-
-## System UI guard verification (0.1.4, draft)
-
-**Check System UI guard** sends one signature-protected read-only request to running System UI. System UI asks the app-side protected provider for a fresh guard validation, because direct access may be blocked by the firmware SELinux policy. The provider checks the resolved System UI UID and framework-verified package attribution before reading the one fixed root-owned probe. Fresh version/nonce-matched replies distinguish broker-valid, broker-blocked, broker-busy and broker-unavailable; absent/stale replies stay unverified. No raw file or boot identifier is returned. One diagnostic lifecycle hook registers the receiver, with no cosmetic hooks or root commands. No continuous polling. Update using the existing permanent key and reboot to load the new receiver. The guard module itself is unchanged. See the [live diagnostic phone test](docs/GUARD_TEST.md).
-
-## Preview lifecycle simulation (0.1.5, draft)
-
-An explicit lifecycle-only test uses a separate current-boot permit lasting at most 60 seconds. System UI checks it through the protected broker, expires the session automatically and stops when the permit is revoked/replaced or the broker is unavailable. Late workers cannot restart a stopped attempt. Bounded two-second validation runs only during this simulation, with no permanent polling or root commands. Root module Action and app Emergency stop revoke the test through independent state checks. Restart/reboot never auto-starts it.
-
-This milestone changes no appearance and provides no cosmetic permission. Original visual capture/rollback and crash-loop recovery remain future backend work. Update both the signed APK and guard ZIP, then follow the [phone lifecycle checklist](docs/PREVIEW_LIFECYCLE.md).
-
-## Clock-color preview preparation
-
-The 0.1.6 test build adds a read-only NX809J status-bar clock capture rehearsal. It identifies the vendor-classified top clock and tracks stock color changes through the bounded lifecycle before a future visual override. No clock color changes are enabled. See [phone test and limitations](docs/CLOCK_CAPTURE.md).
-
-## Temporary clock-color test
-
-The 0.1.9 draft adds an explicit fixed lavender status-bar clock preview, bounded to a separate 30-second root permit. End, expiry, guard Action, Emergency stop and screen-off restore the latest stock color with readback. Update both APK and guard module. This is a phone-validation test, not a persistent cosmetic release or verified full boot-loop recovery. See [install and phone checklist](docs/CLOCK_COLOR_PREVIEW.md).
-
-## Status bar clock editor
-
-The 0.1.10 test adds named color presets and a custom Material RGB/hex picker under Status bar. Only your color selection is saved. Explicit previews use the existing 30-second clock permit and stock restoration; saving and reopening never apply automatically. See [editor phone test](docs/CLOCK_EDITOR.md). Keep the 0.1.9 guard module installed.
-
-## Normal clock color enable
-
-The 0.1.12 test replaces the Clock editor's timer-driven preview with Enable clock color / Restore stock color. Enabled color has no duration limit and resumes after wake/reboot while independently authorized by the updated root guard. Root permission is requested only on explicit Enable/Restore. See [install, persistence and recovery tests](docs/CLOCK_ENABLE.md).
-
-### Clock typography test
-
-The next NX809J test adds saved relative clock size (80–120% in 5% steps, plus stock size) and bold weight to the persistent Clock editor. Enable applies the saved style alongside color; Restore stock, guard Action and Emergency stop revoke the entire clock style. See [clock typography](docs/CLOCK_STYLE.md). User confirms multiple clock sizes, colors and bold work on NX809J. The next signed test adds a saved Show seconds switch using the stock clock seconds lifecycle; seconds phone validation is pending.
-
-### Status-bar clock batch — 0.1.16
-
-A single test APK adds italic, relative letter spacing, built-in font family selection (Stock/Sans serif/Serif/Monospace), and hide clock. Combine them with the merged size, bold, color and seconds controls. Persistent Enable/Restore and independent guard recovery apply to the whole clock style. See [batch checklist](docs/CLOCK_BATCH.md); phone validation is pending.
-
-### Larger status-bar batch — 0.1.17
-
-Seven icon and battery controls share the persistent Enable/Restore flow with the working clock editor. Applied icon/battery settings and tint color are frozen separately from draft edits and bound to the enabled root identity. See [one batch checklist and scope](docs/STATUSBAR_BATCH.md). Phone results are pending for this batch.
-
-### Status-bar details batch — 0.1.18
-
-Independent icon RGB/hex color, separate status/notification/battery opacity, live individual icon hiding, date beside the stock clock and an icons/battery draft reset arrive together in one signed test APK. New date/icon settings stay bound to the applied identity snapshot; choices do not apply until Enable. See [combined checklist](docs/STATUSBAR_DETAILS.md). The user confirms the corrected 0.1.19 batch works flawlessly; PR #12 is merged.
-
-
-### Clock date formatting batch — 0.1.20
-
-Eight new date formats join the existing four active formats. Separate controls choose date before/after time, dot/space/dash/bar separators, and stock/upper/lower letter case. Stock time spans and formatting remain intact; dates follow the stock clock locale/timezone and tick lifecycle. All choices use the existing applied identity snapshot and persistent Enable/Restore flow. See [one combined phone checklist](docs/CLOCK_FORMAT_BATCH.md). User confirms the displayed combination, stock restoration and continued application; PR #13 is merged.
-
-
-### Status-bar position batch — 0.1.22
-
-A dedicated Hide cooling pump icon switch and nine independent controls adjust horizontal offset, vertical offset and rotation for compatible status icons, notification icons and battery. Offsets are bounded to ±8 dp and rotation to ±20°, relative to current stock properties. Applied selections remain identity-bound; existing guards restore the latest stock properties. The editor labels the shared indicator controls “Mobile service icon” and explains that other compatible system indicators can share them. See [combined phone checklist](docs/STATUSBAR_POSITION_BATCH.md). The user confirms the batch works, including screenshots of offsets and rotation; detailed pump-state and reboot results were not supplied.
-
-
-### Vendor indicator batch — 0.1.23
-
-Individual fan, pump and refresh-rate hide options are grouped under Load individual system status icons, alongside the live alarm and other icon entries. A collapsed Fan, pump & refresh-rate appearance section contains six independent size/opacity controls. Existing pump hiding survives the move. All three vendor views are identified from the uploaded NX809J stock System UI and stay scoped to PhoneStatusBarView; no cooling settings, hardware controls or display-rate settings are written. See [combined checklist](docs/VENDOR_INDICATOR_BATCH.md). Phone results are pending.
-
-
-### Quick Settings and lock-screen style batch — 0.1.25
-
-Quick Settings circle tiles now offer Stock, Square, Rounded square and Leaf shapes by changing only the inspected gradient's shape/corners. Wide top tiles retain stock shape and colors, tile state/actions and layout remain stock. Main/secondary tile labels and normal Nubia lock-screen clock/date each gain visual size, opacity, horizontal/vertical offset, rotation and hiding. The Quick Settings and Lock screen cards open the grouped appearance editor. These selections share the existing frozen identity-bound Enable/Restore flow. AOD/pulsing suspends lock-screen changes. See [combined checklist](docs/QS_LOCKSCREEN_BATCH.md). Phone testing is pending.
-
-
-### Fingerprint animation batch — 0.1.37
-
-A separate animation picker adds Stock, None and 39 RisingOS effects with looping previews. Scoped native-frame substitution preserves biometric timing and windows. Host validation passes; Android build and phone validation remain pending. See [implementation, limitations and one phone batch](docs/UDFPS_ANIMATIONS.md).
+Upstream notices and asset provenance remain with their respective files in [`third_party/`](third_party/) and the app's bundled notices. Credits do not grant a blanket license to third-party artwork. Proprietary stock firmware/APKs supplied for inspection are not distributed in this repository.
