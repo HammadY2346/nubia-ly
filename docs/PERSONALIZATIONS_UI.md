@@ -25,3 +25,23 @@ cancellation and recreation), debug/release packaging and pinned signing checks.
 Phone check: browse all three dashboard cards, back navigation, font dropdown and
 preview, cancel then Apply, Enable and Restore. Check large text, landscape,
 scrolling and access to setup/recovery. Animations from merged PR #18 remain.
+
+## Inner appearance editors — 0.1.39
+
+The approved main dashboard is unchanged from 0.1.38. Lock screen, Quick Settings
+and Status bar now open illustrative draft previews with tonal navigation rows.
+Lock screen groups clock, date, fonts, fingerprint and widgets. Quick Settings
+separates shapes from label styles. Status bar groups clock typography, date,
+clock color, icons/battery and individual indicator controls. Icon details use
+expandable tonal groups to reduce the visible control count.
+
+Overview/detail navigation stays in one activity with one draft and one ordered
+save worker. Toolbar and Android Back return from details to the section overview;
+a second Back returns to the main dashboard. The current section/page is saved
+through recreation. Previews are app-only samples, not captures or exact device
+layout simulations. No polling, root work or running animation is added by preview
+rendering. Enable/Restore still owns real appearance changes across all sections.
+
+Phone check: overview/detail/Back for every group, controls and draft persistence,
+font/icon/animation picker return and cancellation, large text/rotation, all three
+previews and Apply/Restore. UI tests cover in-place routing and draft view retention.

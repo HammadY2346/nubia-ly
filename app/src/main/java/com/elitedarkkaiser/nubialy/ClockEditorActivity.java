@@ -30,6 +30,8 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private static final int PICK_FINGERPRINT=7402,PICK_ANIMATION=7403,PICK_CLOCK_FONT=7404;
     private int fingerprintAnimation;private MaterialButton animationPicker;
     private LinearLayout content;
+    private EditorPages pages;
+    private final java.util.List<EditorPreview> editorPreviews=new java.util.ArrayList<>();
     private TextView swatch, selection, saveStatus, previewStatus;
     private MaterialButton enable, restore, check;
     private ChipGroup presets;
@@ -76,9 +78,11 @@ public final class ClockEditorActivity extends AppCompatActivity {
         });
         var editorToolbar=PersonalizationUi.toolbar(this,"Personalizations");content.addView(editorToolbar);
         ChipGroup sections=new ChipGroup(this);sections.setSingleSelection(true);content.addView(sections);
-        java.util.List<View> statusPanels=new java.util.ArrayList<>(),qsPanels=new java.util.ArrayList<>(),lockPanels=new java.util.ArrayList<>();
-        content.addView(text("Saved choices apply together after Enable. Restore stock releases status-bar, Quick Settings and lock-screen appearance.", 15, false));
-        LinearLayout colors = card("Clock color");statusPanels.add((View)colors.getParent());
+        pages=new EditorPages(this,editorToolbar,sections,scroll);
+        editorOverview("lock_screen","Lock screen",new String[][]{{"clock","Clock","Size, opacity & position"},{"date","Date","Visibility & placement"},{"fonts","Clock font styles","Preview your typography"},{"fingerprint","Fingerprint","Icons & animations"},{"widgets","Widgets","Weather, alarm & battery"}});
+        editorOverview("quick_settings","Quick Settings",new String[][]{{"tiles","Tile shapes","Large & small tiles"},{"labels","Label styles","Main & secondary text"}});
+        editorOverview("status_bar","Status bar",new String[][]{{"typography","Clock style","Font, size & seconds"},{"date","Date format","Format, position & letter case"},{"color","Clock color","Presets & custom colors"},{"icons","Icons & battery","Colors, size & placement"},{"inventory","Individual icons","Visibility & vendor indicators"}});
+        LinearLayout colors = editorPanel("status_bar","color","Clock color");
         swatch = text("12:34", 44, true); colors.addView(swatch);
         selection = text("", 16, true); colors.addView(selection);
         presets = new ChipGroup(this); presets.setSingleSelection(true); colors.addView(presets);
@@ -91,46 +95,53 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         MaterialButton custom = button("Custom color"); colors.addView(custom); custom.setOnClickListener(v -> customColor());
         saveStatus = text("Saved selection loaded.", 14, false); colors.addView(saveStatus);
-        LinearLayout icons = card("Icons & battery");statusPanels.add((View)icons.getParent());
+        LinearLayout icons = editorPanel("status_bar","icons","Icons & battery");
         icons.addView(text("Mobile service icon controls style the compatible calling-service indicator, such as VoLTE. Other compatible system indicators can share these settings. App notification icons are separate. Some Wi-Fi and signal icons keep stock appearance. Battery keeps stock charge and warning colors.",14,false));
-        iconSelection=text("",16,true);icons.addView(iconSelection);iconPresets=new ChipGroup(this);iconPresets.setSingleSelection(true);icons.addView(iconPresets);
+        LinearLayout iconTints=detailGroup(icons,"Icon color","Mobile service indicator");
+        iconSelection=text("",16,true);iconTints.addView(iconSelection);iconPresets=new ChipGroup(this);iconPresets.setSingleSelection(true);iconTints.addView(iconPresets);
         for(ClockColorPolicy.Preset preset:ClockColorPolicy.PRESETS){
             Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(preset.name());chip.setTag(preset.color());chip.setCheckable(true);
             GradientDrawable dot=new GradientDrawable();dot.setShape(GradientDrawable.OVAL);dot.setColor(preset.color());dot.setSize(dp(20),dp(20));chip.setChipIcon(dot);chip.setChipIconVisible(true);
             chip.setOnClickListener(v->chooseIcon(preset.color()));iconPresets.addView(chip);statusControls.add(chip);
         }
-        MaterialButton iconCustom=button("Custom mobile service icon color");icons.addView(iconCustom);statusControls.add(iconCustom);iconCustom.setOnClickListener(v->customColor(true));redrawIcon();
-        statusSwitch(icons,"Tint mobile service icon",StatusBarStyle.TINT);
-        statusSwitch(icons,"Hide mobile service icon",StatusBarStyle.HIDE_SYSTEM);
-        statusSwitch(icons,"Hide notification icons",StatusBarStyle.HIDE_NOTIFICATIONS);
-        statusSwitch(icons,"Hide battery",StatusBarStyle.HIDE_BATTERY);
-        statusScale(icons,"Mobile service icon size",systemScale,n->systemScale=n);
-        statusScale(icons,"Notification icon size",notificationScale,n->notificationScale=n);
-        statusScale(icons,"Battery size",batteryScale,n->batteryScale=n);
-        statusOpacity(icons,"Mobile service icon opacity",systemOpacity,n->systemOpacity=n);
-        statusOpacity(icons,"Notification icon opacity",notificationOpacity,n->notificationOpacity=n);
-        statusOpacity(icons,"Battery opacity",batteryOpacity,n->batteryOpacity=n);
-        icons.addView(text("Icon position & rotation",16,true));
-        icons.addView(text("Offsets move compatible icons relative to stock by up to 8 dp. Rotation adds up to 20° around the stock pivot. Zero keeps stock. Large combined values may clip or overlap; these controls do not reserve more layout space.",14,false));
-        transformControls(icons,"Mobile service icon",0);transformControls(icons,"Notification icons",1);transformControls(icons,"Battery",2);
-        inventoryButton=button("Load individual system status icons");icons.addView(inventoryButton);inventoryButton.setOnClickListener(v->{enabled(false);client.inventory(slots->{if(alive())showSlots(slots);},result->{if(alive()){enabled(true);saveStatus.setText(result);}});});
-        iconSlots=new LinearLayout(this);iconSlots.setOrientation(LinearLayout.VERTICAL);icons.addView(iconSlots);showSlots(java.util.List.of());
+        MaterialButton iconCustom=button("Custom mobile service icon color");iconTints.addView(iconCustom);statusControls.add(iconCustom);iconCustom.setOnClickListener(v->customColor(true));redrawIcon();
+        statusSwitch(iconTints,"Tint mobile service icon",StatusBarStyle.TINT);
+        LinearLayout visibility=detailGroup(icons,"Visibility","Mobile service, notifications & battery");
+        statusSwitch(visibility,"Hide mobile service icon",StatusBarStyle.HIDE_SYSTEM);
+        statusSwitch(visibility,"Hide notification icons",StatusBarStyle.HIDE_NOTIFICATIONS);
+        statusSwitch(visibility,"Hide battery",StatusBarStyle.HIDE_BATTERY);
+        LinearLayout sizes=detailGroup(icons,"Size & opacity","Scale compatible icons independently");
+        statusScale(sizes,"Mobile service icon size",systemScale,n->systemScale=n);
+        statusScale(sizes,"Notification icon size",notificationScale,n->notificationScale=n);
+        statusScale(sizes,"Battery size",batteryScale,n->batteryScale=n);
+        statusOpacity(sizes,"Mobile service icon opacity",systemOpacity,n->systemOpacity=n);
+        statusOpacity(sizes,"Notification icon opacity",notificationOpacity,n->notificationOpacity=n);
+        statusOpacity(sizes,"Battery opacity",batteryOpacity,n->batteryOpacity=n);
+        LinearLayout geometry=detailGroup(icons,"Position & rotation","Offsets relative to stock");
+        geometry.addView(text("Icon position & rotation",16,true));
+        geometry.addView(text("Offsets move compatible icons relative to stock by up to 8 dp. Rotation adds up to 20° around the stock pivot. Zero keeps stock. Large combined values may clip or overlap; these controls do not reserve more layout space.",14,false));
+        transformControls(geometry,"Mobile service icon",0);transformControls(geometry,"Notification icons",1);transformControls(geometry,"Battery",2);
+        LinearLayout inventory=editorPanel("status_bar","inventory","Individual icons");
+        inventory.addView(text("Choose which compatible system indicators appear in your status bar.",14,false));
+        inventoryButton=button("Load individual system status icons");inventory.addView(inventoryButton);inventoryButton.setOnClickListener(v->{enabled(false);client.inventory(slots->{if(alive())showSlots(slots);},result->{if(alive()){enabled(true);saveStatus.setText(result);}});});
+        iconSlots=new LinearLayout(this);iconSlots.setOrientation(LinearLayout.VERTICAL);inventory.addView(iconSlots);showSlots(java.util.List.of());
         resetIcons=button("Reset icons & battery selections");icons.addView(resetIcons);resetIcons.setOnClickListener(v->{
             enabled(false);worker.execute(()->{boolean saved=StatusBarPreferences.save(getApplicationContext(),StatusBarStyle.STOCK.withSurfaces(currentSurfaces()));runOnUiThread(()->{if(alive()){if(saved){finish();startActivity(new android.content.Intent(this,ClockEditorActivity.class));}else {enabled(true);saveStatus.setText("Reset could not be saved.");}}});});
         });
         icons.addView(text("Reset clears draft icon/battery controls; press Enable afterward to apply stock icon/battery appearance while keeping your clock choices.",14,false));
         icons.addView(text("100% uses stock size. These controls apply to recognized top-status-bar views; other icons may keep their stock appearance. Press Enable to apply the entire saved style.",14,false));
-        LinearLayout surfaces=card("Quick Settings");qsPanels.add((View)surfaces.getParent());
+        LinearLayout surfaces=editorPanel("quick_settings","tiles","Tile shapes");
         surfaces.addView(text("Choose independent shapes for large and small tiles. Label appearance keeps tile actions unchanged. Press Enable to apply saved choices.",14,false));
         shapeControls(surfaces,"Large QS tiles",true);
         shapeControls(surfaces,"Small QS tiles",false);
         surfaces.addView(text("Large QS tiles are the four wide tiles at the top. Small QS tiles are the tiles below brightness. Each group has its own shape. Press Enable to apply.",14,false));
-        surfaceControls(surfaces,"Quick Settings main labels",0);surfaceControls(surfaces,"Quick Settings secondary labels",1);
-        LinearLayout lockscreen=card("Lock screen");lockPanels.add((View)lockscreen.getParent());
-        surfaceControls(lockscreen,"Lock-screen clock",2);surfaceControls(lockscreen,"Lock-screen date",3);
-        lockScreenExtras(lockscreen);
+        LinearLayout labels=editorPanel("quick_settings","labels","Label styles");
+        surfaceControls(labels,"Main labels",0);surfaceControls(labels,"Secondary labels",1);
+        LinearLayout clock=editorPanel("lock_screen","clock","Clock appearance");surfaceControls(clock,"Clock",2);
+        LinearLayout date=editorPanel("lock_screen","date","Date appearance");surfaceControls(date,"Date",3);
+        LinearLayout lockscreen=editorPanel("lock_screen","widgets","Widgets");lockScreenExtras(lockscreen);
         if(getIntent().getBooleanExtra("surfaces",false))surfaces.post(()->scroll.smoothScrollTo(0,((View)surfaces.getParent()).getTop()));
-        LinearLayout typography = card("Status-bar clock style");statusPanels.add((View)typography.getParent());
+        LinearLayout typography = editorPanel("status_bar","typography","Clock style");
         TextView sizeLabel = text("", 15, true); typography.addView(sizeLabel);
         Slider size = new Slider(this); sizeControl = size; size.setValueFrom(80); size.setValueTo(120); size.setStepSize(5);
         size.setValue(sizePercent == 0 ? 100 : sizePercent); typography.addView(size);
@@ -149,7 +160,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
             chip.setOnClickListener(v -> { fontFamily = font; for(int n=0;n<fontControl.getChildCount();n++){Chip c=(Chip)fontControl.getChildAt(n);c.setChecked((Integer)c.getTag()==font);} saveExtras(); }); fontControl.addView(chip);
         }
         hideControl = new com.google.android.material.materialswitch.MaterialSwitch(this); hideControl.setText("Hide status-bar clock"); hideControl.setChecked(hidden); typography.addView(hideControl);
-        hideControl.setOnCheckedChangeListener((v, checked) -> { hidden = checked; final boolean requested = checked;
+        hideControl.setOnCheckedChangeListener((v, checked) -> { hidden = checked;refreshEditorPreviews(); final boolean requested = checked;
             worker.execute(() -> { boolean saved = ClockColorPreferences.saveHidden(getApplicationContext(), requested); runOnUiThread(() -> { if(alive()) saveStatus.setText(saved ? "Visibility saved. Press Enable to apply it." : "Visibility could not be saved."); }); }); });
         italicControl = new com.google.android.material.materialswitch.MaterialSwitch(this);
         italicControl.setText("Italic clock"); italicControl.setChecked(italic); typography.addView(italicControl);
@@ -169,16 +180,18 @@ public final class ClockEditorActivity extends AppCompatActivity {
         });
         typography.addView(text("Seconds update using the stock clock while awake. They can use more power and status-bar space.", 14, false));
         typography.addView(text("Size follows your stock font scaling. Press Enable to apply your saved size and weight with the selected color.", 14, false));
-        dateChoices(typography,"Date format",ClockDatePolicy.LABELS,0);
-        dateChoices(typography,"Date position",ClockDatePolicy.POSITIONS,1);
-        dateChoices(typography,"Date separator",ClockDatePolicy.SEPARATOR_LABELS,2);
-        dateChoices(typography,"Date letter case",ClockDatePolicy.CASE_LABELS,3);
-        typography.addView(text("Date uses your stock locale and timezone. Position, separator and letter case affect only the added date; time keeps its stock format. Long dates add width. Press Enable to apply your saved choices.",14,false));
-        String initial=getIntent().getStringExtra("section");if(initial==null)initial=getIntent().getBooleanExtra("surfaces",false)?"quick_settings":"status_bar";
+        LinearLayout dateFormats=editorPanel("status_bar","date","Date format");
+        dateChoices(dateFormats,"Date format",ClockDatePolicy.LABELS,0);
+        dateChoices(dateFormats,"Date position",ClockDatePolicy.POSITIONS,1);
+        dateChoices(dateFormats,"Date separator",ClockDatePolicy.SEPARATOR_LABELS,2);
+        dateChoices(dateFormats,"Date letter case",ClockDatePolicy.CASE_LABELS,3);
+        dateFormats.addView(text("Date uses your stock locale and timezone. Position, separator and letter case affect only the added date; time keeps its stock format. Long dates add width. Press Enable to apply your saved choices.",14,false));
+        String initial=state==null?getIntent().getStringExtra("section"):state.getString("editor_section");if(initial==null)initial=getIntent().getBooleanExtra("surfaces",false)?"quick_settings":"status_bar";
         String[] sectionIds={"status_bar","quick_settings","lock_screen"},sectionNames={"Status bar","Quick Settings","Lock screen"};
-        for(int i=0;i<sectionIds.length;i++){final String id=sectionIds[i], sectionTitle=sectionNames[i];if(id.equals(initial))editorToolbar.setTitle(sectionTitle);Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(sectionNames[i]);chip.setCheckable(true);sections.addView(chip);chip.setChecked(id.equals(initial));chip.setOnClickListener(v->{editorToolbar.setTitle(sectionTitle);for(View panel:statusPanels)panel.setVisibility(id.equals("status_bar")?View.VISIBLE:View.GONE);for(View panel:qsPanels)panel.setVisibility(id.equals("quick_settings")?View.VISIBLE:View.GONE);for(View panel:lockPanels)panel.setVisibility(id.equals("lock_screen")?View.VISIBLE:View.GONE);chip.setChecked(true);});}
-        for(View panel:statusPanels)panel.setVisibility(initial.equals("status_bar")?View.VISIBLE:View.GONE);for(View panel:qsPanels)panel.setVisibility(initial.equals("quick_settings")?View.VISIBLE:View.GONE);for(View panel:lockPanels)panel.setVisibility(initial.equals("lock_screen")?View.VISIBLE:View.GONE);
+        for(int i=0;i<sectionIds.length;i++){final String id=sectionIds[i];Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(sectionNames[i]);chip.setCheckable(true);sections.addView(chip);chip.setChecked(id.equals(initial));chip.setOnClickListener(v->{pages.show(id,"");chip.setChecked(true);});}
+        pages.show(initial,state==null?"":state.getString("editor_page",""));
         LinearLayout controls = card("Apply your style");
+        ((android.view.ViewGroup)saveStatus.getParent()).removeView(saveStatus);controls.addView(saveStatus);
         controls.addView(text("Enable applies saved choices across all three areas. Restore stock removes the applied style.", 15, false));
         controls.addView(text("Requires root and the updated recovery guard. Your enabled color resumes after wake or reboot. The guard Action independently turns it off.", 14, false));
         previewStatus = text(getSharedPreferences("recovery", MODE_PRIVATE).getBoolean("restart_recovery_stopped", false)
@@ -210,7 +223,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     }
     private StatusBarStyle currentStatusBar() { return new StatusBarStyle(statusMask,systemScale,notificationScale,batteryScale,systemOpacity,notificationOpacity,batteryOpacity,hiddenSlots,systemTransform,notificationTransform,batteryTransform,fanAppearance,pumpAppearance,refreshAppearance,currentSurfaces()); }
     private void redrawIcon(){iconSelection.setText("Mobile service icon color: "+ClockColorPolicy.hex(iconColor));iconSelection.setTextColor(iconColor);for(int n=0;n<iconPresets.getChildCount();n++){Chip c=(Chip)iconPresets.getChildAt(n);c.setChecked((Integer)c.getTag()==iconColor);}}
-    private void chooseIcon(int color){if(!ClockColorPolicy.valid(color))return;iconColor=color;redrawIcon();worker.execute(()->{boolean saved=StatusBarPreferences.saveColor(getApplicationContext(),color);runOnUiThread(()->{if(alive())saveStatus.setText(saved?"Icon color saved. Press Enable to apply it.":"Icon color could not be saved.");});});}
+    private void chooseIcon(int color){if(!ClockColorPolicy.valid(color))return;iconColor=color;redrawIcon();refreshEditorPreviews();worker.execute(()->{boolean saved=StatusBarPreferences.saveColor(getApplicationContext(),color);runOnUiThread(()->{if(alive())saveStatus.setText(saved?"Icon color saved. Press Enable to apply it.":"Icon color could not be saved.");});});}
     private void showSlots(java.util.List<String> live){
         for(int n=0;n<iconSlots.getChildCount();n++)removeSlotControls(iconSlots.getChildAt(n));iconSlots.removeAllViews();java.util.Set<String> values=new java.util.TreeSet<>(live);values.addAll(hiddenSlots);
         indicatorHide("Hide cooling fan icon",StatusBarStyle.HIDE_FAN);
@@ -231,8 +244,9 @@ public final class ClockEditorActivity extends AppCompatActivity {
         slider.addOnChangeListener((v,value,user)->{if(user){selection.accept((int)value);label.setText(title+": "+(int)value+"%");saveStatusBar();}});
     }
     private void saveStatusBar() {
+        refreshEditorPreviews();
         final StatusBarStyle value=currentStatusBar();
-        worker.execute(()->{boolean saved=StatusBarPreferences.save(getApplicationContext(),value);runOnUiThread(()->{if(alive())saveStatus.setText(saved?"Status-bar selections saved. Press Enable to apply them.":"Status-bar selections could not be saved.");});});
+        worker.execute(()->{boolean saved=StatusBarPreferences.save(getApplicationContext(),value);runOnUiThread(()->{if(alive())saveStatus.setText(saved?"Style choices saved. Press Enable to apply.":"Status-bar selections could not be saved.");});});
     }
     private void statusSwitch(LinearLayout box,String title,int flag) {
         var toggle=new com.google.android.material.materialswitch.MaterialSwitch(this);toggle.setText(title);toggle.setChecked((statusMask&flag)!=0);box.addView(toggle);statusControls.add(toggle);
@@ -243,6 +257,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         slider.addOnChangeListener((v,value,user)->{if(user){selection.accept((int)value);label.setText(title+": "+(int)value+"%");saveStatusBar();}});
     }
     private void saveExtras() {
+        refreshEditorPreviews();
         final boolean requestedItalic = italic; final int requestedSpacing = spacing, requestedFamily = fontFamily;
         worker.execute(() -> { boolean saved = ClockColorPreferences.saveExtras(getApplicationContext(), requestedItalic, requestedSpacing, requestedFamily);
             runOnUiThread(() -> { if (alive()) saveStatus.setText(saved ? "Style saved. Press Enable to apply it." : "Style could not be saved."); }); });
@@ -250,6 +265,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         swatch.setLetterSpacing(spacing / 100f);
     }
     private void saveStyle() {
+        refreshEditorPreviews();
         final int requestedSize = sizePercent; final boolean requestedBold = bold, requestedSeconds = seconds;
         worker.execute(() -> { boolean saved = ClockColorPreferences.saveStyle(getApplicationContext(), requestedSize, requestedBold);
             runOnUiThread(() -> { if (alive()) saveStatus.setText(saved ? "Style saved. Press Enable to apply it." : "Style could not be saved."); }); });
@@ -270,6 +286,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         });
     }
     private void redraw() {
+        refreshEditorPreviews();
         swatch.setTextColor(selected); selection.setText(ClockColorPolicy.hex(selected));
         for (int i=0; i<presets.getChildCount(); i++) {
             Chip chip = (Chip)presets.getChildAt(i); chip.setChecked(((Integer)chip.getTag()) == selected);
@@ -342,6 +359,28 @@ public final class ClockEditorActivity extends AppCompatActivity {
             if(forIcons)chooseIcon(parsed);else choose(parsed); dialog.dismiss();
         })); dialog.show();
     }
+    private LinearLayout detailGroup(LinearLayout parent,String title,String summary){
+        LinearLayout group=new LinearLayout(this);group.setOrientation(LinearLayout.VERTICAL);group.setPadding(dp(12),dp(8),dp(12),dp(8));
+        GradientDrawable background=new GradientDrawable();background.setColor(getColor(R.color.surface_container_high));background.setCornerRadius(dp(22));group.setBackground(background);
+        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,-2);params.topMargin=dp(10);parent.addView(group,params);
+        MaterialButton open=new MaterialButton(this,null,com.google.android.material.R.attr.materialButtonTextButtonStyle);open.setAllCaps(false);open.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);open.setText(title+"  ›");open.setContentDescription(title+". "+summary+". Expand settings");group.addView(open,new LinearLayout.LayoutParams(-1,-2));
+        LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setVisibility(View.GONE);group.addView(body);open.setOnClickListener(v->{boolean show=body.getVisibility()!=View.VISIBLE;body.setVisibility(show?View.VISIBLE:View.GONE);open.setText(title+(show?"  ⌃":"  ›"));open.setContentDescription(title+". "+(show?"Collapse":"Expand")+" settings");});return body;
+    }
+    private LinearLayout editorPanel(String section,String page,String title){LinearLayout box=card(title);pages.register(section,page,title,(View)box.getParent());return box;}
+    private void editorOverview(String section,String title,String[][] items){
+        LinearLayout preview=editorPanel(section,"preview",title+" preview");
+        EditorPreview artwork=new EditorPreview(this,section,()->new EditorPreview.Draft(currentStatusBar(),selected,iconColor,sizePercent,bold,italic,hidden,fontFamily,spacing/100f));
+        editorPreviews.add(artwork);preview.addView(artwork,new LinearLayout.LayoutParams(-1,dp(section.equals("lock_screen")?280:section.equals("quick_settings")?180:100)));
+        preview.addView(text("Draft preview · sample content",12,false));
+        LinearLayout overview=editorPanel(section,"", "Make it yours");
+        for(String[] item:items){
+            com.google.android.material.card.MaterialCardView row=new com.google.android.material.card.MaterialCardView(this);row.setRadius(dp(22));row.setCardElevation(0);row.setStrokeWidth(0);row.setCardBackgroundColor(getColor(R.color.surface_container_high));row.setClickable(true);row.setFocusable(true);row.setContentDescription(item[1]+". "+item[2]);row.setTag("editor-route:"+section+":"+item[0]);
+            LinearLayout line=new LinearLayout(this);line.setGravity(Gravity.CENTER_VERTICAL);line.setPadding(dp(18),dp(12),dp(18),dp(12));line.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+            LinearLayout labels=new LinearLayout(this);labels.setOrientation(LinearLayout.VERTICAL);labels.addView(text(item[1],18,true));labels.addView(text(item[2],13,false));line.addView(labels,new LinearLayout.LayoutParams(0,-2,1));TextView arrow=text("›",26,false);line.addView(arrow);row.addView(line);
+            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,-2);params.topMargin=dp(8);overview.addView(row,params);row.setOnClickListener(v->pages.show(section,item[0]));
+        }
+    }
+    private void refreshEditorPreviews(){for(EditorPreview preview:editorPreviews)preview.invalidate();}
     private LinearLayout card(String title) {
         MaterialCardView panel = new MaterialCardView(this); PersonalizationUi.panel(panel);
         LinearLayout box = new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setPadding(dp(20),dp(20),dp(20),dp(20)); panel.addView(box);
@@ -352,7 +391,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     }
     private MaterialButton button(String title) { MaterialButton button=new MaterialButton(this);button.setText(title);button.setAllCaps(false);button.setCornerRadius(dp(28));button.setLayoutParams(new LinearLayout.LayoutParams(-1,-2));return button; }
     private int dp(int n) {return Math.round(n*getResources().getDisplayMetrics().density);}
-    @Override protected void onSaveInstanceState(Bundle state) { state.putInt("selection", selected);super.onSaveInstanceState(state); }
+    @Override protected void onSaveInstanceState(Bundle state) { if(pages!=null){state.putString("editor_section",pages.section());state.putString("editor_page",pages.page());}state.putInt("selection", selected);super.onSaveInstanceState(state); }
     @Override protected void onDestroy() {closed=true;if(client!=null)client.cancel();if(fingerprintClient!=null)fingerprintClient.cancel();worker.shutdown();super.onDestroy();}
     private void dateChoices(LinearLayout parent,String title,String[] labels,int component){
         parent.addView(text(title,15,true));ChipGroup group=new ChipGroup(this);group.setSingleSelection(true);parent.addView(group);
@@ -397,15 +436,18 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private void lockScreenExtras(LinearLayout parent){
         parent.addView(text("Widgets below the clock",18,true));
         String[] widgets={"Hide weather widget","Hide alarm widget","Hide battery widget"};for(int i=0;i<3;i++){final int bit=1<<i;var toggle=new com.google.android.material.materialswitch.MaterialSwitch(this);toggle.setText(widgets[i]);toggle.setChecked((widgetsHidden&bit)!=0);parent.addView(toggle);statusControls.add(toggle);toggle.setOnCheckedChangeListener((v,on)->{widgetsHidden=on?widgetsHidden|bit:widgetsHidden&~bit;saveStatusBar();});}
+        parent=editorPanel("lock_screen","fingerprint","Fingerprint");
         parent.addView(text("Fingerprint icon",18,true));var hide=new com.google.android.material.materialswitch.MaterialSwitch(this);hide.setText("Hide fingerprint icon");hide.setChecked(fingerprintHidden!=0);parent.addView(hide);statusControls.add(hide);hide.setOnCheckedChangeListener((v,on)->{fingerprintHidden=on?1:0;saveStatusBar();});
-        parent.addView(text("Enable nubia-ly for FingerprintSensorUi (com.fingerprint.sensorservice) in Vector as well as System UI, then reboot. Only the graphic changes. Keep touching the same sensor position to unlock. Enrollment, app authentication and always-on display use stock.",14,false));
+        LinearLayout fingerprintHelp=detailGroup(parent,"Setup & service","Vector scope and fingerprint diagnostics");
+        fingerprintHelp.addView(text("Enable nubia-ly for FingerprintSensorUi (com.fingerprint.sensorservice) in Vector as well as System UI, then reboot. Only the graphic changes. Keep touching the same sensor position to unlock. Enrollment, app authentication and always-on display use stock.",14,false));
         com.elitedarkkaiser.nubialy.xposed.FingerprintGlyphDrawable.artworkResources(getResources());
         fingerprintPreview=new android.widget.ImageView(this);fingerprintPreview.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);LinearLayout.LayoutParams iconSize=new LinearLayout.LayoutParams(dp(88),dp(88));iconSize.gravity=Gravity.CENTER_HORIZONTAL;parent.addView(fingerprintPreview,iconSize);
         fingerprintPicker=button("UDFPS icon");parent.addView(fingerprintPicker);statusControls.add(fingerprintPicker);redrawFingerprint();
         fingerprintPicker.setOnClickListener(v->{android.content.Intent intent=new android.content.Intent(this,FingerprintPickerActivity.class);intent.putExtra("selection",fingerprintStyle);startActivityForResult(intent,PICK_FINGERPRINT);});
         parent.addView(text("Choose an icon on its own page, then press Enable customization to apply. The icon follows stock visibility, including face unlock.",14,false));
         animationPicker=button("Fingerprint animation · "+FingerprintAnimations.NAMES[fingerprintAnimation]);parent.addView(animationPicker);statusControls.add(animationPicker);animationPicker.setOnClickListener(v->{android.content.Intent intent=new android.content.Intent(this,FingerprintAnimationPickerActivity.class);intent.putExtra("selection",fingerprintAnimation);startActivityForResult(intent,PICK_ANIMATION);});
-        TextView serviceStatus=text("Fingerprint service has not been checked.",14,false);parent.addView(serviceStatus);MaterialButton serviceCheck=button("Check fingerprint service");parent.addView(serviceCheck);serviceCheck.setOnClickListener(v->{serviceStatus.setText("Checking fingerprint service…");fingerprintClient.check(serviceStatus::setText);});
+        TextView serviceStatus=text("Fingerprint service has not been checked.",14,false);fingerprintHelp.addView(serviceStatus);MaterialButton serviceCheck=button("Check fingerprint service");fingerprintHelp.addView(serviceCheck);serviceCheck.setOnClickListener(v->{serviceStatus.setText("Checking fingerprint service…");fingerprintClient.check(serviceStatus::setText);});
+        parent=editorPanel("lock_screen","fonts","Clock font styles");
         parent.addView(text("Clock font styles",18,true));
         lockFontPreview=text("12:34",48,false);lockFontPreview.setGravity(Gravity.CENTER);parent.addView(lockFontPreview);
         lockFontPicker=button("Clock font styles");parent.addView(lockFontPicker);statusControls.add(lockFontPicker);redrawClockFont();
@@ -421,9 +463,8 @@ public final class ClockEditorActivity extends AppCompatActivity {
     }
     private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation);}
     private void surfaceControls(LinearLayout parent,String title,int group){
-        MaterialButton open=button(title+" appearance");parent.addView(open);statusControls.add(open);
-        LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setVisibility(View.GONE);parent.addView(box);
-        open.setOnClickListener(v->{boolean expanded=box.getVisibility()!=View.VISIBLE;box.setVisibility(expanded?View.VISIBLE:View.GONE);open.setText(expanded?"Close "+title.toLowerCase(java.util.Locale.ROOT):title+" appearance");});
+        parent.addView(text(title,18,true));
+        LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);parent.addView(box);
         var hide=new com.google.android.material.checkbox.MaterialCheckBox(this);hide.setText("Hide "+title.toLowerCase(java.util.Locale.ROOT));hide.setChecked((surfaceHidden&(1<<group))!=0);box.addView(hide);statusControls.add(hide);
         hide.setOnCheckedChangeListener((v,value)->{surfaceHidden=value?surfaceHidden|(1<<group):surfaceHidden&~(1<<group);saveStatusBar();});
         statusScale(box,"Visual size",StatusBarStyle.indicatorScale(surfaceAppearance[group]),n->{surfaceAppearance[group]=StatusBarStyle.appearance(n,StatusBarStyle.indicatorOpacity(surfaceAppearance[group]));});
