@@ -25,6 +25,19 @@ nubia-ly is a standalone app. [Redmagic 11 Toolbox](https://github.com/austineyo
 > [!IMPORTANT]
 > Support currently targets **NX809J stock Android 16 only**. Other REDMAGIC models, custom ROMs and firmware revisions need separate validation. Root access and Vector are required for System UI customization. The boot-animation loader additionally checks the supported KernelSU setup and exact firmware player.
 
+## Screenshots
+
+<table>
+  <tr>
+    <th>Icon pack picker</th>
+    <th>Quick Settings layout</th>
+  </tr>
+  <tr>
+    <td align="center"><img src=".github/screenshots/icon-packs.jpg" width="260" alt="nubia-ly icon pack picker with visual style cards" /></td>
+    <td align="center"><img src=".github/screenshots/quick-settings.jpg" width="260" alt="REDMAGIC Quick Settings with a customized six-large-tile and five-column layout" /></td>
+  </tr>
+</table>
+
 ## Features
 
 | Area | Make it yours |
