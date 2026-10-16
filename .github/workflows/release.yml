@@ -1,0 +1,93 @@
+name: Prepare public release draft
+on:
+  workflow_run:
+    workflows: [nubia-ly Android CI]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: nubia-ly-release-draft
+  cancel-in-progress: false
+jobs:
+  draft:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - name: Check release version and existing tag
+        id: release
+        run: |
+          set -eu
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          text = Path('app/build.gradle.kts').read_text()
+          assert re.search(r'versionName\s*=\s*"1\.0\.0"', text), 'Expected 1.0.0'
+          assert re.search(r'versionCode\s*=\s*68\b', text), 'Expected version code 68'
+          PY
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            echo 'exists=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'exists=false' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Download verified signed release APK
+        if: steps.release.outputs.exists != 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: nubia-ly-signed-release-apk
+          path: staging/apk
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - name: Download companion guard
+        if: steps.release.outputs.exists != 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: nubia-ly-guard-test-module
+          path: staging/guard
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - name: Stage public downloads
+        if: steps.release.outputs.exists != 'true'
+        run: |
+          set -eu
+          mkdir -p dist
+          test "$(find staging/apk -type f -name '*.apk' | wc -l)" -eq 1
+          cp staging/apk/*.apk dist/nubia-ly-v1.0.0.apk
+          cp staging/guard/nubia-ly-guard-test.zip dist/nubia-ly-guard-v0.1.15.zip
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          with ZipFile('dist/nubia-ly-guard-v0.1.15.zip') as archive:
+              props = archive.read('module.prop').decode().splitlines()
+              assert 'id=nubia_ly_guard' in props
+              assert 'version=0.1.15' in props
+          assert Path('dist/nubia-ly-v1.0.0.apk').stat().st_size > 0
+          PY
+          cd dist
+          sha256sum nubia-ly-v1.0.0.apk nubia-ly-guard-v0.1.15.zip > SHA256SUMS.txt
+      - name: Create draft with tested binaries
+        if: steps.release.outputs.exists != 'true'
+        run: |
+          set -eu
+          gh release create v1.0.0 \
+            --draft --target "$SOURCE_SHA" \
+            --title 'nubia-ly 1.0.0' \
+            --notes-file docs/releases/v1.0.0.md \
+            dist/nubia-ly-v1.0.0.apk \
+            dist/nubia-ly-guard-v0.1.15.zip \
+            dist/SHA256SUMS.txt
