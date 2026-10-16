@@ -43,6 +43,6 @@ final class EditorPreview extends View {
     private void shape(Canvas canvas,float x,float y,float w,float h,int shape){
         android.graphics.drawable.GradientDrawable tile=new android.graphics.drawable.GradientDrawable();tile.setColor(paint.getColor());tile.setBounds(Math.round(x),Math.round(y),Math.round(x+w),Math.round(y+h));
         if(shape==3)tile.setCornerRadii(new float[]{22,22,0,0,22,22,0,0});else tile.setCornerRadius(shape==1?0:shape==2?10:h/2);
-        if(tileStyle==0)tile.draw(canvas);else try{if(!QsOutlineRenderer.draw(canvas,tile,1f,()->true,()->tile.draw(canvas)))tile.draw(canvas);}catch(Throwable unavailable){tile.draw(canvas);}
+        if(tileStyle==0)tile.draw(canvas);else try{if(!QsTileEffects.draw(tileStyle,canvas,tile,1f,()->true,()->tile.draw(canvas)))tile.draw(canvas);}catch(Throwable unavailable){tile.draw(canvas);}
     }
 }
