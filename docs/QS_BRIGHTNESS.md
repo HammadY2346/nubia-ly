@@ -63,3 +63,16 @@ each style with Enable. Drag through minimum, middle and maximum; confirm mirror
 appearance, auto-brightness toggle, normal response and tile styles. Test light/
 dark themes, shade close/reopen, rotation, wake, then Restore stock. Recovery is
 the existing guard Action or disabling nubia-ly in Vector and rebooting.
+
+## 0.1.43 Control Center detection correction
+
+Device feedback on 0.1.42 showed brightness style 2 enabled with zero tracked
+layers. The initial exact-class filter excluded the vendor Control Center path.
+The inspected APK also contains CCToggleSeekBar, a direct ToggleSeekBar subclass,
+owned by CCBrightnessToggleSliderView, itself a CCToggleSliderView subclass.
+The same getSlider() identity contract and native drawable layers apply.
+Both standard and exact Control Center brightness owners are now accepted; the
+generic CCToggleSliderView and other control sliders remain excluded. Regression
+host tests exercise the Control Center brightness slider and mirror and reject a
+generic Control Center slider. Diagnostics now distinguish observed sliders,
+draw callbacks and the last progress-root class to make detection failures clear.
