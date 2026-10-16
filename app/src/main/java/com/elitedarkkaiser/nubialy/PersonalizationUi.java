@@ -31,6 +31,7 @@ final class PersonalizationUi {
         side.addView(tile(a,"Quick Settings","Tiles & labels",1,()->open.accept("quick_settings"),62),new LinearLayout.LayoutParams(-1,-2));
         LinearLayout.LayoutParams lower=new LinearLayout.LayoutParams(-1,-2);lower.topMargin=dp(a,12);
         side.addView(tile(a,"Status bar","Clock, icons & battery",2,()->open.accept("status_bar"),62),lower);
+        LinearLayout.LayoutParams volume=new LinearLayout.LayoutParams(-1,-2);volume.topMargin=dp(a,12);dashboard.addView(tile(a,"Volume","Slider styles",3,()->open.accept("volume"),62),volume);
         return dashboard;
     }
     private static MaterialCardView tile(Activity a,String title,String summary,int kind,Runnable action,int previewHeight){
@@ -55,6 +56,7 @@ final class PersonalizationUi {
                 p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2);canvas.drawRoundRect(73,203,87,215,3,3,p);canvas.drawArc(76,196,84,210,180,180,false,p);p.setStyle(Paint.Style.FILL);
             }else if(kind==1){
                 for(int i=0;i<4;i++){p.setColor(i<2?0xffd3cbef:0xff44444e);float x=(i%2)*81,y=(i/2)*32;canvas.drawRoundRect(x,y,x+73,y+25,12,12,p);p.setColor(i<2?0xff3e3655:0xffa5a1ae);canvas.drawCircle(x+15,y+12,4,p);canvas.drawRoundRect(x+27,y+10,x+59,y+14,2,2,p);}
+            }else if(kind==3){for(int i=0;i<3;i++){p.setColor(0xff55505f);canvas.drawRoundRect(30+i*40,4,54+i*40,58,12,12,p);p.setColor(0xffd3cbef);canvas.drawRoundRect(30+i*40,16+i*7,54+i*40,58,12,12,p);}
             }else{
                 p.setColor(0xffd3cbef);p.setTypeface(Typeface.create("sans-serif-medium",0));p.setTextSize(20);p.setTextAlign(Paint.Align.LEFT);canvas.drawText("10:26",4,36,p);
                 for(int i=0;i<3;i++)canvas.drawRoundRect(92+i*9,28-i*4,97+i*9,38,2,2,p);

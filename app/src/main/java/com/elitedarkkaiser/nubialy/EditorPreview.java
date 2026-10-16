@@ -28,6 +28,7 @@ final class EditorPreview extends View {
                 if(!s.hide(1))drawText(c,i==0?"Connected":"Off",x+78,y+43,9,s.appearance(1),s.position(1),i==0?0xff514965:0xffc8c2d0);
             }
             for(int i=0;i<6;i++){paint.setColor(i==0?0xffd3cbef:0xff68646f);shape(c,23+i*54,151,34,22,s.tileShape());}
+        }else if(section.equals("volume")){VolumeStylePreview.paint(c,s.volumeStyle(),360,height,1);
         }else{
             paint.setTypeface(Typeface.create(ClockStylePolicy.familyName(d.family),(d.bold?1:0)|(d.italic?2:0)));
             if(!d.hidden){paint.setTextAlign(Paint.Align.LEFT);paint.setTextSize(22*(d.size==0?1:d.size/100f));paint.setColor(d.color);c.drawText("12:34",20,57,paint);}

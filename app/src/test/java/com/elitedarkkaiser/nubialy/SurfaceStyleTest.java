@@ -2,6 +2,8 @@ package com.elitedarkkaiser.nubialy;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public final class SurfaceStyleTest {
+    @Test public void volumeMigrationAndBounds(){for(int id=0;id<=6;id++){var s=new SurfaceStyle(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,3,id);assertTrue(s.valid());assertEquals(s,SurfaceStyle.decode(s.encode()));}assertEquals(0,SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,3").volumeStyle());assertNull(SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,3,7"));}
+
     @Test public void brightnessMigrationAndBounds(){
         for(int style=0;style<=3;style++){var value=new SurfaceStyle(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,style);assertTrue(value.valid());assertEquals(value,SurfaceStyle.decode(value.encode()));}
         assertEquals(0,SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7").brightnessStyle());

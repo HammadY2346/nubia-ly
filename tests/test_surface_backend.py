@@ -7,6 +7,7 @@ sources=ast.literal_eval(next(n.value for n in module.body if isinstance(n,ast.A
 sources.pop('com/elitedarkkaiser/nubialy/xposed/SurfaceBackend.java',None)
 sources.pop('com/elitedarkkaiser/nubialy/xposed/StatusBarTest.java',None)
 sources.update({
+'com/elitedarkkaiser/nubialy/xposed/VolumeBackend.java':'package com.elitedarkkaiser.nubialy.xposed;final class VolumeBackend {static void install(ClassLoader l){}static void begin(int id){}static void refresh(){}static boolean end(){return true;}static boolean healthy(){return true;}static String status(){return "";}}',
 'com/elitedarkkaiser/nubialy/xposed/BrightnessBackend.java':'package com.elitedarkkaiser.nubialy.xposed;final class BrightnessBackend {static void install(ClassLoader l){}static void refresh(){}static void observe(android.view.View v){}static void release(android.view.View v){}static void begin(int id){}static boolean end(){return true;}static boolean healthy(){return true;}static String status(){return "";}}',
 'com/elitedarkkaiser/nubialy/xposed/QsOutlineBackend.java':'package com.elitedarkkaiser.nubialy.xposed;final class QsOutlineBackend {static void begin(int id){}static void track(android.view.ViewGroup v){}static void release(android.view.ViewGroup v){}static boolean end(){return true;}static boolean healthy(){return true;}static String status(){return "";}}',
 'android/util/TypedValue.java':'package android.util;public class TypedValue {public static final int COMPLEX_UNIT_PX=0;}',
