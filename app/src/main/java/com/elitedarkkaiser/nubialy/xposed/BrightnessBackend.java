@@ -50,7 +50,7 @@ final class BrightnessBackend {
     private static boolean owned(SeekBar slider){
         if(slider==null||!slider.isAttachedToWindow()||!sliderName(slider.getClass().getName()))return false;
         ViewParent parent=slider.getParent();for(int depth=0;depth<8&&parent instanceof View view;depth++,parent=view.getParent()){
-            String name=view.getClass().getName();boolean expected=slider.getClass().getName().equals(SLIDER)?name.equals(OWNER):name.equals(CCOWNER);
+            String name=view.getClass().getName();boolean expected=name.equals(OWNER)||(slider.getClass().getName().equals(CCSLIDER)&&name.equals(CCOWNER));
             if(expected)return XposedHelpers.callMethod(view,"getSlider")==slider;
         }return false;
     }

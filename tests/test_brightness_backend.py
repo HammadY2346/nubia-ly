@@ -33,13 +33,14 @@ sources.update({
 static void check(boolean b){if(!b)throw new AssertionError(BrightnessBackend.status());}
 public static void main(String[] args){BrightnessBackend.install(BrightnessTest.class.getClassLoader());var owner=new com.zte.controlcenter.view.ToggleSliderView();var mirror=new com.zte.controlcenter.view.ToggleSliderView();var unrelated=new com.android.systemui.settings.brightness.ToggleSeekBar();
 if(args.length>0){
-var live=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();var liveMirror=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();BrightnessBackend.observe(live.slider);BrightnessBackend.observe(liveMirror.slider);
+// Stock zte_quick_qs_toggle_slider is a merge: ToggleSliderView owns CCToggleSeekBar.
+var live=new com.zte.controlcenter.view.ToggleSliderView();var liveMirror=new com.zte.controlcenter.view.ToggleSliderView();live.slider=new com.zte.controlcenter.view.CCToggleSeekBar();live.slider.parent=live;liveMirror.slider=new com.zte.controlcenter.view.CCToggleSeekBar();liveMirror.slider.parent=liveMirror;BrightnessBackend.observe(live.slider);BrightnessBackend.observe(liveMirror.slider);
 BrightnessBackend.begin(3);BrightnessEffects.decorated=0;
 // Reproduce device: lifecycle discovery fires, inherited onDraw hook never fires.
 for(var view:new android.widget.SeekBar[]{live.slider,liveMirror.slider}){var root=(LayerDrawable)view.progress;((GradientDrawable)root.track).draw(new Canvas());((GradientDrawable)((ClipDrawable)root.progress).fill).draw(new Canvas());}
 check(BrightnessEffects.decorated==4);check(BrightnessBackend.status().contains("draw callbacks: 0"));
 var old=(LayerDrawable)live.slider.progress;live.slider.progress=new LayerDrawable();((GradientDrawable)old.track).draw(new Canvas());check(BrightnessEffects.decorated==4);BrightnessBackend.refresh();((GradientDrawable)((LayerDrawable)live.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==5);
-var late=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();BrightnessBackend.observe(late.slider);((GradientDrawable)((LayerDrawable)late.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==6);
+var late=new com.zte.controlcenter.view.ToggleSliderView();late.slider=new com.zte.controlcenter.view.CCToggleSeekBar();late.slider.parent=late;BrightnessBackend.observe(late.slider);((GradientDrawable)((LayerDrawable)late.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==6);
 BrightnessBackend.release(late.slider);((GradientDrawable)((LayerDrawable)late.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==6);check(BrightnessBackend.end());((GradientDrawable)((LayerDrawable)live.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==6);check(de.robv.android.xposed.XposedBridge.hooks.isEmpty());System.out.println("Brightness applies with zero inherited onDraw callbacks, refreshes replacement roots, discovers late sliders and restores stock");return;}
 
 var cc=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();var ccMirror=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();var volume=new com.zte.controlcenter.view.CCToggleSliderView();

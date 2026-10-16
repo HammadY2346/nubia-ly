@@ -89,3 +89,15 @@ executes native leaf drawing without calling the inherited draw hook and verifie
 both Control Center slider/mirror styling, late discovery, replacement-root
 refresh, stale-root exclusion, release and restoration. Diagnostics additionally
 count successful decorated draws, separately from inherited draw callbacks.
+
+## 0.1.45 mixed stock owner/child pairing
+
+0.1.44 device diagnostics showed observed CCToggleSeekBar rejected by owner
+validation. Full compiled XML inspection resolves the actual horizontal path:
+ToggleSliderView's constructor inflates 0x7f0e061f, layout
+zte_quick_qs_toggle_slider (res/8Z0.xml). That merge contains CCToggleSeekBar at
+id slider, with native brightness_progress. Thus exact ToggleSliderView can own
+either the base ToggleSeekBar or CCToggleSeekBar. The getSlider() identity contract
+remains required. This mixed pairing is now accepted; generic CCToggleSliderView
+and volume owners remain excluded. The zero-onDraw regression now reproduces
+that precise XML pairing for slider, mirror and late discovery.
