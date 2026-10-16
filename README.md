@@ -29,7 +29,7 @@ nubia-ly is a standalone app. [Redmagic 11 Toolbox](https://github.com/austineyo
 
 | Area | Make it yours |
 | --- | --- |
-| **Status bar** | Clock fonts, color, size, weight, seconds, spacing and dates; individual icon visibility; icon colors, opacity and placement; Wi-Fi and mobile signal artwork. |
+| **Status bar** | Clock fonts, color, size, weight, seconds, spacing and dates; individual icon visibility; icon colors, opacity and placement; Wi-Fi and mobile signal artwork; 16 coordinated Status bar/QS icon packs. |
 | **Battery** | Stock plus 24 alternatives, inside/outside/hidden percentage, charging-symbol visibility and adjustable size. |
 | **Quick Settings** | Independent portrait/landscape grids, native large-tile arrangements, label position and line limits, brightness placement and sun-icon visibility; separate large/small tile shapes, outline/layered treatments and brightness-slider styles. |
 | **Lock screen** | Clock/date appearance, built-in clock fonts, fingerprint icons and animations, plus measured charging diagnostics beneath the stock charging message. |
@@ -47,6 +47,12 @@ nubia-ly is a standalone app. [Redmagic 11 Toolbox](https://github.com/austineyo
 - **Systemless boot artwork:** the original animation archive stays untouched. A verified file bind supplies the chosen archive for the next boot.
 
 Tile actions, volume levels, biometric authentication and power actions remain controlled by the native firmware. Quick Settings uses the existing native tile views and pager; tile size and spacing controls are not exposed.
+
+### Shared icon packs
+
+Open **Status bar → Icon packs** to choose Stock or one of 16 RisingOS families: Acherus, Aurora, Circular, Filled, Gradicon, Kai, Lorn, Nostalgic, OxygenOS, Outline, Plumpy, Pavlova UI, Rounded, Sam, Victor and Xperia. The selected pack styles compatible Status bar and Quick Settings glyphs. Existing independent Wi-Fi and mobile-signal choices stay available and override the pack in the Status bar when selected.
+
+Selection saves a draft; **Enable customization** applies it. Unsupported resources, connectivity warnings and transitional states keep their native artwork. Pack coverage varies; this does not replace application notification icons, firmware APKs or system files. Restore and the guard revoke draw-time styling, and enabled choices use the existing saved-feature resume flow.
 
 ### Quick Settings layouts
 
@@ -70,7 +76,7 @@ Selections save a draft until **Enable customization**. **Restore stock appearan
 | Runtime framework | [Vector](https://github.com/JingMatrix/Vector) with a compatible Zygisk environment |
 | Companion module | **nubia-ly Recovery Guard**, installed through your root manager |
 | App package | `com.elitedarkkaiser.nubialy` |
-| Current app / guard | `0.1.65-lifecycle` (66) / `0.1.15` (16) |
+| Current app / guard | `0.1.66-iconpacks` (67) / `0.1.15` (16) |
 
 Recommended Vector scopes are **System UI** (`com.android.systemui`) and **Fingerprint SensorService** (`com.fingerprint.sensorservice`). The latter is used for the firmware's separate fingerprint renderer. These are the app's declared scopes.
 

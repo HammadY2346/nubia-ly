@@ -38,6 +38,7 @@ jobs:
           python3 tests/test_volume_backend.py
           python3 tests/test_notification_backend.py
           python3 tests/test_personalization_controls.py
+          python3 tests/test_system_icon_packs.py
           python3 tests/test_battery_backend.py
           python3 tests/test_icon_controls_backend.py
           python3 tests/test_boot_resume_receiver.py
