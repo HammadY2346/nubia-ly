@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+<title id="title">nubia-ly — Your REDMAGIC. Your style.</title>
+<desc id="desc">Lavender branding with stylized clock, Quick Settings and volume artwork on dark rounded cards.</desc>
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#241b39"/><stop offset="1" stop-color="#101014"/></linearGradient><linearGradient id="tile" x2="1" y2="1"><stop stop-color="#d8cef5"/><stop offset="1" stop-color="#a89bcf"/></linearGradient></defs>
+<rect width="1200" height="420" rx="32" fill="url(#bg)"/>
+<circle cx="1120" cy="30" r="240" fill="#bdb1ff" opacity=".04"/>
+<g font-family="sans-serif">
+<rect x="62" y="58" width="70" height="70" rx="20" fill="#241353"/>
+<path d="M77 108V78h9l18 19V78h10v30h-9L87 89v19z" fill="#bdb1ff"/><path d="M113 70h7v7h-7z" fill="#ffbe98"/>
+<text x="62" y="207" fill="#f2edf8" font-size="76" font-weight="700" letter-spacing="-3">nubia-ly</text>
+<text x="65" y="253" fill="#d4c8ed" font-size="27">Your REDMAGIC. Your style.</text>
+<text x="65" y="302" fill="#a9a1b4" font-size="17">Stock firmware. Personal touches.</text>
+<rect x="65" y="333" width="236" height="34" rx="17" fill="#393044"/>
+<text x="183" y="356" fill="#ded2f6" font-size="13" text-anchor="middle" letter-spacing="1">NX809J · ANDROID 16</text>
+<rect x="654" y="55" width="210" height="310" rx="34" fill="#35303f"/>
+<rect x="670" y="71" width="178" height="278" rx="24" fill="#241e32"/>
+<path d="M670 290q65-85 178-15v74H670z" fill="#8d80ab"/><path d="M670 318q70-38 95 31h-95z" fill="#697a80"/>
+<text x="759" y="172" text-anchor="middle" fill="#e7dcff" font-size="64" font-weight="300">10</text>
+<text x="759" y="234" text-anchor="middle" fill="#e7dcff" font-size="64" font-weight="300">26</text>
+<text x="759" y="261" text-anchor="middle" fill="#d7cfdf" font-size="12">Make it yours</text>
+<rect x="880" y="55" width="258" height="146" rx="30" fill="#302b38"/>
+<g fill="url(#tile)"><rect x="900" y="78" width="100" height="36" rx="18"/><rect x="1014" y="78" width="100" height="36" rx="18"/></g>
+<g fill="#57515f"><rect x="900" y="125" width="100" height="36" rx="18"/><rect x="1014" y="125" width="100" height="36" rx="18"/></g>
+<g fill="#393044"><circle cx="919" cy="96" r="5"/><rect x="934" y="93" width="49" height="6" rx="3"/><circle cx="1033" cy="96" r="5"/><rect x="1048" y="93" width="49" height="6" rx="3"/></g>
+<rect x="880" y="217" width="258" height="148" rx="30" fill="#302b38"/>
+<g fill="#57515f"><rect x="929" y="240" width="30" height="102" rx="15"/><rect x="994" y="240" width="30" height="102" rx="15"/><rect x="1059" y="240" width="30" height="102" rx="15"/></g>
+<g fill="#d4c8ed"><rect x="929" y="269" width="30" height="73" rx="15"/><rect x="994" y="291" width="30" height="51" rx="15"/><rect x="1059" y="310" width="30" height="32" rx="15"/></g>
+</g></svg>
