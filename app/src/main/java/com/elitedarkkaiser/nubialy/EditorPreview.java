@@ -8,9 +8,10 @@ import java.util.function.Supplier;
 /** An illustrative app-only draft, with no timers or device access. */
 final class EditorPreview extends View {
     record Draft(StatusBarStyle bar,int color,int iconColor,int size,boolean bold,boolean italic,boolean hidden,int family,float spacing){}
+    private int tileStyle;
     private final String section;private final Supplier<Draft> draft;private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
     EditorPreview(Context context,String section,Supplier<Draft> draft){super(context);this.section=section;this.draft=draft;setContentDescription("Illustrative "+section.replace('_',' ')+" draft preview");}
-    @Override protected void onDraw(Canvas c){super.onDraw(c);if(getWidth()==0)return;Draft d=draft.get();SurfaceStyle s=d.bar.surfaces();float height=section.equals("lock_screen")?280:section.equals("quick_settings")?180:100;
+    @Override protected void onDraw(Canvas c){super.onDraw(c);if(getWidth()==0)return;Draft d=draft.get();SurfaceStyle s=d.bar.surfaces();tileStyle=s.qsStyle();float height=section.equals("lock_screen")?280:section.equals("quick_settings")?180:100;
         c.save();c.scale(getWidth()/360f,getHeight()/height);
         paint.setShader(new LinearGradient(0,0,360,height,new int[]{0xff494253,0xff272932,0xff414a50},null,Shader.TileMode.CLAMP));c.drawRoundRect(0,0,360,height,28,28,paint);paint.setShader(null);
         if(section.equals("lock_screen")){
@@ -39,5 +40,9 @@ final class EditorPreview extends View {
     }
     private void plain(Canvas c,String text,float x,float y,float size,int color){paint.setTextAlign(Paint.Align.CENTER);paint.setTextSize(size);paint.setColor(color);paint.setAlpha(255);c.drawText(text,x,y,paint);}
     private void drawText(Canvas c,String text,float x,float y,float size,int appearance,int transform,int color){c.save();c.translate(x+StatusBarStyle.horizontal(transform),y+StatusBarStyle.vertical(transform));c.rotate(StatusBarStyle.rotation(transform));float scale=StatusBarStyle.indicatorScale(appearance)/100f;c.scale(scale,scale);paint.setTextAlign(Paint.Align.CENTER);paint.setTextSize(size);paint.setColor(color);paint.setAlpha(StatusBarStyle.indicatorOpacity(appearance)*255/100);c.drawText(text,0,0,paint);c.restore();paint.setAlpha(255);}
-    private void shape(Canvas c,float x,float y,float w,float h,int shape){if(shape==3){Path path=new Path();path.moveTo(x+22,y);path.lineTo(x+w,y);path.lineTo(x+w,y+h-22);path.quadTo(x+w,y+h,x+w-22,y+h);path.lineTo(x,y+h);path.lineTo(x,y+22);path.quadTo(x,y,x+22,y);path.close();c.drawPath(path,paint);}else{float radius=shape==1?3:shape==2?10:h/2;c.drawRoundRect(x,y,x+w,y+h,radius,radius,paint);}}
+    private void shape(Canvas canvas,float x,float y,float w,float h,int shape){
+        android.graphics.drawable.GradientDrawable tile=new android.graphics.drawable.GradientDrawable();tile.setColor(paint.getColor());tile.setBounds(Math.round(x),Math.round(y),Math.round(x+w),Math.round(y+h));
+        if(shape==3)tile.setCornerRadii(new float[]{22,22,0,0,22,22,0,0});else tile.setCornerRadius(shape==1?0:shape==2?10:h/2);
+        if(tileStyle==0)tile.draw(canvas);else try{if(!QsOutlineRenderer.draw(canvas,tile,1f,()->true,()->tile.draw(canvas)))tile.draw(canvas);}catch(Throwable unavailable){tile.draw(canvas);}
+    }
 }

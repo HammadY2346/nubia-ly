@@ -1,0 +1,36 @@
+"""Production draw-hook isolation and cleanup with native-draw and authority doubles."""
+from pathlib import Path
+import ast,subprocess,tempfile
+root=Path(__file__).resolve().parents[1]
+m=ast.parse((root/'tests/test_statusbar_backend.py').read_text())
+base=ast.literal_eval(next(n.value for n in m.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='sources' for t in n.targets)))
+sources={k:v for k,v in base.items() if k.startswith('de/robv/android/xposed/')}
+sources['de/robv/android/xposed/XC_MethodHook.java']=sources['de/robv/android/xposed/XC_MethodHook.java'].replace('public Object thisObject;','public boolean skip;public void setResult(Object value){skip=true;}public Object thisObject;')
+sources['de/robv/android/xposed/XposedBridge.java']=sources['de/robv/android/xposed/XposedBridge.java'].replace('public static Map<Member,','public static boolean bypass;public static Object invokeOriginalMethod(Member method,Object owner,Object[] args)throws Throwable{boolean old=bypass;bypass=true;try{return ((Method)method).invoke(owner,args);}catch(InvocationTargetException e){throw e.getCause();}finally{bypass=old;}}public static Map<Member,').replace('original.run();Collections.reverse','if(!p.skip)original.run();Collections.reverse')
+sources['de/robv/android/xposed/XposedHelpers.java']=sources['de/robv/android/xposed/XposedHelpers.java'].replace('o.getClass().getDeclaredMethods()','o.getClass().getMethods()')
+sources.update({
+'android/os/Looper.java':'package android.os;public class Looper {static final Looper MAIN=new Looper();public static boolean off;public static Looper getMainLooper(){return MAIN;}public static Looper myLooper(){return off?null:MAIN;}}',
+'android/util/DisplayMetrics.java':'package android.util;public class DisplayMetrics {public float density=2;}',
+'android/content/res/Resources.java':'package android.content.res;public class Resources {public android.util.DisplayMetrics getDisplayMetrics(){return new android.util.DisplayMetrics();}}',
+'android/graphics/Canvas.java':'package android.graphics;public class Canvas {public int draws;public boolean failOnce;public Runnable during;}',
+'android/view/ViewGroup.java':'package android.view;public class ViewGroup {public boolean attached=true,failInvalidate;public int invalidations;public boolean isAttachedToWindow(){return attached;}public void invalidate(){if(failInvalidate)throw new IllegalStateException();invalidations++;}public android.content.res.Resources getResources(){return new android.content.res.Resources();}}',
+'android/graphics/drawable/GradientDrawable.java':'''package android.graphics.drawable;import de.robv.android.xposed.XposedBridge;public class GradientDrawable {public int color=0xff123456,alpha=143,shape=1;public void draw(android.graphics.Canvas c){Runnable nativeDraw=()->{if(c.failOnce){c.failOnce=false;throw new IllegalStateException();}c.draws++;if(c.during!=null)c.during.run();};if(XposedBridge.bypass)nativeDraw.run();else XposedBridge.run(this,GradientDrawable.class,"draw",new Class<?>[]{android.graphics.Canvas.class},new Object[]{c},nativeDraw);}}''',
+'com/zte/qs/tileimpl/QSTileViewWide.java':'package com.zte.qs.tileimpl;public class QSTileViewWide extends android.view.ViewGroup {public android.graphics.drawable.GradientDrawable background=new android.graphics.drawable.GradientDrawable();public android.graphics.drawable.GradientDrawable getColorBackgroundDrawable(){return background;}}',
+'com/zte/qs/tileimpl/QSTileViewCircle.java':'package com.zte.qs.tileimpl;public class QSTileViewCircle extends QSTileViewWide {}',
+'com/elitedarkkaiser/nubialy/QsOutlineRenderer.java':'''package com.elitedarkkaiser.nubialy;public class QsOutlineRenderer {@FunctionalInterface public interface NativeDraw{void draw()throws Throwable;}public static boolean draw(android.graphics.Canvas c,android.graphics.drawable.GradientDrawable d,float density,java.util.function.BooleanSupplier allowed,NativeDraw draw)throws Throwable{if(!allowed.getAsBoolean())return false;draw.draw();if(!allowed.getAsBoolean())return false;draw.draw();return true;}}''',
+'com/elitedarkkaiser/nubialy/xposed/OutlineTest.java':'''package com.elitedarkkaiser.nubialy.xposed;import android.graphics.*;import android.graphics.drawable.*;public class OutlineTest {static void check(boolean b){if(!b)throw new AssertionError(QsOutlineBackend.status());}public static void main(String[] a){var wide=new com.zte.qs.tileimpl.QSTileViewWide();var small=new com.zte.qs.tileimpl.QSTileViewCircle();QsOutlineBackend.begin(1);QsOutlineBackend.track(wide);QsOutlineBackend.track(small);
+Canvas c=new Canvas();wide.background.draw(c);check(c.draws==2);c=new Canvas();small.background.draw(c);check(c.draws==2);check(wide.background.color==0xff123456&&wide.background.alpha==143&&wide.background.shape==1);
+if(a.length>0){c=new Canvas();c.failOnce=true;wide.background.draw(c);check(c.draws==1&&!QsOutlineBackend.healthy());c=new Canvas();wide.background.draw(c);check(c.draws==1);check(QsOutlineBackend.end());check(de.robv.android.xposed.XposedBridge.hooks.isEmpty());System.out.println("Outline failure leaves stock drawing and cleans up");return;}
+var other=new GradientDrawable();c=new Canvas();other.draw(c);check(c.draws==1);var stale=wide.background;wide.background=new GradientDrawable();c=new Canvas();stale.draw(c);check(c.draws==1);QsOutlineBackend.track(wide);c=new Canvas();wide.background.draw(c);check(c.draws==2);
+wide.attached=false;c=new Canvas();wide.background.draw(c);check(c.draws==1);wide.attached=true;android.os.Looper.off=true;c=new Canvas();wide.background.draw(c);check(c.draws==1);android.os.Looper.off=false;QsOutlineBackend.release(wide);c=new Canvas();wide.background.draw(c);check(c.draws==1);QsOutlineBackend.track(wide);
+// Revocation during the first native pass cannot cause a later decorated pass.
+c=new Canvas();c.during=()->QsOutlineBackend.end();wide.background.draw(c);check(c.draws==2);check(de.robv.android.xposed.XposedBridge.hooks.isEmpty());c=new Canvas();wide.background.draw(c);check(c.draws==1);
+QsOutlineBackend.begin(0);QsOutlineBackend.track(wide);c=new Canvas();wide.background.draw(c);check(c.draws==1);check(QsOutlineBackend.end());QsOutlineBackend.begin(1);wide.failInvalidate=true;QsOutlineBackend.track(wide);check(!QsOutlineBackend.healthy());check(QsOutlineBackend.end());check(de.robv.android.xposed.XposedBridge.hooks.isEmpty());System.out.println("Outline scope, native state, replacement, detach, thread, revocation and stock cleanup passed");}}'''
+})
+with tempfile.TemporaryDirectory(prefix='nubialy-qs-outline-') as folder:
+    folder=Path(folder)
+    for name,content in sources.items():
+        p=folder/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
+    files=[str(p) for p in folder.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/QsOutlineBackend.java')]
+    subprocess.run(['java','com.sun.tools.javac.Main','-d',str(folder/'classes'),*files],check=True)
+    for args in [[],['failure']]:subprocess.run(['java','-cp',str(folder/'classes'),'com.elitedarkkaiser.nubialy.xposed.OutlineTest',*args],check=True)

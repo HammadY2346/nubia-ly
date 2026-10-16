@@ -28,6 +28,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private MaterialButton fingerprintPicker;
     private android.widget.ImageView fingerprintPreview;
     private static final int PICK_FINGERPRINT=7402,PICK_ANIMATION=7403,PICK_CLOCK_FONT=7404;
+    private int qsStyle;
     private int fingerprintAnimation;private MaterialButton animationPicker;
     private LinearLayout content;
     private EditorPages pages;
@@ -66,7 +67,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         selected = ClockColorPreferences.read(this);
         sizePercent = ClockColorPreferences.size(this); bold = ClockColorPreferences.bold(this); seconds = ClockColorPreferences.seconds(this); italic = ClockColorPreferences.italic(this); spacing = ClockColorPreferences.spacing(this); fontFamily = ClockColorPreferences.family(this); hidden = ClockColorPreferences.hidden(this);
         StatusBarStyle bar = StatusBarPreferences.read(this); statusMask = bar.mask(); systemScale = bar.systemScale(); notificationScale = bar.notificationScale(); batteryScale = bar.batteryScale();systemOpacity=bar.systemOpacity();notificationOpacity=bar.notificationOpacity();batteryOpacity=bar.batteryOpacity();systemTransform=bar.systemTransform();notificationTransform=bar.notificationTransform();batteryTransform=bar.batteryTransform();fanAppearance=bar.fanAppearance();pumpAppearance=bar.pumpAppearance();refreshAppearance=bar.refreshAppearance();hiddenSlots.addAll(bar.hiddenSlots());iconColor=StatusBarPreferences.color(this);dateMode=StatusBarPreferences.date(this);
-        widgetsHidden=bar.surfaces().widgetsHidden();fingerprintAnimation=bar.surfaces().fingerprintAnimation();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
+        qsStyle=bar.surfaces().qsStyle();widgetsHidden=bar.surfaces().widgetsHidden();fingerprintAnimation=bar.surfaces().fingerprintAnimation();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
         if (state != null && ClockColorPolicy.valid(state.getInt("selection", 0))) selected = state.getInt("selection");
         client = new SystemUiGuardClient(this);fingerprintClient=new FingerprintServiceClient(this);
         ScrollView scroll = new ScrollView(this);
@@ -80,7 +81,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         ChipGroup sections=new ChipGroup(this);sections.setSingleSelection(true);content.addView(sections);
         pages=new EditorPages(this,editorToolbar,sections,scroll);
         editorOverview("lock_screen","Lock screen",new String[][]{{"clock","Clock","Size, opacity & position"},{"date","Date","Visibility & placement"},{"fonts","Clock font styles","Preview your typography"},{"fingerprint","Fingerprint","Icons & animations"},{"widgets","Widgets","Weather, alarm & battery"}});
-        editorOverview("quick_settings","Quick Settings",new String[][]{{"tiles","Tile shapes","Large & small tiles"},{"labels","Label styles","Main & secondary text"}});
+        editorOverview("quick_settings","Quick Settings",new String[][]{{"style","Tile style","Stock or outlined backgrounds"},{"tiles","Tile shapes","Large & small tiles"},{"labels","Label styles","Main & secondary text"}});
         editorOverview("status_bar","Status bar",new String[][]{{"typography","Clock style","Font, size & seconds"},{"date","Date format","Format, position & letter case"},{"color","Clock color","Presets & custom colors"},{"icons","Icons & battery","Colors, size & placement"},{"inventory","Individual icons","Visibility & vendor indicators"}});
         LinearLayout colors = editorPanel("status_bar","color","Clock color");
         swatch = text("12:34", 44, true); colors.addView(swatch);
@@ -130,6 +131,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         });
         icons.addView(text("Reset clears draft icon/battery controls; press Enable afterward to apply stock icon/battery appearance while keeping your clock choices.",14,false));
         icons.addView(text("100% uses stock size. These controls apply to recognized top-status-bar views; other icons may keep their stock appearance. Press Enable to apply the entire saved style.",14,false));
+        LinearLayout stylePanel=editorPanel("quick_settings","style","Tile style");qsStyleControls(stylePanel);
         LinearLayout surfaces=editorPanel("quick_settings","tiles","Tile shapes");
         surfaces.addView(text("Choose independent shapes for large and small tiles. Label appearance keeps tile actions unchanged. Press Enable to apply saved choices.",14,false));
         shapeControls(surfaces,"Large QS tiles",true);
@@ -457,6 +459,17 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private void redrawFingerprint(){fingerprintPreview.setImageDrawable(fingerprintStyle==0?getDrawable(R.drawable.rising_fp_udfps_icon_default):new com.elitedarkkaiser.nubialy.xposed.FingerprintGlyphDrawable(fingerprintStyle,0xffc0a8ff));fingerprintPreview.setContentDescription(FingerprintStyles.NAMES[fingerprintStyle]);fingerprintPicker.setText("UDFPS icon · "+FingerprintStyles.NAMES[fingerprintStyle]);}
     private void redrawClockFont(){if(lockFontPreview==null)return;var face=LockClockFonts.FACES[lockClockFont];lockFontPreview.setTypeface(android.graphics.Typeface.create(face.family(),face.style()));lockFontPicker.setText("Clock font styles · "+face.name());}
     @Override protected void onActivityResult(int request,int result,android.content.Intent data){super.onActivityResult(request,result,data);if(request==PICK_CLOCK_FONT&&result==RESULT_OK&&data!=null){int value=data.getIntExtra("selection",-1);if(LockClockFonts.valid(value)){lockClockFont=value;redrawClockFont();saveStatusBar();}}if(request==PICK_ANIMATION&&result==RESULT_OK&&data!=null){int value=data.getIntExtra("selection",-1);if(FingerprintAnimations.valid(value)){fingerprintAnimation=value;animationPicker.setText("Fingerprint animation · "+FingerprintAnimations.NAMES[value]);saveStatusBar();}}if(request==PICK_FINGERPRINT&&result==RESULT_OK&&data!=null){int value=data.getIntExtra("selection",-1);if(FingerprintStyles.valid(value)){fingerprintStyle=value;redrawFingerprint();saveStatusBar();}}}
+    private void qsStyleControls(LinearLayout parent){
+        parent.addView(text("Keep your tile colors and shapes. Outline adds a border and softens the fill. Both large and small tiles use the selected style.",14,false));
+        java.util.List<MaterialCardView> choices=new java.util.ArrayList<>();String[] names={"Stock","Outline"};
+        LinearLayout row=new LinearLayout(this);boolean stacked=getResources().getConfiguration().fontScale>1.3f;row.setOrientation(stacked?LinearLayout.VERTICAL:LinearLayout.HORIZONTAL);parent.addView(row);
+        for(int i=0;i<2;i++){final int value=i;MaterialCardView card=new MaterialCardView(this);card.setRadius(dp(24));card.setCardElevation(0);card.setCardBackgroundColor(getColor(R.color.surface_container_high));card.setClickable(true);card.setFocusable(true);card.setTag("qs-style:"+i);choices.add(card);statusControls.add(card);
+            LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setGravity(Gravity.CENTER);body.setPadding(dp(12),dp(16),dp(12),dp(10));body.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);body.addView(new QsStylePreview(this,i),new LinearLayout.LayoutParams(-1,dp(112)));TextView title=text(names[i],16,true);title.setGravity(Gravity.CENTER);body.addView(title);card.addView(body);
+            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(stacked?-1:0,-2,stacked?0:1);params.setMargins(dp(4),dp(4),dp(4),dp(4));row.addView(card,params);
+            card.setOnClickListener(v->{qsStyle=value;for(int n=0;n<choices.size();n++){MaterialCardView option=choices.get(n);option.setStrokeWidth(dp(n==value?3:0));option.setStrokeColor(getColor(R.color.primary));option.setSelected(n==value);option.setContentDescription(names[n]+(n==value?", selected":""));}saveStatusBar();});
+        }
+        for(int i=0;i<choices.size();i++){MaterialCardView card=choices.get(i);card.setStrokeWidth(dp(i==qsStyle?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==qsStyle);card.setContentDescription(names[i]+(i==qsStyle?", selected":""));}
+    }
     private void shapeControls(LinearLayout parent,String title,boolean large){
         parent.addView(text(title,18,true));
         String[] names={"Stock","Square","Rounded square","Leaf"};
@@ -476,7 +489,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         int selection=large?largeTileShape:tileShape;for(int i=0;i<cards.size();i++){MaterialCardView card=cards.get(i);card.setStrokeWidth(dp(i==selection?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==selection);card.setContentDescription(title+", "+names[i]+(i==selection?", selected":""));}
     }
-    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation);}
+    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation,qsStyle);}
     private void surfaceControls(LinearLayout parent,String title,int group){
         parent.addView(text(title,18,true));
         LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);parent.addView(box);
