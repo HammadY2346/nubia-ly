@@ -7,6 +7,7 @@ sources=ast.literal_eval(next(n.value for n in module.body if isinstance(n,ast.A
 sources.pop('com/elitedarkkaiser/nubialy/xposed/SurfaceBackend.java',None)
 sources.pop('com/elitedarkkaiser/nubialy/xposed/StatusBarTest.java',None)
 sources.update({
+'com/elitedarkkaiser/nubialy/xposed/QsOutlineBackend.java':'package com.elitedarkkaiser.nubialy.xposed;final class QsOutlineBackend {static void begin(int id){}static void track(android.view.ViewGroup v){}static void release(android.view.ViewGroup v){}static boolean end(){return true;}static boolean healthy(){return true;}static String status(){return "";}}',
 'android/util/TypedValue.java':'package android.util;public class TypedValue {public static final int COMPLEX_UNIT_PX=0;}',
 'android/graphics/Paint.java':'package android.graphics;public class Paint {float size=100;public Paint(){}public Paint(Paint p){size=p.size;}public void setTextSize(float s){size=s;}public void setTypeface(Typeface t){}public static class FontMetrics {public float top,bottom;}public FontMetrics getFontMetrics(){var f=new FontMetrics();f.top=-size;f.bottom=size*0.4f;return f;}public float measureText(String t){return t.length()*size*0.6f;}}',
 

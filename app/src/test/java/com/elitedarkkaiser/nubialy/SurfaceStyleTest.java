@@ -2,6 +2,11 @@ package com.elitedarkkaiser.nubialy;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public final class SurfaceStyleTest {
+    @Test public void outlineStyleRoundTripsAndLegacyUsesStock(){
+        for(int shape=0;shape<4;shape++){var value=new SurfaceStyle(0,0,0,0,0,0,0,0,0,shape,3,0,0,0,0,0,1);assertTrue(value.valid());assertEquals(value,SurfaceStyle.decode(value.encode()));}
+        assertEquals(0,SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0").qsStyle());
+        assertNull(SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2"));
+    }
     @Test public void everyFingerprintStyleRoundTrips(){for(int id=0;id<FingerprintStyles.NAMES.length;id++){var style=new SurfaceStyle(0,0,0,0,0,0,0,0,0,0,0,0,id,0,0);assertTrue(style.valid());assertEquals(style,SurfaceStyle.decode(style.encode()));}}
     @Test public void animationMigrationAndBounds(){for(int id=0;id<FingerprintAnimations.NAMES.length;id++){var s=new SurfaceStyle(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,id);assertTrue(s.valid());assertEquals(s,SurfaceStyle.decode(s.encode()));}assertEquals(0,SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0").fingerprintAnimation());assertNull(SurfaceStyle.decode("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41"));}
     @Test public void boundedScopeAndLegacyDefaults(){
