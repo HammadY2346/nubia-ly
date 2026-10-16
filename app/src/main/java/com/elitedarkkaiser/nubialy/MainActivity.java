@@ -36,7 +36,7 @@ public final class MainActivity extends AppCompatActivity {
         scroll.setFillViewport(true);
         content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(dp(24), dp(28), dp(24), dp(24));
+        content.setPadding(dp(20), dp(28), dp(20), dp(24));
         scroll.addView(content);
         setContentView(scroll);
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(scroll, (view, insets) -> {
@@ -44,8 +44,8 @@ public final class MainActivity extends AppCompatActivity {
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             return insets;
         });
-        content.addView(label("nubia-ly", 36, true));
-        content.addView(label("Make your REDMAGIC feel like yours.", 16, false));
+        content.addView(label("Personalizations", 34, true));
+        content.addView(label("Your REDMAGIC. Your style.", 16, false));
         spacer(24);
         if (!CompatibilityPolicy.isNx809j(Build.MODEL, Build.DEVICE)) {
             content.addView(label("Device not supported", 24, true));
@@ -74,26 +74,12 @@ public final class MainActivity extends AppCompatActivity {
         vector.addView(label("App activation does not confirm System UI loading. Verify its entry in Vector logs. Enable persistent status-bar styling in its editor.", 14, false));
         int setupEnd=content.getChildCount();
         spacer(20);
-        content.addView(label("Customize", 24, true));
-        content.addView(label("Choose an area to make it yours. Save your choices, then Enable to apply.", 14, false));
-        spacer(10);
-        for (FeatureCatalog.Feature feature : FeatureCatalog.FEATURES) {
-            LinearLayout featureCard = card(feature.title()+"  ›", feature.description());
-            TextView badge = label(feature.state() == FeatureCatalog.State.BLOCKED ? "Blocked experiment" : "Coming later", 13, true);
-            badge.setTextColor(0xffffbe98);
-            featureCard.addView(badge);
-            if("quick_settings".equals(feature.id())||"lock_screen".equals(feature.id())){
-                badge.setText("Customize");badge.setTextColor(0xffc0a8ff);featureCard.setOnClickListener(v->startActivity(new android.content.Intent(this,ClockEditorActivity.class).putExtra("section",feature.id())));continue;
-            }
-            if ("status_bar".equals(feature.id())) {
-                badge.setText("Customize");badge.setTextColor(0xffc0a8ff);
-                featureCard.setOnClickListener(v -> startActivity(new android.content.Intent(this, ClockEditorActivity.class)));
-                continue;
-            }
-            featureCard.setOnClickListener(v -> new MaterialAlertDialogBuilder(this)
-                .setTitle(feature.title()).setMessage(feature.description() + "\n\nNo change will be applied in this build.")
-                .setPositiveButton("Got it", null).show());
-        }
+        content.addView(PersonalizationUi.dashboard(this, section -> startActivity(
+            new android.content.Intent(this,ClockEditorActivity.class).putExtra("section",section))));
+        spacer(16);
+        content.addView(label("More",20,true));
+        LinearLayout planned=card("Notifications", "More ways to personalize, coming later.");
+        planned.setOnClickListener(v->new MaterialAlertDialogBuilder(this).setTitle("Notifications").setMessage("Notification styling is not available yet.").setPositiveButton("Close",null).show());
         spacer(12);
         int recoveryStart=content.getChildCount();
         LinearLayout recovery = card("Restore & recovery", "Recovery must be ready before the first customization is enabled.");
@@ -258,10 +244,7 @@ public final class MainActivity extends AppCompatActivity {
     }
     private LinearLayout card(String title, String description) {
         MaterialCardView card = new MaterialCardView(this);
-        card.setRadius(dp(24));
-        card.setCardElevation(0);
-        card.setStrokeWidth(dp(1));
-        card.setStrokeColor(0xff302c42);
+        PersonalizationUi.panel(card);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
         params.setMargins(0, 0, 0, dp(12));
         card.setLayoutParams(params);
@@ -277,14 +260,14 @@ public final class MainActivity extends AppCompatActivity {
     private TextView label(String text, int size, boolean bold) {
         TextView view = new TextView(this);
         view.setText(text); view.setTextSize(size);
-        view.setTextColor(bold ? 0xfff0ecf8 : 0xffbcb6ca);
+        view.setTextColor(getColor(bold ? R.color.on_surface : R.color.on_surface_variant));
         view.setPadding(0, 0, 0, dp(8));
         if (bold) view.setTypeface(view.getTypeface(), android.graphics.Typeface.BOLD);
         return view;
     }
     private MaterialButton button(String text) {
         MaterialButton button = new MaterialButton(this);
-        button.setText(text); button.setAllCaps(false); button.setCornerRadius(dp(18));
+        button.setText(text); button.setAllCaps(false); button.setCornerRadius(dp(28));
         return button;
     }
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
