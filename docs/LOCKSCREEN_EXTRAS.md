@@ -68,3 +68,8 @@ Tap **UDFPS icon** in the lock-screen editor to open a separate three-column, sc
 Phone validation: choose a monochrome fingerprint, a colored/glowing design, and a character icon; apply each, lock/wake and verify its position matches the stock sensor graphic. Normal fingerprint unlock must work. Test Hide on/off and Restore stock. Face unlock naturally removes the fingerprint graphic when it recognizes the face; preserve that vendor behavior. Back from the picker must not alter the draft; reopening it must outline the selected card. Check scrolling, rotation, and return to the editor.
 
 User confirmed that the earlier disappearance follows natural face-unlock behavior; it is not a reason to override vendor visibility, disabled state, or window removal. No biometric animation pack is installed by this gallery.
+
+
+### Gallery selection fix (0.1.36)
+
+Each icon card now directly handles its click and returns the bound icon ID to the editor. The decorative image cannot take focus or taps; recycled cards receive a fresh callback. Grid-level item click delivery is no longer required. Android resource-backed touch tests cover the artwork center, card border, rebound last catalog entry and accessibility activation. Confirm that tapping any icon closes the picker, updates the editor preview/name, and reopens with the new selection outlined. Apply it with Enable customization.
