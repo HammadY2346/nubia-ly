@@ -28,7 +28,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private MaterialButton fingerprintPicker;
     private android.widget.ImageView fingerprintPreview;
     private static final int PICK_FINGERPRINT=7402,PICK_ANIMATION=7403,PICK_CLOCK_FONT=7404;
-    private int qsStyle,brightnessStyle,volumeStyle,notificationStyle;
+    private int qsStyle,brightnessStyle,volumeStyle,notificationStyle,wifiStyle,signalStyle,powerStyle,notificationAppearance,notificationBehavior,chargingInfo;
     private int fingerprintAnimation;private MaterialButton animationPicker;
     private LinearLayout content;
     private EditorPages pages;
@@ -67,7 +67,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         selected = ClockColorPreferences.read(this);
         sizePercent = ClockColorPreferences.size(this); bold = ClockColorPreferences.bold(this); seconds = ClockColorPreferences.seconds(this); italic = ClockColorPreferences.italic(this); spacing = ClockColorPreferences.spacing(this); fontFamily = ClockColorPreferences.family(this); hidden = ClockColorPreferences.hidden(this);
         StatusBarStyle bar = StatusBarPreferences.read(this); statusMask = bar.mask(); systemScale = bar.systemScale(); notificationScale = bar.notificationScale(); batteryScale = bar.batteryScale();systemOpacity=bar.systemOpacity();notificationOpacity=bar.notificationOpacity();batteryOpacity=bar.batteryOpacity();systemTransform=bar.systemTransform();notificationTransform=bar.notificationTransform();batteryTransform=bar.batteryTransform();fanAppearance=bar.fanAppearance();pumpAppearance=bar.pumpAppearance();refreshAppearance=bar.refreshAppearance();hiddenSlots.addAll(bar.hiddenSlots());iconColor=StatusBarPreferences.color(this);dateMode=StatusBarPreferences.date(this);
-        notificationStyle=bar.surfaces().notificationStyle();volumeStyle=bar.surfaces().volumeStyle();brightnessStyle=bar.surfaces().brightnessStyle();qsStyle=bar.surfaces().qsStyle();widgetsHidden=bar.surfaces().widgetsHidden();fingerprintAnimation=bar.surfaces().fingerprintAnimation();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
+        wifiStyle=bar.surfaces().wifiStyle();signalStyle=bar.surfaces().signalStyle();powerStyle=bar.surfaces().powerStyle();notificationAppearance=bar.surfaces().notificationAppearance();notificationBehavior=bar.surfaces().notificationBehavior();chargingInfo=bar.surfaces().chargingInfo();notificationStyle=bar.surfaces().notificationStyle();volumeStyle=bar.surfaces().volumeStyle();brightnessStyle=bar.surfaces().brightnessStyle();qsStyle=bar.surfaces().qsStyle();widgetsHidden=bar.surfaces().widgetsHidden();fingerprintAnimation=bar.surfaces().fingerprintAnimation();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
         if (state != null && ClockColorPolicy.valid(state.getInt("selection", 0))) selected = state.getInt("selection");
         client = new SystemUiGuardClient(this);fingerprintClient=new FingerprintServiceClient(this);
         ScrollView scroll = new ScrollView(this);
@@ -80,11 +80,12 @@ public final class ClockEditorActivity extends AppCompatActivity {
         var editorToolbar=PersonalizationUi.toolbar(this,"Personalizations");content.addView(editorToolbar);
         ChipGroup sections=new ChipGroup(this);sections.setSingleSelection(true);content.addView(sections);
         pages=new EditorPages(this,editorToolbar,sections,scroll);
-        editorOverview("lock_screen","Lock screen",new String[][]{{"clock","Clock","Size, opacity & position"},{"date","Date","Visibility & placement"},{"fonts","Clock font styles","Preview your typography"},{"fingerprint","Fingerprint","Icons & animations"},{"widgets","Widgets","Weather, alarm & battery"}});
+        editorOverview("lock_screen","Lock screen",new String[][]{{"clock","Clock","Size, opacity & position"},{"date","Date","Visibility & placement"},{"fonts","Clock font styles","Preview your typography"},{"fingerprint","Fingerprint","Icons & animations"},{"widgets","Widgets","Weather, alarm & battery"},{"charging","Charging information","Battery voltage, current & temperature"}});
         editorOverview("quick_settings","Quick Settings",new String[][]{{"style","Tile style","Outline, depth & layered effects"},{"brightness","Brightness slider","Outline, depth & a slim track"},{"tiles","Tile shapes","Large & small tiles"},{"labels","Label styles","Main & secondary text"}});
-        editorOverview("notifications","Notifications",new String[][]{{"styles","Notification styles","Card backgrounds & layers"}});
+        editorOverview("notifications","Notifications",new String[][]{{"styles","Notification styles","Card backgrounds & layers"},{"appearance","Appearance controls","Background opacity & rounded corners"},{"behavior","Notification controls","Heads-up, history & app settings"}});
+        editorOverview("power_menu","Power menu",new String[][]{{"styles","Power-menu styles","Duoline, CyberPunk, Fluid & layers"}});
         editorOverview("volume","Volume",new String[][]{{"styles","Volume styles","Outline, gradients & layered effects"}});
-        editorOverview("status_bar","Status bar",new String[][]{{"typography","Clock style","Font, size & seconds"},{"date","Date format","Format, position & letter case"},{"color","Clock color","Presets & custom colors"},{"icons","Icons & battery","Colors, size & placement"},{"inventory","Individual icons","Visibility & vendor indicators"}});
+        editorOverview("status_bar","Status bar",new String[][]{{"typography","Clock style","Font, size & seconds"},{"date","Date format","Format, position & letter case"},{"color","Clock color","Presets & custom colors"},{"icons","Icons & battery","Colors, size & placement"},{"connectivity","Wi-Fi & mobile signal","Choose independent icon styles"},{"inventory","Individual icons","Visibility & vendor indicators"}});
         LinearLayout colors = editorPanel("status_bar","color","Clock color");
         swatch = text("12:34", 44, true); colors.addView(swatch);
         selection = text("", 16, true); colors.addView(selection);
@@ -133,6 +134,11 @@ public final class ClockEditorActivity extends AppCompatActivity {
         });
         icons.addView(text("Reset clears draft icon/battery controls; press Enable afterward to apply stock icon/battery appearance while keeping your clock choices.",14,false));
         icons.addView(text("100% uses stock size. These controls apply to recognized top-status-bar views; other icons may keep their stock appearance. Press Enable to apply the entire saved style.",14,false));
+        connectivityControls(editorPanel("status_bar","connectivity","Wi-Fi & mobile signal"));
+        visualStyleChoices(editorPanel("power_menu","styles","Power-menu styles"),"power");
+        notificationAppearanceControls(editorPanel("notifications","appearance","Appearance controls"));
+        notificationBehaviorControls(editorPanel("notifications","behavior","Notification controls"));
+        chargingControls(editorPanel("lock_screen","charging","Charging information"));
         LinearLayout notificationPanel=editorPanel("notifications","styles","Notification styles");notificationStyleControls(notificationPanel);
         LinearLayout volumePanel=editorPanel("volume","styles","Volume styles");volumeStyleControls(volumePanel);
         LinearLayout stylePanel=editorPanel("quick_settings","style","Tile style");qsStyleControls(stylePanel);
@@ -194,7 +200,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         dateChoices(dateFormats,"Date letter case",ClockDatePolicy.CASE_LABELS,3);
         dateFormats.addView(text("Date uses your stock locale and timezone. Position, separator and letter case affect only the added date; time keeps its stock format. Long dates add width. Press Enable to apply your saved choices.",14,false));
         String initial=state==null?getIntent().getStringExtra("section"):state.getString("editor_section");if(initial==null)initial=getIntent().getBooleanExtra("surfaces",false)?"quick_settings":"status_bar";
-        String[] sectionIds={"status_bar","quick_settings","lock_screen","volume","notifications"},sectionNames={"Status bar","Quick Settings","Lock screen","Volume","Notifications"};
+        String[] sectionIds={"status_bar","quick_settings","lock_screen","volume","notifications","power_menu"},sectionNames={"Status bar","Quick Settings","Lock screen","Volume","Notifications","Power menu"};
         for(int i=0;i<sectionIds.length;i++){final String id=sectionIds[i];Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(sectionNames[i]);chip.setCheckable(true);sections.addView(chip);chip.setChecked(id.equals(initial));chip.setOnClickListener(v->{pages.show(id,"");chip.setChecked(true);});}
         pages.show(initial,state==null?"":state.getString("editor_page",""));
         LinearLayout controls = card("Apply your style");
@@ -497,6 +503,43 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         for(int i=0;i<choices.size();i++){MaterialCardView card=choices.get(i);card.setStrokeWidth(dp(i==volumeStyle?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==volumeStyle);card.setContentDescription(names[i]+(i==volumeStyle?", selected":""));}
     }
+    private void connectivityControls(LinearLayout parent){
+        ConnectivityStyles.resources(getResources());
+        parent.addView(text("Choose separate Wi-Fi and mobile-signal artwork. Signal strength, SIMs and connectivity remain controlled by Android. Warning and unsupported icons keep stock appearance. Press Enable to apply.",14,false));
+        parent.addView(text("Wi-Fi",18,true));visualStyleChoices(parent,"wifi");parent.addView(text("Mobile signal",18,true));visualStyleChoices(parent,"signal");
+    }
+    private int visualSelection(String kind){return kind.equals("wifi")?wifiStyle:kind.equals("signal")?signalStyle:powerStyle;}
+    private void visualStyleChoices(LinearLayout parent,String kind){
+        boolean power=kind.equals("power"),wifi=kind.equals("wifi");String[] names=power?NotificationEffects.NAMES:ConnectivityStyles.NAMES;
+        if(power)parent.addView(text("Style the stock power and restart button backgrounds. Power actions, confirmations and lock-screen security stay controlled by REDMAGIC. Press Enable to apply.",14,false));
+        java.util.List<MaterialCardView> choices=new java.util.ArrayList<>();LinearLayout row=null;boolean stacked=getResources().getConfiguration().fontScale>1.3f||getResources().getConfiguration().screenWidthDp<360;
+        for(int i=0;i<names.length;i++){final int value=i;if(stacked||i%2==0){row=new LinearLayout(this);parent.addView(row);}MaterialCardView card=new MaterialCardView(this);card.setRadius(dp(24));card.setCardElevation(0);card.setCardBackgroundColor(getColor(R.color.surface_container_high));card.setClickable(true);card.setFocusable(true);card.setTag(kind+"-style:"+i);choices.add(card);statusControls.add(card);
+            LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setGravity(Gravity.CENTER);body.setPadding(dp(12),dp(12),dp(12),dp(12));body.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+            if(power)body.addView(new PowerStylePreview(this,i),new LinearLayout.LayoutParams(-1,dp(100)));else body.addView(new ConnectivityStylePreview(this,wifi,i),new LinearLayout.LayoutParams(-1,dp(90)));
+            TextView title=text(names[i],16,true);title.setGravity(Gravity.CENTER);body.addView(title);card.addView(body);LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(stacked?-1:0,-2,stacked?0:1);cp.setMargins(dp(4),dp(4),dp(4),dp(4));row.addView(card,cp);
+            card.setOnClickListener(v->{if(power)powerStyle=value;else if(wifi)wifiStyle=value;else signalStyle=value;for(int n=0;n<choices.size();n++){MaterialCardView option=choices.get(n);option.setStrokeWidth(dp(n==value?3:0));option.setStrokeColor(getColor(R.color.primary));option.setSelected(n==value);option.setContentDescription(names[n]+(n==value?", selected":""));}saveStatusBar();});
+        }
+        for(int n=0;n<choices.size();n++){MaterialCardView card=choices.get(n);card.setStrokeWidth(dp(n==visualSelection(kind)?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(n==visualSelection(kind));card.setContentDescription(names[n]+(n==visualSelection(kind)?", selected":""));}
+    }
+    private void notificationAppearanceControls(LinearLayout parent){
+        parent.addView(text("Adjust the compatible card background without fading text or actions. Corner clipping adds rounding inside the stock shape; grouped and newer vendor surfaces may keep stock. Press Enable to apply.",14,false));
+        TextView label=text("",16,true);parent.addView(label);Slider opacity=new Slider(this);opacity.setValueFrom(50);opacity.setValueTo(100);opacity.setStepSize(5);int selectedOpacity=NotificationControls.opacity(notificationAppearance);opacity.setValue(selectedOpacity==0?100:selectedOpacity);parent.addView(opacity);statusControls.add(opacity);
+        Runnable redraw=()->label.setText("Background opacity: "+(NotificationControls.opacity(notificationAppearance)==0?"Stock":NotificationControls.opacity(notificationAppearance)+"%"));redraw.run();opacity.addOnChangeListener((v,value,user)->{if(user){notificationAppearance=NotificationControls.encode((int)value,NotificationControls.corners(notificationAppearance));redraw.run();saveStatusBar();}});
+        MaterialButton stock=button("Use stock opacity");parent.addView(stock);statusControls.add(stock);stock.setOnClickListener(v->{notificationAppearance=NotificationControls.encode(0,NotificationControls.corners(notificationAppearance));opacity.setValue(100);redraw.run();saveStatusBar();});
+        parent.addView(text("Corner clipping",16,true));String[] names={"Stock","12 dp","24 dp","32 dp"};ChipGroup corners=new ChipGroup(this);corners.setSingleSelection(true);parent.addView(corners);for(int i=0;i<names.length;i++){final int n=i;Chip choice=new Chip(this);choice.setId(View.generateViewId());choice.setText(names[i]);choice.setCheckable(true);choice.setChecked(NotificationControls.corners(notificationAppearance)==i);corners.addView(choice);statusControls.add(choice);choice.setOnClickListener(v->{notificationAppearance=NotificationControls.encode(NotificationControls.opacity(notificationAppearance),n);saveStatusBar();});}
+    }
+    private void notificationBehaviorControls(LinearLayout parent){
+        var toggle=new com.google.android.material.materialswitch.MaterialSwitch(this);toggle.setText("Suppress automatic heads-up popups");toggle.setChecked(notificationBehavior!=0);parent.addView(toggle);statusControls.add(toggle);toggle.setOnCheckedChangeListener((v,on)->{notificationBehavior=on?1:0;saveStatusBar();});
+        parent.addView(text("Applies to new automatic heads-up presentations after Enable. Existing or user-pinned popups, notification delivery, sound, full-screen alerts and DND retain their native behavior.",14,false));
+        MaterialButton history=button("Notification history");parent.addView(history);history.setOnClickListener(v->openNotificationSettings("android.settings.NOTIFICATION_HISTORY"));MaterialButton apps=button("App notification controls");parent.addView(apps);apps.setOnClickListener(v->openNotificationSettings("android.settings.ALL_APPS_NOTIFICATION_SETTINGS"));
+        MaterialButton settings=button("System notification settings & snoozing");parent.addView(settings);settings.setOnClickListener(v->openNotificationSettings("android.settings.NOTIFICATION_SETTINGS"));parent.addView(text("History, snoozing and per-app behavior open REDMAGIC settings. Changes made there are managed by Android and are separate from Restore stock appearance.",14,false));
+    }
+    private void openNotificationSettings(String action){try{startActivity(new android.content.Intent(action));}catch(android.content.ActivityNotFoundException unavailable){new MaterialAlertDialogBuilder(this).setTitle("Not available").setMessage("REDMAGIC does not expose this settings page on your firmware.").setPositiveButton("OK",null).show();}}
+    private void chargingControls(LinearLayout parent){
+        var toggle=new com.google.android.material.materialswitch.MaterialSwitch(this);toggle.setText("Show live charging diagnostics");toggle.setChecked(chargingInfo!=0);parent.addView(toggle);statusControls.add(toggle);toggle.setOnCheckedChangeListener((v,on)->{chargingInfo=on?1:0;saveStatusBar();});
+        parent.addView(text("Adds a second line beneath the stock charging message while plugged in and awake: measured battery voltage, battery current and temperature when available. The existing charging type and percentage remain above it. Press Enable to apply.",14,false));
+        parent.addView(text("Example · Battery 4.420 V · +2,350 mA · 36.5 °C",16,true));parent.addView(text("Battery voltage is measured at the battery, not the USB charger. Current sign follows the device sensor. Readings follow native charging updates; there is no background polling.",14,false));
+    }
     private void notificationStyleControls(LinearLayout parent){
         parent.addView(text("Choose a background treatment for notification cards. Text, actions and gestures follow Android. Press Enable to apply.",14,false));
         java.util.List<MaterialCardView> choices=new java.util.ArrayList<>();String[] names=NotificationEffects.NAMES;
@@ -527,7 +570,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         int selection=large?largeTileShape:tileShape;for(int i=0;i<cards.size();i++){MaterialCardView card=cards.get(i);card.setStrokeWidth(dp(i==selection?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==selection);card.setContentDescription(title+", "+names[i]+(i==selection?", selected":""));}
     }
-    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation,qsStyle,brightnessStyle,volumeStyle,notificationStyle);}
+    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation,qsStyle,brightnessStyle,volumeStyle,notificationStyle,wifiStyle,signalStyle,powerStyle,notificationAppearance,notificationBehavior,chargingInfo);}
     private void surfaceControls(LinearLayout parent,String title,int group){
         parent.addView(text(title,18,true));
         LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);parent.addView(box);

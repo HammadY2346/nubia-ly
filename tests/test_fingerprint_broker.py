@@ -26,6 +26,6 @@ with tempfile.TemporaryDirectory() as temp:
     temp=Path(temp)
     for name,content in sources.items():
         p=temp/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
-    names=['FingerprintAnimations','FingerprintStyles','GuardBrokerProvider','GuardBrokerPolicy','SystemUiGuardProtocol','RecoveryStore','ClockEnabledPolicy','PreviewPolicy','CompatibilityPolicy','SurfaceStyle','StatusBarStyle','LockClockFonts']
+    names=['FingerprintAnimations','FingerprintStyles','GuardBrokerProvider','GuardBrokerPolicy','SystemUiGuardProtocol','RecoveryStore','ClockEnabledPolicy','PreviewPolicy','CompatibilityPolicy','SurfaceStyle','NotificationControls','StatusBarStyle','LockClockFonts']
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(temp/'classes'),*[str(p) for p in temp.rglob('*.java')],*[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/(n+'.java')) for n in names]],check=True)
     subprocess.run(['java','-cp',str(temp/'classes'),'com.elitedarkkaiser.nubialy.FingerprintBrokerTest'],check=True)

@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory() as folder:
     folder=Path(folder)
     for name,content in sources.items():
         p=folder/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
-    names=['PreviewLifecycle','PreviewPolicy','ClockEnabledPolicy','ClockColorPolicy','ClockStylePolicy','ClockDatePolicy','SystemUiGuardProtocol','GuardBrokerPolicy','StatusBarStyle','SurfaceStyle','LockClockFonts']
+    names=['PreviewLifecycle','PreviewPolicy','ClockEnabledPolicy','ClockColorPolicy','ClockStylePolicy','ClockDatePolicy','SystemUiGuardProtocol','GuardBrokerPolicy','StatusBarStyle','SurfaceStyle','NotificationControls','LockClockFonts']
     files=[str(p) for p in folder.rglob('*.java')]+[str(root/'app/src/main/java'/pkg/(n+'.java')) for n in names]+[str(root/'app/src/main/java'/pkg/'xposed/PreviewRuntime.java')]
     files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintStyles.java'))
     files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintAnimations.java'))
