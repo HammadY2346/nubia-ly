@@ -4,9 +4,11 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.GraphicsMode;
 import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
 public final class FingerprintAnimationArtworkTest {
     @Test public void everyAnimationAtlasDecodes(){
         FingerprintAnimationArtwork.resources(RuntimeEnvironment.getApplication().getResources());
