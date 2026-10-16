@@ -42,7 +42,7 @@ final class QsOutlineBackend {
         }catch(Throwable unavailable){failed=true;invalidateOwners();}
     }
     static void release(ViewGroup owner){owners.entrySet().removeIf(e->e.getValue().get()==owner);}
-    private static void invalidateOwners(){for(var ref:new ArrayList<>(owners.values())){ViewGroup owner=ref.get();if(owner!=null)owner.invalidate();}}
+    private static void invalidateOwners(){for(var ref:new ArrayList<>(owners.values())){ViewGroup owner=ref.get();if(owner!=null)try{owner.invalidate();}catch(Throwable unavailable){failed=true;}}}
     static boolean end(){generation++;active=false;invalidateOwners();owners.clear();if(hook!=null)try{hook.unhook();hook=null;}catch(Throwable unavailable){failed=true;}return hook==null;}
     static boolean healthy(){return !failed;}
     static String status(){return "QS outline: "+(active?"enabled":"stock")+"; tracked: "+owners.size()+(failed?"; decoration stopped after failure.":".");}
