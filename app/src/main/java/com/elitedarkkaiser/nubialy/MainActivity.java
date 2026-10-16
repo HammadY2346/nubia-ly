@@ -77,10 +77,6 @@ public final class MainActivity extends AppCompatActivity {
         content.addView(PersonalizationUi.dashboard(this, section -> startActivity(
             new android.content.Intent(this,ClockEditorActivity.class).putExtra("section",section))));
         spacer(16);
-        content.addView(label("More",20,true));
-        LinearLayout planned=card("Notifications", "More ways to personalize, coming later.");
-        planned.setOnClickListener(v->new MaterialAlertDialogBuilder(this).setTitle("Notifications").setMessage("Notification styling is not available yet.").setPositiveButton("Close",null).show());
-        spacer(12);
         int recoveryStart=content.getChildCount();
         LinearLayout recovery = card("Restore & recovery", "Recovery must be ready before the first customization is enabled.");
         recoveryStatus = label("", 14, false);

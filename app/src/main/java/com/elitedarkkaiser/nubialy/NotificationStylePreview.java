@@ -1,0 +1,17 @@
+package com.elitedarkkaiser.nubialy;
+import android.content.Context;
+import android.graphics.*;
+import android.graphics.drawable.GradientDrawable;
+import android.view.View;
+/** Local sample cards only, never notification contents. */
+final class NotificationStylePreview extends View {
+    private final int style;
+    NotificationStylePreview(Context context,int style){super(context);this.style=style;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+    static void paint(Canvas c,int style,float w,float h,float density){if(w<16||h<16)return;Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
+        for(int i=0;i<2;i++){float margin=w*.04f,gap=h*.04f,top=i*h/2+gap;RectF b=new RectF(margin,top,w-margin,(i+1)*h/2-gap);float radius=Math.min(b.height()/3,16*density);float[] radii=new float[8];java.util.Arrays.fill(radii,radius);GradientDrawable bg=new GradientDrawable();bg.setColor(0xff66616f);bg.setCornerRadius(radius);bg.setBounds(Math.round(b.left),Math.round(b.top),Math.round(b.right),Math.round(b.bottom));
+            try{if(!NotificationEffects.draw(style,c,b,radii,density,()->true,()->bg.draw(c)))bg.draw(c);}catch(Throwable unavailable){bg.draw(c);}
+            float y=b.top+b.height()*.38f;p.setColor(0xffd3cbef);c.drawCircle(b.left+b.height()*.28f,y,b.height()*.09f,p);float x=b.left+b.height()*.5f;p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeWidth(Math.max(2,b.height()*.055f));c.drawLine(x,y,b.left+b.width()*.7f,y,p);p.setColor(0xffc8c1d1);c.drawLine(x,y+b.height()*.24f,b.left+b.width()*.86f,y+b.height()*.24f,p);
+        }
+    }
+    @Override protected void onDraw(Canvas c){super.onDraw(c);paint(c,style,getWidth(),getHeight(),getResources().getDisplayMetrics().density);}
+}

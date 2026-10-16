@@ -28,7 +28,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private MaterialButton fingerprintPicker;
     private android.widget.ImageView fingerprintPreview;
     private static final int PICK_FINGERPRINT=7402,PICK_ANIMATION=7403,PICK_CLOCK_FONT=7404;
-    private int qsStyle,brightnessStyle,volumeStyle;
+    private int qsStyle,brightnessStyle,volumeStyle,notificationStyle;
     private int fingerprintAnimation;private MaterialButton animationPicker;
     private LinearLayout content;
     private EditorPages pages;
@@ -67,7 +67,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         selected = ClockColorPreferences.read(this);
         sizePercent = ClockColorPreferences.size(this); bold = ClockColorPreferences.bold(this); seconds = ClockColorPreferences.seconds(this); italic = ClockColorPreferences.italic(this); spacing = ClockColorPreferences.spacing(this); fontFamily = ClockColorPreferences.family(this); hidden = ClockColorPreferences.hidden(this);
         StatusBarStyle bar = StatusBarPreferences.read(this); statusMask = bar.mask(); systemScale = bar.systemScale(); notificationScale = bar.notificationScale(); batteryScale = bar.batteryScale();systemOpacity=bar.systemOpacity();notificationOpacity=bar.notificationOpacity();batteryOpacity=bar.batteryOpacity();systemTransform=bar.systemTransform();notificationTransform=bar.notificationTransform();batteryTransform=bar.batteryTransform();fanAppearance=bar.fanAppearance();pumpAppearance=bar.pumpAppearance();refreshAppearance=bar.refreshAppearance();hiddenSlots.addAll(bar.hiddenSlots());iconColor=StatusBarPreferences.color(this);dateMode=StatusBarPreferences.date(this);
-        volumeStyle=bar.surfaces().volumeStyle();brightnessStyle=bar.surfaces().brightnessStyle();qsStyle=bar.surfaces().qsStyle();widgetsHidden=bar.surfaces().widgetsHidden();fingerprintAnimation=bar.surfaces().fingerprintAnimation();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
+        notificationStyle=bar.surfaces().notificationStyle();volumeStyle=bar.surfaces().volumeStyle();brightnessStyle=bar.surfaces().brightnessStyle();qsStyle=bar.surfaces().qsStyle();widgetsHidden=bar.surfaces().widgetsHidden();fingerprintAnimation=bar.surfaces().fingerprintAnimation();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
         if (state != null && ClockColorPolicy.valid(state.getInt("selection", 0))) selected = state.getInt("selection");
         client = new SystemUiGuardClient(this);fingerprintClient=new FingerprintServiceClient(this);
         ScrollView scroll = new ScrollView(this);
@@ -82,6 +82,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         pages=new EditorPages(this,editorToolbar,sections,scroll);
         editorOverview("lock_screen","Lock screen",new String[][]{{"clock","Clock","Size, opacity & position"},{"date","Date","Visibility & placement"},{"fonts","Clock font styles","Preview your typography"},{"fingerprint","Fingerprint","Icons & animations"},{"widgets","Widgets","Weather, alarm & battery"}});
         editorOverview("quick_settings","Quick Settings",new String[][]{{"style","Tile style","Outline, depth & layered effects"},{"brightness","Brightness slider","Outline, depth & a slim track"},{"tiles","Tile shapes","Large & small tiles"},{"labels","Label styles","Main & secondary text"}});
+        editorOverview("notifications","Notifications",new String[][]{{"styles","Notification styles","Card backgrounds & layers"}});
         editorOverview("volume","Volume",new String[][]{{"styles","Volume styles","Outline, gradients & layered effects"}});
         editorOverview("status_bar","Status bar",new String[][]{{"typography","Clock style","Font, size & seconds"},{"date","Date format","Format, position & letter case"},{"color","Clock color","Presets & custom colors"},{"icons","Icons & battery","Colors, size & placement"},{"inventory","Individual icons","Visibility & vendor indicators"}});
         LinearLayout colors = editorPanel("status_bar","color","Clock color");
@@ -132,6 +133,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         });
         icons.addView(text("Reset clears draft icon/battery controls; press Enable afterward to apply stock icon/battery appearance while keeping your clock choices.",14,false));
         icons.addView(text("100% uses stock size. These controls apply to recognized top-status-bar views; other icons may keep their stock appearance. Press Enable to apply the entire saved style.",14,false));
+        LinearLayout notificationPanel=editorPanel("notifications","styles","Notification styles");notificationStyleControls(notificationPanel);
         LinearLayout volumePanel=editorPanel("volume","styles","Volume styles");volumeStyleControls(volumePanel);
         LinearLayout stylePanel=editorPanel("quick_settings","style","Tile style");qsStyleControls(stylePanel);
         LinearLayout brightnessPanel=editorPanel("quick_settings","brightness","Brightness slider");brightnessStyleControls(brightnessPanel);
@@ -192,7 +194,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         dateChoices(dateFormats,"Date letter case",ClockDatePolicy.CASE_LABELS,3);
         dateFormats.addView(text("Date uses your stock locale and timezone. Position, separator and letter case affect only the added date; time keeps its stock format. Long dates add width. Press Enable to apply your saved choices.",14,false));
         String initial=state==null?getIntent().getStringExtra("section"):state.getString("editor_section");if(initial==null)initial=getIntent().getBooleanExtra("surfaces",false)?"quick_settings":"status_bar";
-        String[] sectionIds={"status_bar","quick_settings","lock_screen","volume"},sectionNames={"Status bar","Quick Settings","Lock screen","Volume"};
+        String[] sectionIds={"status_bar","quick_settings","lock_screen","volume","notifications"},sectionNames={"Status bar","Quick Settings","Lock screen","Volume","Notifications"};
         for(int i=0;i<sectionIds.length;i++){final String id=sectionIds[i];Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(sectionNames[i]);chip.setCheckable(true);sections.addView(chip);chip.setChecked(id.equals(initial));chip.setOnClickListener(v->{pages.show(id,"");chip.setChecked(true);});}
         pages.show(initial,state==null?"":state.getString("editor_page",""));
         LinearLayout controls = card("Apply your style");
@@ -375,7 +377,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private void editorOverview(String section,String title,String[][] items){
         LinearLayout preview=editorPanel(section,"preview",title+" preview");
         EditorPreview artwork=new EditorPreview(this,section,()->new EditorPreview.Draft(currentStatusBar(),selected,iconColor,sizePercent,bold,italic,hidden,fontFamily,spacing/100f));
-        editorPreviews.add(artwork);preview.addView(artwork,new LinearLayout.LayoutParams(-1,dp(section.equals("lock_screen")?280:section.equals("quick_settings")?180:section.equals("volume")?220:100)));
+        editorPreviews.add(artwork);preview.addView(artwork,new LinearLayout.LayoutParams(-1,dp(section.equals("lock_screen")?280:section.equals("quick_settings")?180:section.equals("volume")?220:section.equals("notifications")?180:100)));
         preview.addView(text("Draft preview · sample content",12,false));
         LinearLayout overview=editorPanel(section,"", "Make it yours");
         for(String[] item:items){
@@ -495,6 +497,17 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         for(int i=0;i<choices.size();i++){MaterialCardView card=choices.get(i);card.setStrokeWidth(dp(i==volumeStyle?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==volumeStyle);card.setContentDescription(names[i]+(i==volumeStyle?", selected":""));}
     }
+    private void notificationStyleControls(LinearLayout parent){
+        parent.addView(text("Choose a background treatment for notification cards. Text, actions and gestures follow Android. Press Enable to apply.",14,false));
+        java.util.List<MaterialCardView> choices=new java.util.ArrayList<>();String[] names=NotificationEffects.NAMES;
+        LinearLayout row=null;boolean stacked=getResources().getConfiguration().fontScale>1.3f||getResources().getConfiguration().screenWidthDp<360;
+        for(int i=0;i<names.length;i++){final int value=i;if(stacked||i%2==0){row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);parent.addView(row);}MaterialCardView card=new MaterialCardView(this);card.setRadius(dp(24));card.setCardElevation(0);card.setCardBackgroundColor(getColor(R.color.surface_container_high));card.setClickable(true);card.setFocusable(true);card.setTag("notification-style:"+i);choices.add(card);statusControls.add(card);
+            LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setGravity(Gravity.CENTER);body.setPadding(dp(12),dp(16),dp(12),dp(10));body.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);body.addView(new NotificationStylePreview(this,i),new LinearLayout.LayoutParams(-1,dp(120)));TextView title=text(names[i],16,true);title.setGravity(Gravity.CENTER);body.addView(title);card.addView(body);
+            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(stacked?-1:0,-2,stacked?0:1);params.setMargins(dp(4),dp(4),dp(4),dp(4));row.addView(card,params);
+            card.setOnClickListener(v->{notificationStyle=value;for(int n=0;n<choices.size();n++){MaterialCardView option=choices.get(n);option.setStrokeWidth(dp(n==value?3:0));option.setStrokeColor(getColor(R.color.primary));option.setSelected(n==value);option.setContentDescription(names[n]+(n==value?", selected":""));}saveStatusBar();});
+        }
+        for(int i=0;i<choices.size();i++){MaterialCardView card=choices.get(i);card.setStrokeWidth(dp(i==notificationStyle?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==notificationStyle);card.setContentDescription(names[i]+(i==notificationStyle?", selected":""));}
+    }
     private void shapeControls(LinearLayout parent,String title,boolean large){
         parent.addView(text(title,18,true));
         String[] names={"Stock","Square","Rounded square","Leaf"};
@@ -514,7 +527,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         int selection=large?largeTileShape:tileShape;for(int i=0;i<cards.size();i++){MaterialCardView card=cards.get(i);card.setStrokeWidth(dp(i==selection?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==selection);card.setContentDescription(title+", "+names[i]+(i==selection?", selected":""));}
     }
-    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation,qsStyle,brightnessStyle,volumeStyle);}
+    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation,qsStyle,brightnessStyle,volumeStyle,notificationStyle);}
     private void surfaceControls(LinearLayout parent,String title,int group){
         parent.addView(text(title,18,true));
         LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);parent.addView(box);

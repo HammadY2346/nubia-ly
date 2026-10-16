@@ -25,7 +25,7 @@ final class EditorPages {
     void show(String section,String page){
         boolean known=panels.stream().anyMatch(p->p.section.equals(section)&&p.page.equals(page));
         this.section=known?section:"status_bar";this.page=known?page:"";
-        String title=this.section.equals("lock_screen")?"Lock screen":this.section.equals("quick_settings")?"Quick Settings":this.section.equals("volume")?"Volume":"Status bar";
+        String title=this.section.equals("lock_screen")?"Lock screen":this.section.equals("quick_settings")?"Quick Settings":this.section.equals("volume")?"Volume":this.section.equals("notifications")?"Notifications":"Status bar";
         for(Panel p:panels){boolean same=p.section.equals(this.section);p.view.setVisibility(same&&(p.page.equals(this.page)||p.page.equals("preview"))?View.VISIBLE:View.GONE);if(same&&p.page.equals(this.page)&&!this.page.isEmpty())title=p.title;}
         toolbar.setTitle(title);tabs.setVisibility(this.page.isEmpty()?View.VISIBLE:View.GONE);
         scroll.post(()->scroll.scrollTo(0,0));
