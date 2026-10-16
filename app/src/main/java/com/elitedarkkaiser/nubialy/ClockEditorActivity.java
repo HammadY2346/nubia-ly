@@ -28,7 +28,8 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private MaterialButton fingerprintPicker;
     private android.widget.ImageView fingerprintPreview;
     private static final int PICK_FINGERPRINT=7402,PICK_ANIMATION=7403,PICK_CLOCK_FONT=7404;
-    private int qsStyle,brightnessStyle,volumeStyle,notificationStyle,wifiStyle,signalStyle,powerStyle,notificationAppearance,notificationBehavior,chargingInfo,batteryStyle;
+    private View batteryControlPreview;
+    private int qsStyle,brightnessStyle,volumeStyle,notificationStyle,wifiStyle,signalStyle,powerStyle,notificationAppearance,notificationBehavior,chargingInfo,batteryStyle,batteryPercent,batteryCharge,notificationCount,notificationLimit;
     private int fingerprintAnimation;private MaterialButton animationPicker;
     private LinearLayout content;
     private EditorPages pages;
@@ -67,7 +68,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         selected = ClockColorPreferences.read(this);
         sizePercent = ClockColorPreferences.size(this); bold = ClockColorPreferences.bold(this); seconds = ClockColorPreferences.seconds(this); italic = ClockColorPreferences.italic(this); spacing = ClockColorPreferences.spacing(this); fontFamily = ClockColorPreferences.family(this); hidden = ClockColorPreferences.hidden(this);
         StatusBarStyle bar = StatusBarPreferences.read(this); statusMask = bar.mask(); systemScale = bar.systemScale(); notificationScale = bar.notificationScale(); batteryScale = bar.batteryScale();systemOpacity=bar.systemOpacity();notificationOpacity=bar.notificationOpacity();batteryOpacity=bar.batteryOpacity();systemTransform=bar.systemTransform();notificationTransform=bar.notificationTransform();batteryTransform=bar.batteryTransform();fanAppearance=bar.fanAppearance();pumpAppearance=bar.pumpAppearance();refreshAppearance=bar.refreshAppearance();hiddenSlots.addAll(bar.hiddenSlots());iconColor=StatusBarPreferences.color(this);dateMode=StatusBarPreferences.date(this);
-        batteryStyle=bar.surfaces().batteryStyle();wifiStyle=bar.surfaces().wifiStyle();signalStyle=bar.surfaces().signalStyle();powerStyle=bar.surfaces().powerStyle();notificationAppearance=bar.surfaces().notificationAppearance();notificationBehavior=bar.surfaces().notificationBehavior();chargingInfo=bar.surfaces().chargingInfo();notificationStyle=bar.surfaces().notificationStyle();volumeStyle=bar.surfaces().volumeStyle();brightnessStyle=bar.surfaces().brightnessStyle();qsStyle=bar.surfaces().qsStyle();widgetsHidden=bar.surfaces().widgetsHidden();fingerprintAnimation=bar.surfaces().fingerprintAnimation();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
+        batteryPercent=bar.surfaces().batteryPercent();batteryCharge=bar.surfaces().batteryCharge();notificationCount=bar.surfaces().notificationCount();notificationLimit=bar.surfaces().notificationLimit();batteryStyle=bar.surfaces().batteryStyle();wifiStyle=bar.surfaces().wifiStyle();signalStyle=bar.surfaces().signalStyle();powerStyle=bar.surfaces().powerStyle();notificationAppearance=bar.surfaces().notificationAppearance();notificationBehavior=bar.surfaces().notificationBehavior();chargingInfo=bar.surfaces().chargingInfo();notificationStyle=bar.surfaces().notificationStyle();volumeStyle=bar.surfaces().volumeStyle();brightnessStyle=bar.surfaces().brightnessStyle();qsStyle=bar.surfaces().qsStyle();widgetsHidden=bar.surfaces().widgetsHidden();fingerprintAnimation=bar.surfaces().fingerprintAnimation();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
         if (state != null && ClockColorPolicy.valid(state.getInt("selection", 0))) selected = state.getInt("selection");
         client = new SystemUiGuardClient(this);fingerprintClient=new FingerprintServiceClient(this);
         ScrollView scroll = new ScrollView(this);
@@ -82,10 +83,10 @@ public final class ClockEditorActivity extends AppCompatActivity {
         pages=new EditorPages(this,editorToolbar,sections,scroll);
         editorOverview("lock_screen","Lock screen",new String[][]{{"clock","Clock","Size, opacity & position"},{"date","Date","Visibility & placement"},{"fonts","Clock font styles","Preview your typography"},{"fingerprint","Fingerprint","Icons & animations"},{"widgets","Widgets","Weather, alarm & battery"},{"charging","Charging information","Battery voltage, current & temperature"}});
         editorOverview("quick_settings","Quick Settings",new String[][]{{"style","Tile style","Outline, depth & layered effects"},{"brightness","Brightness slider","Outline, depth & a slim track"},{"tiles","Tile shapes","Large & small tiles"},{"labels","Label styles","Main & secondary text"}});
-        editorOverview("notifications","Notifications",new String[][]{{"styles","Notification styles","Card backgrounds & layers"},{"appearance","Appearance controls","Background opacity & rounded corners"},{"behavior","Notification controls","Heads-up, history & app settings"}});
+        editorOverview("notifications","Notifications",new String[][]{{"styles","Notification styles","Card backgrounds & layers"},{"appearance","Appearance controls","Background opacity & rounded corners"},{"behavior","Notification controls","Heads-up, history & app settings"},{"icons","Counts & icon limits","Status-bar overflow & icon slots"}});
         editorOverview("power_menu","Power menu",new String[][]{{"styles","Power-menu styles","Duoline, CyberPunk, Fluid & layers"}});
         editorOverview("volume","Volume",new String[][]{{"styles","Volume styles","Outline, gradients & layered effects"}});
-        editorOverview("status_bar","Status bar",new String[][]{{"typography","Clock style","Font, size & seconds"},{"date","Date format","Format, position & letter case"},{"color","Clock color","Presets & custom colors"},{"icons","Icons & battery","Colors, size & placement"},{"battery","Battery styles","Circle, portrait & landscape designs"},{"connectivity","Wi-Fi & mobile signal","Choose independent icon styles"},{"inventory","Individual icons","Visibility & vendor indicators"}});
+        editorOverview("status_bar","Status bar",new String[][]{{"typography","Clock style","Font, size & seconds"},{"date","Date format","Format, position & letter case"},{"color","Clock color","Presets & custom colors"},{"icons","Icons & battery","Colors, size & placement"},{"battery","Battery styles & controls","Design, percentage, charging & size"},{"connectivity","Wi-Fi & mobile signal","Choose independent icon styles"},{"inventory","Individual icons","Visibility & vendor indicators"}});
         LinearLayout colors = editorPanel("status_bar","color","Clock color");
         swatch = text("12:34", 44, true); colors.addView(swatch);
         selection = text("", 16, true); colors.addView(selection);
@@ -117,7 +118,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         LinearLayout sizes=detailGroup(icons,"Size & opacity","Scale compatible icons independently");
         statusScale(sizes,"Mobile service icon size",systemScale,n->systemScale=n);
         statusScale(sizes,"Notification icon size",notificationScale,n->notificationScale=n);
-        statusScale(sizes,"Battery size",batteryScale,n->batteryScale=n);
+        MaterialButton batterySizing=button("Battery size & controls");sizes.addView(batterySizing);batterySizing.setOnClickListener(v->pages.show("status_bar","battery"));
         statusOpacity(sizes,"Mobile service icon opacity",systemOpacity,n->systemOpacity=n);
         statusOpacity(sizes,"Notification icon opacity",notificationOpacity,n->notificationOpacity=n);
         statusOpacity(sizes,"Battery opacity",batteryOpacity,n->batteryOpacity=n);
@@ -130,14 +131,15 @@ public final class ClockEditorActivity extends AppCompatActivity {
         inventoryButton=button("Load individual system status icons");inventory.addView(inventoryButton);inventoryButton.setOnClickListener(v->{enabled(false);client.inventory(slots->{if(alive())showSlots(slots);},result->{if(alive()){enabled(true);saveStatus.setText(result);}});});
         iconSlots=new LinearLayout(this);iconSlots.setOrientation(LinearLayout.VERTICAL);inventory.addView(iconSlots);showSlots(java.util.List.of());
         resetIcons=button("Reset icons & battery selections");icons.addView(resetIcons);resetIcons.setOnClickListener(v->{
-            enabled(false);worker.execute(()->{boolean saved=StatusBarPreferences.save(getApplicationContext(),StatusBarStyle.STOCK.withSurfaces(currentSurfaces().withBatteryStyle(0)));runOnUiThread(()->{if(alive()){if(saved){finish();startActivity(new android.content.Intent(this,ClockEditorActivity.class));}else {enabled(true);saveStatus.setText("Reset could not be saved.");}}});});
+            enabled(false);worker.execute(()->{boolean saved=StatusBarPreferences.save(getApplicationContext(),StatusBarStyle.STOCK.withSurfaces(currentSurfaces().withBatteryStyle(0).withBatteryControls(0,0)));runOnUiThread(()->{if(alive()){if(saved){finish();startActivity(new android.content.Intent(this,ClockEditorActivity.class));}else {enabled(true);saveStatus.setText("Reset could not be saved.");}}});});
         });
         icons.addView(text("Reset clears draft icon/battery controls; press Enable afterward to apply stock icon/battery appearance while keeping your clock choices.",14,false));
         icons.addView(text("100% uses stock size. These controls apply to recognized top-status-bar views; other icons may keep their stock appearance. Press Enable to apply the entire saved style.",14,false));
-        batteryStyleControls(editorPanel("status_bar","battery","Battery styles"));
+        LinearLayout batteries=editorPanel("status_bar","battery","Battery styles & controls");batteryControls(batteries);batteryStyleControls(batteries);
         connectivityControls(editorPanel("status_bar","connectivity","Wi-Fi & mobile signal"));
         visualStyleChoices(editorPanel("power_menu","styles","Power-menu styles"),"power");
         notificationAppearanceControls(editorPanel("notifications","appearance","Appearance controls"));
+        notificationIconControls(editorPanel("notifications","icons","Counts & icon limits"));
         notificationBehaviorControls(editorPanel("notifications","behavior","Notification controls"));
         chargingControls(editorPanel("lock_screen","charging","Charging information"));
         LinearLayout notificationPanel=editorPanel("notifications","styles","Notification styles");notificationStyleControls(notificationPanel);
@@ -394,7 +396,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
             LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,-2);params.topMargin=dp(8);overview.addView(row,params);row.setOnClickListener(v->pages.show(section,item[0]));
         }
     }
-    private void refreshEditorPreviews(){for(EditorPreview preview:editorPreviews)preview.invalidate();}
+    private void refreshEditorPreviews(){for(EditorPreview preview:editorPreviews)preview.invalidate();if(batteryControlPreview!=null)batteryControlPreview.invalidate();}
     private LinearLayout card(String title) {
         MaterialCardView panel = new MaterialCardView(this); PersonalizationUi.panel(panel);
         LinearLayout box = new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setPadding(dp(20),dp(20),dp(20),dp(20)); panel.addView(box);
@@ -504,6 +506,21 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         for(int i=0;i<choices.size();i++){MaterialCardView card=choices.get(i);card.setStrokeWidth(dp(i==volumeStyle?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==volumeStyle);card.setContentDescription(names[i]+(i==volumeStyle?", selected":""));}
     }
+    private void batteryControls(LinearLayout parent){
+        LinearLayout controls=detailGroup(parent,"Battery controls","Percentage, charging & size");
+        batteryControlPreview=new BatteryControlsPreview(this,()->currentStatusBar());controls.addView(batteryControlPreview,new LinearLayout.LayoutParams(-1,dp(100)));controls.addView(text("Percentage placement",16,true));
+        String[] names={"Stock","Inside","Outside","Hidden"};ChipGroup choices=new ChipGroup(this);choices.setSingleSelection(true);controls.addView(choices);
+        for(int i=0;i<names.length;i++){final int value=i;Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setTag("battery-percent:"+i);chip.setText(names[i]);chip.setCheckable(true);chip.setChecked(batteryPercent==i);choices.addView(chip);statusControls.add(chip);chip.setOnClickListener(v->{batteryPercent=value;saveStatusBar();});}
+        var charge=new com.google.android.material.materialswitch.MaterialSwitch(this);charge.setTag("battery-hide-charge");charge.setText("Hide charging symbol");charge.setChecked(batteryCharge!=0);controls.addView(charge);statusControls.add(charge);charge.setOnCheckedChangeListener((v,on)->{batteryCharge=on?1:0;saveStatusBar();});
+        statusScale(controls,"Battery size",batteryScale,n->batteryScale=n);
+        controls.addView(text("Press Enable to apply. Size shares the Icons & battery setting. Text only always displays its percentage; Hidden hides the whole battery. Charging can temporarily replace an inside percentage. Warning and unsupported charging states retain REDMAGIC indicators.",14,false));
+    }
+    private void notificationIconControls(LinearLayout parent){
+        parent.addView(text("Control notification icons in the top status bar. The count replaces the overflow dot with the number of additional notification icons, including the icon represented by the dot. Grouped notifications follow Android’s icon grouping. Notifications in the shade are unchanged.",14,false));
+        var count=new com.google.android.material.materialswitch.MaterialSwitch(this);count.setTag("notification-overflow-count");count.setText("Show overflow count");count.setChecked(notificationCount!=0);parent.addView(count);statusControls.add(count);count.setOnCheckedChangeListener((v,on)->{notificationCount=on?1:0;saveStatusBar();});
+        parent.addView(text("Maximum icon slots",16,true));ChipGroup limits=new ChipGroup(this);limits.setSingleSelection(true);parent.addView(limits);for(int i=0;i<=8;i++){final int value=i;Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setTag("notification-limit:"+i);chip.setText(i==0?"Stock":Integer.toString(i));chip.setCheckable(true);chip.setChecked(notificationLimit==i);limits.addView(chip);statusControls.add(chip);chip.setOnClickListener(v->{notificationLimit=value;saveStatusBar();});}
+        parent.addView(text("Overflow uses one slot. Available space and REDMAGIC may reduce the number further. Existing Hide notification icons takes priority. Lock screen, AOD and notification shelf retain stock behavior. Press Enable to apply.",14,false));
+    }
     private void batteryStyleControls(LinearLayout parent){
         parent.addView(text("Choose a battery design inspired by RisingOS. Previews show sample low, normal and charging states. Styles follow your real battery level and native colors. Press Enable to apply.",14,false));
         parent.addView(text("Designs fit inside your current status-bar space. External percentage and charge indicators keep their stock positions. Text only replaces the battery group with its percentage; Hidden hides its graphics while keeping the space.",14,false));
@@ -581,7 +598,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         }
         int selection=large?largeTileShape:tileShape;for(int i=0;i<cards.size();i++){MaterialCardView card=cards.get(i);card.setStrokeWidth(dp(i==selection?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==selection);card.setContentDescription(title+", "+names[i]+(i==selection?", selected":""));}
     }
-    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation,qsStyle,brightnessStyle,volumeStyle,notificationStyle,wifiStyle,signalStyle,powerStyle,notificationAppearance,notificationBehavior,chargingInfo,batteryStyle);}
+    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation,qsStyle,brightnessStyle,volumeStyle,notificationStyle,wifiStyle,signalStyle,powerStyle,notificationAppearance,notificationBehavior,chargingInfo,batteryStyle,batteryPercent,batteryCharge,notificationCount,notificationLimit);}
     private void surfaceControls(LinearLayout parent,String title,int group){
         parent.addView(text(title,18,true));
         LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);parent.addView(box);
