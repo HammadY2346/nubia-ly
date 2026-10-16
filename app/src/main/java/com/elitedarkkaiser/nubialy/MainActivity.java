@@ -75,7 +75,7 @@ public final class MainActivity extends AppCompatActivity {
         int setupEnd=content.getChildCount();
         spacer(20);
         content.addView(PersonalizationUi.dashboard(this, section -> startActivity(
-            new android.content.Intent(this,ClockEditorActivity.class).putExtra("section",section))));
+            new android.content.Intent(this,section.equals("boot_animation")?BootAnimationActivity.class:ClockEditorActivity.class).putExtra("section",section))));
         spacer(16);
         int recoveryStart=content.getChildCount();
         LinearLayout recovery = card("Restore & recovery", "Recovery must be ready before the first customization is enabled.");
@@ -87,6 +87,7 @@ public final class MainActivity extends AppCompatActivity {
             stop.setEnabled(false);
             worker.execute(() -> {
                 boolean saved = RecoveryStore.stop(getApplicationContext());
+                boolean guardStopped=RootGuardCommand.stopClock(android.os.SystemClock.elapsedRealtime()+8000);
                 runOnUiThread(() -> {
                     if (closed || isFinishing() || isDestroyed()) return;
                     stop.setEnabled(true);
@@ -97,7 +98,7 @@ public final class MainActivity extends AppCompatActivity {
                             if (!closed && !isFinishing() && !isDestroyed()) previewStatus.setText(result);
                         });
                     }
-                    recoveryStatus.setText(saved ? "Emergency stop saved. Preview restoration requested."
+                    recoveryStatus.setText(saved ? (guardStopped?"Emergency stop saved. Boot animations revert on reboot.":"System UI stop saved. Root guard stop unconfirmed; use its Action button.")
                         : "Could not save emergency stop. Customizations remain blocked in this build.");
                 });
             });

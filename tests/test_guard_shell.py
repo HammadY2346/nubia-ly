@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory(prefix='nubialy-guard-test-') as work:
         (module / source.name).write_text(text)
     binaries = work / 'bin'
     binaries.mkdir()
-    (binaries / 'getprop').write_text('#!/bin/sh\ncase "$1" in ro.product.model) echo "${TEST_MODEL:-NX809J}" ;; ro.build.version.sdk) echo 36 ;; esac\n')
+    (binaries / 'getprop').write_text('#!/bin/sh\ncase "$1" in ro.product.model) echo "${TEST_MODEL:-NX809J}" ;; ro.build.version.sdk) echo 36 ;; sys.boot_completed) echo 1 ;; esac\n')
     (binaries / 'am').write_text('#!/bin/sh\nexit 0\n')
     (binaries / 'id').write_text('#!/bin/sh\necho "${TEST_UID:-0}"\n')
     for executable in binaries.iterdir(): executable.chmod(0o755)

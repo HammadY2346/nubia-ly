@@ -8,6 +8,7 @@ import argparse,hashlib,json,tempfile,os
 ROOT=Path(__file__).resolve().parents[1]
 CATALOG=json.loads((ROOT/'third_party/rising-bootanimations/catalog.json').read_text())
 def inspect(path,entry):
+ if path.stat().st_size!=entry['bytes']:raise ValueError('Archive size mismatch')
  data=path.read_bytes()
  if len(data)!=entry['bytes'] or hashlib.sha256(data).hexdigest()!=entry['sha256']:raise ValueError('Archive identity mismatch')
  with ZipFile(path) as z:

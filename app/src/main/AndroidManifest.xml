@@ -18,6 +18,7 @@
             android:permission="com.elitedarkkaiser.nubialy.permission.GUARD_DIAGNOSTIC">
             <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
         </receiver>
+        <activity android:name=".BootAnimationActivity" android:exported="false" />
         <activity android:name=".ClockFontPickerActivity" android:exported="false" />
         <activity android:name=".FingerprintAnimationPickerActivity" android:exported="false" />
         <activity android:name=".FingerprintPickerActivity" android:exported="false" />

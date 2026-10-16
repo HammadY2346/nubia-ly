@@ -1,6 +1,6 @@
 id=nubia_ly_guard
 name=nubia-ly Recovery Guard
-version=0.1.13
-versionCode=14
+version=0.1.14
+versionCode=15
 author=EliteDarkKaiser
-description=NX809J independent recovery and saved-feature resume after first unlock. Action revokes enabled authority. No full boot-loop recovery promise.
+description=NX809J independent recovery and saved-feature resume after first unlock. Action revokes enabled authority. Optional verified boot-animation file bind with incomplete-boot rollback. No full boot-loop recovery promise.
