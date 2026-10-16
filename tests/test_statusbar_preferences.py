@@ -22,6 +22,7 @@ sources={
  c.prefs.values.put("active_surfaces","bad");check(StatusBarPreferences.active(c,id).equals(StatusBarStyle.STOCK));
  check(StatusBarPreferences.activate(c,id,selected,0xff112233));
  c.prefs.fail=true;check(!StatusBarPreferences.activate(c,other,StatusBarStyle.STOCK,0xff445566));check(StatusBarPreferences.active(c,id).equals(selected));check(StatusBarPreferences.active(c,other).equals(StatusBarStyle.STOCK));c.prefs.fail=false;
+ var clock=new ClockSnapshot(0xff445566,110,true,true,true,-5,2,true);check(StatusBarPreferences.activate(c,id,details,0xffabcdef,2,clock));check(StatusBarPreferences.activeClock(c,id).equals(clock));check(StatusBarPreferences.save(c,selected));check(StatusBarPreferences.activeClock(c,id).equals(clock));check(StatusBarPreferences.activeClock(c,other).equals(ClockSnapshot.STOCK));c.prefs.values.put("active_clock","corrupt");check(StatusBarPreferences.activeClock(c,id).equals(ClockSnapshot.STOCK));check(ClockSnapshot.decode(clock.encode()).equals(clock));check(ClockSnapshot.decode("1,0,0,0,0")==null);
  check(!StatusBarPreferences.activate(c,"bad",selected,0xff112233));check(!StatusBarPreferences.activate(c,id,new StatusBarStyle(128,100,100,100),0xff112233));check(!StatusBarPreferences.activate(c,id,selected,0x00112233));
  c.prefs.values.put("active_mask","corrupt");check(StatusBarPreferences.active(c,id).equals(StatusBarStyle.STOCK));c.prefs.values.put("mask",128);check(StatusBarPreferences.read(c).equals(StatusBarStyle.STOCK));c.prefs.values.put("active_color",0);check(StatusBarPreferences.activeColor(c,id)==ClockColorPolicy.DEFAULT);
  System.out.println("Status-bar preferences passed: draft/applied separation, identity binding, frozen color, failed commit and corruption fallback");}}
@@ -31,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix='nubialy-status-prefs-') as work:
     work=Path(work)
     for name,content in sources.items():
         p=work/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
-    files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/n) for n in ['StatusBarPreferences.java','StatusBarStyle.java','SurfaceStyle.java','NotificationControls.java','LockClockFonts.java','ClockColorPolicy.java','ClockDatePolicy.java','PreviewPolicy.java']]
+    files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy'/n) for n in ['StatusBarPreferences.java','StatusBarStyle.java','SurfaceStyle.java','NotificationControls.java','LockClockFonts.java','ClockColorPolicy.java','ClockDatePolicy.java','PreviewPolicy.java','ClockSnapshot.java','ClockStylePolicy.java']]
     files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintStyles.java'))
     files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintAnimations.java'))
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(work/'classes'),*files],check=True)

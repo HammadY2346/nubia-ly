@@ -12,7 +12,7 @@ if [ -e "$state_dir" ]; then
     [ -d "$state_dir" ] && [ "$(stat -c %u:%a "$state_dir")" = 0:700 ] || exit 1
 fi
 command=${1:-status}
-case "$command" in status|stop|probe|preview|clock|enable_clock|resume) ;; *) echo "STOP: use status, stop, probe, preview or clock"; exit 1 ;; esac
+case "$command" in status|stop|probe|preview|clock|enable_clock|resume|resume_app) ;; *) echo "STOP: use status, stop, probe, preview or clock"; exit 1 ;; esac
 # Refuse pre-existing symlinks and non-root/writable directories.
 [ ! -L "$guard_dir" ] || { echo "STOP: unsafe guard directory"; exit 1; }
 if [ ! -e "$guard_dir" ]; then
@@ -53,6 +53,23 @@ case "$command" in
         else
             echo "No clock-color permit; blocked"
         fi
+        ;;
+    resume_app)
+        # A bounded boot-time nudge only. Never mint or replace enabled authority here.
+        [ ! -e "${0%/*}/disable" ] && [ ! -e "${0%/*}/remove" ] || exit 0
+        [ -f "$state_dir/clock_id" ] && [ ! -L "$state_dir/clock_id" ] || exit 0
+        [ "$(stat -c %u:%a "$state_dir/clock_id")" = 0:600 ] || exit 1
+        [ -f "$guard_dir/enabled" ] && [ ! -L "$guard_dir/enabled" ] || exit 0
+        [ "$(stat -c %u:%a "$guard_dir/enabled")" = 0:644 ] || exit 1
+        permit_id=$(cat "$state_dir/clock_id") || exit 1
+        boot_id=$(cat /proc/sys/kernel/random/boot_id) || exit 1
+        expected=$(printf 'nubia-ly-clock-enabled-v1\n%s\nclock-enabled\n%s' "$boot_id" "$permit_id")
+        [ "$(cat "$guard_dir/enabled")" = "$expected" ] || exit 1
+        case "$permit_id" in ""|*[!0-9a-f-]*) exit 1 ;; esac
+        [ "${#permit_id}" = 36 ] || exit 1
+        am broadcast --user 0 --include-stopped-packages --receiver-include-background \
+            -a com.elitedarkkaiser.nubialy.RESUME_AFTER_UNLOCK \
+            -n com.elitedarkkaiser.nubialy/.BootResumeReceiver >/dev/null 2>&1
         ;;
     enable_clock|resume)
         [ ! -e "${0%/*}/disable" ] && [ ! -e "${0%/*}/remove" ] || { echo "STOP: guard module disabled or pending removal"; exit 1; }

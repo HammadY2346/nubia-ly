@@ -20,8 +20,8 @@ android {
         targetSdk = 35
         buildConfigField("String", "BASELINE_FINGERPRINT", baselineLiteral("fingerprint"))
         buildConfigField("String", "BASELINE_SYSTEM_UI_SHA256", baselineLiteral("systemUiSha256"))
-        versionCode = 54
-        versionName = "0.1.53-editor-cleanup"
+        versionCode = 55
+        versionName = "0.1.54-unlock-resume"
     }
     signingConfigs {
         if (releaseSigning) create("persistent") {

@@ -35,11 +35,15 @@ public final class StatusBarPreferences {
             int color=p.getInt("active_color",ClockColorPolicy.DEFAULT);return ClockColorPolicy.valid(color)?color:ClockColorPolicy.DEFAULT;
         } catch(ClassCastException invalid){return ClockColorPolicy.DEFAULT;}
     }
+    public static ClockSnapshot activeClock(Context context,String id){
+        try{var p=context.getSharedPreferences("status_bar_editor",Context.MODE_PRIVATE);if(id==null||!id.equals(p.getString("active_id","")))return ClockSnapshot.STOCK;ClockSnapshot value=ClockSnapshot.decode(p.getString("active_clock",""));return value==null?ClockSnapshot.STOCK:value;}catch(ClassCastException invalid){return ClockSnapshot.STOCK;}
+    }
     public static boolean activate(Context context,String id,StatusBarStyle value,int color){return activate(context,id,value,color,0);}
-    public static boolean activate(Context context, String id, StatusBarStyle value, int color,int date) {
-        return PreviewPolicy.uuid(id) && value != null && value.valid() && ClockColorPolicy.valid(color)&&ClockDatePolicy.valid(date)
+    public static boolean activate(Context context, String id, StatusBarStyle value, int color,int date) {return activate(context,id,value,color,date,ClockSnapshot.STOCK);}
+    public static boolean activate(Context context, String id, StatusBarStyle value, int color,int date,ClockSnapshot clock) {
+        return clock!=null&&clock.valid()&&PreviewPolicy.uuid(id) && value != null && value.valid() && ClockColorPolicy.valid(color)&&ClockDatePolicy.valid(date)
             && context.getSharedPreferences("status_bar_editor", Context.MODE_PRIVATE).edit()
-            .putString("active_id",id).putInt("active_mask",value.mask()).putInt("active_system_scale",value.systemScale())
+            .putString("active_id",id).putString("active_clock",clock.encode()).putInt("active_mask",value.mask()).putInt("active_system_scale",value.systemScale())
             .putInt("active_notification_scale",value.notificationScale()).putInt("active_battery_scale",value.batteryScale()).putInt("active_color",color).putInt("active_date",date).putInt("active_system_opacity",value.systemOpacity()).putInt("active_notification_opacity",value.notificationOpacity()).putInt("active_battery_opacity",value.batteryOpacity()).putString("active_hidden_slots",value.slotsText()).putInt("active_system_transform",value.systemTransform()).putInt("active_notification_transform",value.notificationTransform()).putInt("active_battery_transform",value.batteryTransform()).putInt("active_fan_appearance",value.fanAppearance()).putInt("active_pump_appearance",value.pumpAppearance()).putInt("active_refresh_appearance",value.refreshAppearance()).putString("active_surfaces",value.surfaces().encode()).commit();
     }
     public static boolean save(Context context, StatusBarStyle value) {
