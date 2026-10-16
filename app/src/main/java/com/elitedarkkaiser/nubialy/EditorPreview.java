@@ -11,7 +11,7 @@ final class EditorPreview extends View {
     private int tileStyle;
     private final String section;private final Supplier<Draft> draft;private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
     EditorPreview(Context context,String section,Supplier<Draft> draft){super(context);this.section=section;this.draft=draft;setContentDescription("Illustrative "+section.replace('_',' ')+" draft preview");}
-    @Override protected void onDraw(Canvas c){super.onDraw(c);if(getWidth()==0)return;Draft d=draft.get();SurfaceStyle s=d.bar.surfaces();tileStyle=s.qsStyle();float height=section.equals("lock_screen")?280:section.equals("quick_settings")?180:section.equals("volume")?220:100;
+    @Override protected void onDraw(Canvas c){super.onDraw(c);if(getWidth()==0)return;Draft d=draft.get();SurfaceStyle s=d.bar.surfaces();tileStyle=s.qsStyle();float height=section.equals("lock_screen")?280:section.equals("quick_settings")?180:section.equals("volume")?220:section.equals("notifications")?180:100;
         c.save();c.scale(getWidth()/360f,getHeight()/height);
         paint.setShader(new LinearGradient(0,0,360,height,new int[]{0xff494253,0xff272932,0xff414a50},null,Shader.TileMode.CLAMP));c.drawRoundRect(0,0,360,height,28,28,paint);paint.setShader(null);
         if(section.equals("lock_screen")){
@@ -28,6 +28,7 @@ final class EditorPreview extends View {
                 if(!s.hide(1))drawText(c,i==0?"Connected":"Off",x+78,y+43,9,s.appearance(1),s.position(1),i==0?0xff514965:0xffc8c2d0);
             }
             for(int i=0;i<6;i++){paint.setColor(i==0?0xffd3cbef:0xff68646f);shape(c,23+i*54,151,34,22,s.tileShape());}
+        }else if(section.equals("notifications")){NotificationStylePreview.paint(c,s.notificationStyle(),360,height,1);
         }else if(section.equals("volume")){VolumeStylePreview.paint(c,s.volumeStyle(),360,height,1);
         }else{
             paint.setTypeface(Typeface.create(ClockStylePolicy.familyName(d.family),(d.bold?1:0)|(d.italic?2:0)));

@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 public final class AppearanceEditorNavigationTest {
     @Test public void everySectionOpensItsDetailPagesAndBackKeepsOverview(){
         ShadowBuild.setModel("NX809J");
-        String[][] routes={{"lock_screen","clock","date","fonts","fingerprint","widgets"},{"quick_settings","style","brightness","tiles","labels"},{"volume","styles"},{"status_bar","typography","date","color","icons","inventory"}};
+        String[][] routes={{"lock_screen","clock","date","fonts","fingerprint","widgets"},{"quick_settings","style","brightness","tiles","labels"},{"volume","styles"},{"notifications","styles"},{"status_bar","typography","date","color","icons","inventory"}};
         for(String[] section:routes){
             var controller=Robolectric.buildActivity(ClockEditorActivity.class,new Intent().putExtra("section",section[0])).setup();var activity=controller.get();assertFalse(activity.isFinishing());EditorPages router=ReflectionHelpers.getField(activity,"pages");
             for(int i=1;i<section.length;i++){
@@ -43,6 +43,9 @@ public final class AppearanceEditorNavigationTest {
     }
     @Test public void volumeCardSelectionOnlySavesDraft()throws Exception{
         ShadowBuild.setModel("NX809J");var controller=Robolectric.buildActivity(ClockEditorActivity.class,new Intent().putExtra("section","volume")).setup();var activity=controller.get();var recovery=activity.getSharedPreferences("recovery",android.content.Context.MODE_PRIVATE);var before=recovery.getAll();activity.getWindow().getDecorView().findViewWithTag("editor-route:volume:styles").performClick();activity.getWindow().getDecorView().findViewWithTag("volume-style:4").performClick();java.util.concurrent.ExecutorService worker=ReflectionHelpers.getField(activity,"worker");worker.submit(()->{}).get(3,java.util.concurrent.TimeUnit.SECONDS);org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(4,StatusBarPreferences.read(activity).surfaces().volumeStyle());assertEquals(before,recovery.getAll());controller.pause().stop().destroy();
+    }
+    @Test public void notificationSelectionOnlySavesDraft()throws Exception{
+        ShadowBuild.setModel("NX809J");var controller=Robolectric.buildActivity(ClockEditorActivity.class,new Intent().putExtra("section","notifications")).setup();var activity=controller.get();var recovery=activity.getSharedPreferences("recovery",android.content.Context.MODE_PRIVATE);var before=recovery.getAll();activity.getWindow().getDecorView().findViewWithTag("editor-route:notifications:styles").performClick();activity.getWindow().getDecorView().findViewWithTag("notification-style:2").performClick();java.util.concurrent.ExecutorService worker=ReflectionHelpers.getField(activity,"worker");worker.submit(()->{}).get(3,java.util.concurrent.TimeUnit.SECONDS);org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(2,StatusBarPreferences.read(activity).surfaces().notificationStyle());assertEquals(before,recovery.getAll());controller.pause().stop().destroy();
     }
     @Test public void recreationRestoresTheFocusedPage(){
         ShadowBuild.setModel("NX809J");var controller=Robolectric.buildActivity(ClockEditorActivity.class,new Intent().putExtra("section","lock_screen")).setup();var activity=controller.get();activity.getWindow().getDecorView().findViewWithTag("editor-route:lock_screen:widgets").performClick();controller.recreate();EditorPages router=ReflectionHelpers.getField(controller.get(),"pages");assertEquals("lock_screen",router.section());assertEquals("widgets",router.page());controller.pause().stop().destroy();
