@@ -32,6 +32,16 @@ sources.update({
 'com/elitedarkkaiser/nubialy/xposed/BrightnessTest.java':'''package com.elitedarkkaiser.nubialy.xposed;import android.graphics.*;import android.graphics.drawable.*;import com.elitedarkkaiser.nubialy.BrightnessEffects;public class BrightnessTest {
 static void check(boolean b){if(!b)throw new AssertionError(BrightnessBackend.status());}
 public static void main(String[] args){BrightnessBackend.install(BrightnessTest.class.getClassLoader());var owner=new com.zte.controlcenter.view.ToggleSliderView();var mirror=new com.zte.controlcenter.view.ToggleSliderView();var unrelated=new com.android.systemui.settings.brightness.ToggleSeekBar();
+if(args.length>0){
+var live=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();var liveMirror=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();BrightnessBackend.observe(live.slider);BrightnessBackend.observe(liveMirror.slider);
+BrightnessBackend.begin(3);BrightnessEffects.decorated=0;
+// Reproduce device: lifecycle discovery fires, inherited onDraw hook never fires.
+for(var view:new android.widget.SeekBar[]{live.slider,liveMirror.slider}){var root=(LayerDrawable)view.progress;((GradientDrawable)root.track).draw(new Canvas());((GradientDrawable)((ClipDrawable)root.progress).fill).draw(new Canvas());}
+check(BrightnessEffects.decorated==4);check(BrightnessBackend.status().contains("draw callbacks: 0"));
+var old=(LayerDrawable)live.slider.progress;live.slider.progress=new LayerDrawable();((GradientDrawable)old.track).draw(new Canvas());check(BrightnessEffects.decorated==4);BrightnessBackend.refresh();((GradientDrawable)((LayerDrawable)live.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==5);
+var late=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();BrightnessBackend.observe(late.slider);((GradientDrawable)((LayerDrawable)late.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==6);
+BrightnessBackend.release(late.slider);((GradientDrawable)((LayerDrawable)late.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==6);check(BrightnessBackend.end());((GradientDrawable)((LayerDrawable)live.slider.progress).track).draw(new Canvas());check(BrightnessEffects.decorated==6);check(de.robv.android.xposed.XposedBridge.hooks.isEmpty());System.out.println("Brightness applies with zero inherited onDraw callbacks, refreshes replacement roots, discovers late sliders and restores stock");return;}
+
 var cc=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();var ccMirror=new com.zte.controlcenter.view.CCBrightnessToggleSliderView();var volume=new com.zte.controlcenter.view.CCToggleSliderView();
 BrightnessBackend.observe(owner.slider);BrightnessBackend.observe(mirror.slider);for(int style=1;style<=3;style++){int previous=owner.slider.invalidations;BrightnessBackend.begin(style);check(owner.slider.invalidations>previous);BrightnessEffects.decorated=0;cc.slider.onDraw(new Canvas());ccMirror.slider.onDraw(new Canvas());check(BrightnessEffects.decorated==4);volume.slider.onDraw(new Canvas());check(BrightnessEffects.decorated==4);BrightnessEffects.decorated=0;owner.slider.onDraw(new Canvas());mirror.slider.onDraw(new Canvas());check(BrightnessEffects.decorated==4);unrelated.onDraw(new Canvas());new android.widget.SeekBar().onDraw(new Canvas());check(BrightnessEffects.decorated==4);
 var stale=(LayerDrawable)owner.slider.progress;owner.slider.progress=new LayerDrawable();((GradientDrawable)stale.track).draw(new Canvas());check(BrightnessEffects.decorated==4);owner.slider.onDraw(new Canvas());check(BrightnessEffects.decorated==6);
@@ -49,4 +59,4 @@ with tempfile.TemporaryDirectory(prefix='nubialy-brightness-') as folder:
   p=folder/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
  files=[str(p) for p in folder.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/BrightnessBackend.java')]
  subprocess.run(['java','com.sun.tools.javac.Main','-d',str(folder/'classes'),*files],check=True)
- subprocess.run(['java','-cp',str(folder/'classes'),'com.elitedarkkaiser.nubialy.xposed.BrightnessTest'],check=True)
+ for args in [[],['bypass-draw']]:subprocess.run(['java','-cp',str(folder/'classes'),'com.elitedarkkaiser.nubialy.xposed.BrightnessTest',*args],check=True)

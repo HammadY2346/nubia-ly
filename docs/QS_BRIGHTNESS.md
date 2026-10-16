@@ -76,3 +76,16 @@ generic CCToggleSliderView and other control sliders remain excluded. Regression
 host tests exercise the Control Center brightness slider and mirror and reject a
 generic Control Center slider. Diagnostics now distinguish observed sliders,
 draw callbacks and the last progress-root class to make detection failures clear.
+
+## 0.1.44 discovery without inherited draw callbacks
+
+0.1.43 phone diagnostics reported two observed sliders but zero inherited draw
+callbacks and no registered layers. Activation now resolves each observed,
+attached slider's current native drawable layers immediately. Late lifecycle
+observations also register layers before invalidation, and existing guarded
+surface refresh revalidates current roots. Styling no longer depends on inherited
+onDraw dispatch. The original draw observer remains a fallback. A regression
+executes native leaf drawing without calling the inherited draw hook and verifies
+both Control Center slider/mirror styling, late discovery, replacement-root
+refresh, stale-root exclusion, release and restoration. Diagnostics additionally
+count successful decorated draws, separately from inherited draw callbacks.

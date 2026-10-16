@@ -18,15 +18,15 @@ final class BrightnessBackend {
     private static final Map<GradientDrawable,Entry> leaves=new WeakHashMap<>();
     private static final Map<SeekBar,Boolean> observed=new WeakHashMap<>();
     private static final List<XC_MethodHook.Unhook> hooks=new ArrayList<>();
-    private static ClassLoader loader;private static boolean active,failed;private static long generation;private static int selection;private static int drawCallbacks;private static String lastRoot="not observed";
+    private static ClassLoader loader;private static boolean active,failed;private static long generation;private static int selection;private static int drawCallbacks,decoratedDraws;private static String lastRoot="not observed";
     static void install(ClassLoader value){loader=value;}
-    static void observe(View view){if(main()&&view instanceof SeekBar slider&&sliderName(view.getClass().getName())){observed.put(slider,true);if(active&&owned(slider))slider.invalidate();}}
+    static void observe(View view){if(main()&&view instanceof SeekBar slider&&sliderName(view.getClass().getName())){observed.put(slider,true);if(active&&!failed){try{track(slider);if(owned(slider))slider.invalidate();}catch(Throwable unavailable){failed=true;invalidate();}}}}
     private static boolean sliderName(String name){return name.equals(SLIDER)||name.equals(CCSLIDER);}
     static void release(View view){if(view instanceof SeekBar slider){observed.remove(slider);leaves.entrySet().removeIf(e->e.getValue().slider().get()==slider);}}
     private static boolean main(){return Looper.myLooper()==Looper.getMainLooper();}
     static void begin(int style){
         if(style<0||style>3||!main())throw new IllegalArgumentException();if(!end())throw new IllegalStateException("Brightness cleanup incomplete");selection=style;if(style==0)return;
-        drawCallbacks=0;lastRoot="not observed";final long ticket=++generation;
+        drawCallbacks=decoratedDraws=0;lastRoot="not observed";final long ticket=++generation;
         try{
             Class<?> slider=XposedHelpers.findClass(SLIDER,loader),owner=XposedHelpers.findClass(OWNER,loader);
             if(slider.getSuperclass()!=SeekBar.class||owner.getMethod("getSlider").getReturnType()!=slider)throw new IllegalStateException("Brightness signatures");
@@ -41,11 +41,12 @@ final class BrightnessBackend {
             hooks.add(XposedHelpers.findAndHookMethod(GradientDrawable.class,"draw",Canvas.class,new XC_MethodHook(){@Override protected void beforeHookedMethod(MethodHookParam p){
                 if(!active||failed||!main()||!(p.thisObject instanceof GradientDrawable d))return;Entry entry=leaves.get(d);if(!eligible(entry,d))return;
                 SeekBar view=entry.slider().get();
-                try{if(BrightnessEffects.draw(style,(Canvas)p.args[0],d,view.getResources().getDisplayMetrics().density,()->active&&!failed&&generation==ticket&&eligible(entry,d),()->XposedBridge.invokeOriginalMethod(p.method,p.thisObject,p.args)))p.setResult(null);}
+                try{if(BrightnessEffects.draw(style,(Canvas)p.args[0],d,view.getResources().getDisplayMetrics().density,()->active&&!failed&&generation==ticket&&eligible(entry,d),()->XposedBridge.invokeOriginalMethod(p.method,p.thisObject,p.args))){decoratedDraws++;p.setResult(null);}}
                 catch(Throwable unavailable){failed=true;invalidate();}
-            }}));active=true;invalidate();
+            }}));active=true;refresh();invalidate();
         }catch(Throwable unavailable){failed=true;end();throw new IllegalStateException("Brightness styling unavailable",unavailable);}
     }
+    static void refresh(){if(!active||failed||!main())return;try{for(SeekBar slider:new ArrayList<>(observed.keySet()))track(slider);}catch(Throwable unavailable){failed=true;invalidate();}}
     private static boolean owned(SeekBar slider){
         if(slider==null||!slider.isAttachedToWindow()||!sliderName(slider.getClass().getName()))return false;
         ViewParent parent=slider.getParent();for(int depth=0;depth<8&&parent instanceof View view;depth++,parent=view.getParent()){
@@ -71,5 +72,5 @@ final class BrightnessBackend {
     private static void invalidate(){Set<SeekBar> views=new HashSet<>(observed.keySet());for(Entry entry:new ArrayList<>(leaves.values())){SeekBar view=entry.slider().get();if(view!=null)views.add(view);}for(SeekBar view:views)try{if(owned(view))view.invalidate();}catch(Throwable unavailable){failed=true;}}
     static boolean end(){generation++;active=false;invalidate();leaves.clear();boolean removed=true;for(var hook:new ArrayList<>(hooks))try{hook.unhook();hooks.remove(hook);}catch(Throwable unavailable){removed=false;failed=true;}return removed;}
     static boolean healthy(){return !failed;}
-    static String status(){return "Brightness style: "+selection+"; tracked layers: "+leaves.size()+"; observed sliders: "+observed.size()+"; draw callbacks: "+drawCallbacks+"; last root: "+lastRoot+(failed?"; styling stopped.":".");}
+    static String status(){return "Brightness style: "+selection+"; tracked layers: "+leaves.size()+"; observed sliders: "+observed.size()+"; decorated draws: "+decoratedDraws+"; draw callbacks: "+drawCallbacks+"; last root: "+lastRoot+(failed?"; styling stopped.":".");}
 }
