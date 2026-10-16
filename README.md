@@ -89,7 +89,7 @@ Selections save a draft until **Enable customization**. **Restore stock appearan
 | Runtime framework | [Vector](https://github.com/JingMatrix/Vector) with a compatible Zygisk environment |
 | Companion module | **nubia-ly Recovery Guard**, installed through your root manager |
 | App package | `com.elitedarkkaiser.nubialy` |
-| Current app / guard | `1.0.0` (68) / `0.1.15` (16) |
+| Current app / guard | `1.0.0` (69) / `0.1.15` (16) |
 
 Recommended Vector scopes are **System UI** (`com.android.systemui`) and **Fingerprint SensorService** (`com.fingerprint.sensorservice`). The latter is used for the firmware's separate fingerprint renderer. These are the app's declared scopes.
 

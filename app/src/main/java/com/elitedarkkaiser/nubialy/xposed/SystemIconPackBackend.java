@@ -24,7 +24,7 @@ final class SystemIconPackBackend {
     private static final Map<ImageView,Boolean> targets=new WeakHashMap<>();
     private static final Map<Integer,String> resourceKeys=new HashMap<>();
     private static final List<XC_MethodHook.Unhook> draws=new ArrayList<>();
-    private static Class<?> qsIconClass,resourceIconClass,statusIconClass;
+    private static Class<?> qsIconClass,resourceIconClass,drawableResourceIconClass,statusIconClass;
     private static java.lang.reflect.Method drawMethod;
     private static int pack,drawCount,qsBindings,statusBindings,tintSkips;
     private static final Set<String> unmatched=new TreeSet<>();private static boolean ready,active;
@@ -55,8 +55,14 @@ final class SystemIconPackBackend {
             for(int i=0;i<8&&v!=null;i++){
                 if(qsIconClass!=null&&qsIconClass.isInstance(v)){
                     Object icon=XposedHelpers.getObjectField(v,"mLastIcon");
-                    if(icon==null||!resourceIconClass.isInstance(icon))return null;
-                    String key=resourceKey(image.getResources(),XposedHelpers.getIntField(icon,"mResId"));
+                    if(icon==null)return null;
+                    // QsInCompose preloads these on a worker: DrawableIconWithRes keeps mId,
+                    // not ResourceIcon.mResId. The bound model survives drawable cloning.
+                    int res;
+                    if(resourceIconClass.isInstance(icon))res=XposedHelpers.getIntField(icon,"mResId");
+                    else if(drawableResourceIconClass.isInstance(icon))res=XposedHelpers.getIntField(icon,"mId");
+                    else return null;
+                    String key=resourceKey(image.getResources(),res);
                     if(key!=null)qsBindings++;return key;
                 }
                 v=v.getParent() instanceof View parent?parent:null;
@@ -70,7 +76,7 @@ final class SystemIconPackBackend {
             View v=image;for(int i=0;i<8&&v!=null;i++){if(qsIconClass!=null&&qsIconClass.isInstance(v)){int color=XposedHelpers.getIntField(v,"mTint");return color==0?null:color;}v=v.getParent() instanceof View parent?parent:null;}
         }catch(Throwable unsupported){}return null;
     }
-    private static void boundChanged(ImageView image){sources.remove(image);artwork.remove(image);if(active&&image.isAttachedToWindow())image.invalidate();}
+    private static void boundChanged(ImageView image){sources.remove(image);if(active&&image.isAttachedToWindow())image.invalidate();}
     private static boolean scope(ImageView image){
         try{String id=image.getResources().getResourceEntryName(image.getId());if(id.equals("wifi_signal")||id.equals("mobile_signal"))return false;}catch(Throwable absent){}
         View v=image;boolean qs=false;for(int i=0;i<18&&v!=null;i++){
@@ -84,6 +90,7 @@ final class SystemIconPackBackend {
     static void install(ClassLoader loader){try{
         qsIconClass=XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSIconViewImpl",loader);
         resourceIconClass=XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl$ResourceIcon",loader);
+        drawableResourceIconClass=XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl$DrawableIconWithRes",loader);
         statusIconClass=XposedHelpers.findClass("com.android.systemui.statusbar.StatusBarIconView",loader);
         Class<?> state=XposedHelpers.findClass("com.android.systemui.plugins.qs.QSTile$State",loader);
         XposedBridge.hookMethod(qsIconClass.getDeclaredMethod("updateIcon",ImageView.class,state,boolean.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(main()&&!p.hasThrowable())boundChanged((ImageView)p.args[0]);}});

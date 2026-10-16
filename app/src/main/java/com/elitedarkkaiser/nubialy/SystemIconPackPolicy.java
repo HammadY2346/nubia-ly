@@ -12,11 +12,11 @@ public final class SystemIconPackPolicy {
         return switch(name){
             case "qs_airplane_icon_on","qs_airplane_icon_off","intl_ic_qs_airplane","stat_sys_airplane_mode","ic_signal_airplane","ic_qs_airplane" -> "airplane";
             case "qs_flashlight_icon_on","qs_flashlight_icon_off","ic_eqs_flashlight_on","ic_eqs_flashlight_off","ic_eqs_flashlight_on_from_off_animation","ic_qs_flashlight_off","ic_signal_flashlight","stat_sys_flashlight","ic_qs_flashlight" -> "flashlight";
-            case "qs_bluetooth_icon_on","qs_bluetooth_icon_off","intl_ic_qs_bluetooth","ic_qs_bluetooth_on","ic_qs_bluetooth","stat_sys_data_bluetooth" -> "bluetooth";
-            case "ic_bluetooth_connected","stat_sys_data_bluetooth_connected","ic_qs_bluetooth_connected" -> "bluetooth_connected";
+            case "bluetooth","qs_bluetooth_icon_on","qs_bluetooth_icon_off","intl_ic_qs_bluetooth","ic_qs_bluetooth_on","ic_qs_bluetooth","stat_sys_data_bluetooth" -> "bluetooth";
+            case "bluetooth_connected","ic_bluetooth_connected","stat_sys_data_bluetooth_connected","ic_qs_bluetooth_connected" -> "bluetooth_connected";
             case "qs_auto_rotate_icon_on","ic_qs_auto_rotate" -> "rotate";
             case "qs_auto_rotate_icon_off" -> "portrait";
-            case "qs_hotspot_icon_on","qs_hotspot_icon_off","ic_hotspot","stat_sys_hotspot" -> "hotspot";
+            case "ic_wifi_4_hotspot","ic_wifi_5_hotspot","ic_wifi_6_hotspot","qs_hotspot_icon_on","qs_hotspot_icon_off","ic_hotspot","stat_sys_hotspot" -> "hotspot";
             case "qs_location_icon_on","qs_location_icon_off","ic_location","ic_signal_location","stat_sys_location" -> "location";
             case "stat_sys_alarm","stat_sys_alarm_dim","ic_alarm","ic_alarm_dim","ic_qs_alarm" -> "alarm";
             case "stat_sys_ringer_silent","ic_qs_ringer_silent","ic_volume_ringer_mute" -> "silent";
