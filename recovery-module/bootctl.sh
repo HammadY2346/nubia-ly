@@ -51,6 +51,21 @@ profile() {
     [ "${#variant}" -le 32 ] || return 1
     target=/system/media/bootanimation.zip
     if [ -n "$variant" ]; then target=/system/media/$variant/bootanimation.zip; fi
+    if [ ! -e "$target" ] && [ ! -L "$target" ]; then
+        [ ! -e "/proc/1/root$target" ] && [ ! -L "/proc/1/root$target" ] || return 1
+        # The inspected player falls through when the carrier candidate is absent.
+        # Support only the verified default fallback, with no competing archive.
+        [ -z "$(getprop ro.product.bootanim.file)" ] || return 1
+        case "$(getprop ro.boot.theme)" in ""|0) ;; *) return 1 ;; esac
+        for fallback_dir in /apex/com.android.bootanimation/etc /oem/media /product/media /system/media; do
+            for fallback_name in bootanimation.zip bootanimation-dark.zip; do
+                candidate=$fallback_dir/$fallback_name
+                [ "$candidate" = /system/media/bootanimation.zip ] && continue
+                [ ! -e "$candidate" ] && [ ! -L "$candidate" ] && [ ! -e "/proc/1/root$candidate" ] || return 1
+            done
+        done
+        target=/system/media/bootanimation.zip
+    fi
     # Persisted vendor properties may load after post-fs-data. Use the stage-time
     # verified target when early boot has no variant value yet.
     if [ "$command" = mount ] && [ -z "$variant" ] && safe_file "$boot_dir/baseline" 600; then

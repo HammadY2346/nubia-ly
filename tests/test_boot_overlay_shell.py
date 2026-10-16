@@ -12,9 +12,10 @@ with tempfile.TemporaryDirectory(prefix='nubialy-boot-overlay-') as directory:
  text=production.replace('/data/adb/nubia_ly_guard',str(state)).replace('/data/adb/ksu',str(ksu)).replace('/system/lib64/libbootanimation.so',str(player)).replace('/system/media',str(media)).replace('/proc/sys/kernel/random/boot_id',str(boot_id)).replace('/proc/1/mountinfo',str(mountinfo)).replace('/proc/1/root','').replace('/data/user/0/com.elitedarkkaiser/nubialy', '/unused')
  for name in ['/data/user/0/com.elitedarkkaiser.nubialy/files/boot-stage.zip','/data/data/com.elitedarkkaiser.nubialy/files/boot-stage.zip']:text=text.replace(name,str(staged))
  text=text.replace('8a254699242729e1af694850415b60a8c98201fae8f3aec5c17ff188d2e12d55',hashlib.sha256(player.read_bytes()).hexdigest());text=re.sub(r'bytes=\d+; hash=[a-f0-9]{64}',f'bytes={len(payload)}; hash={digest}',text)
+ for fallback in ['/apex/com.android.bootanimation/etc','/oem/media','/product/media']:text=text.replace(fallback,str(w/fallback.strip('/')))
  script=module/'bootctl.sh';script.write_text(text)
  (bin/'getprop').write_text('''#!/bin/sh
-case "$1" in ro.product.model) echo "${MODEL:-NX809J}";;ro.build.version.sdk) echo 36;;sys.boot_completed) echo "${COMPLETE:-0}";;persist.vendor.custom.variant.id) echo "${VARIANT:-}";;persist.sys.customanim.boot) echo "${CUSTOM:-}";;persist.vendor.sys.fansanim.boot) echo "${FANS:-0}";;esac
+case "$1" in ro.product.model) echo "${MODEL:-NX809J}";;ro.build.version.sdk) echo 36;;ro.boot.theme) echo "${THEME:-}";;ro.product.bootanim.file) echo "${PRODUCT_FILE:-}";;sys.boot_completed) echo "${COMPLETE:-0}";;persist.vendor.custom.variant.id) echo "${VARIANT:-}";;persist.sys.customanim.boot) echo "${CUSTOM:-}";;persist.vendor.sys.fansanim.boot) echo "${FANS:-0}";;esac
 ''')
  (bin/'id').write_text('#!/bin/sh\necho 0\n')
  realstat=shutil.which('stat')
@@ -67,6 +68,15 @@ with open(os.environ['CALLS'],'a') as f:f.write(args[3]+'\\n')
  run('stage_rising');run('mount',False,extra={'COMPLETE':'1'});run('restore')
  run('stage_rising');run('mount',False,extra={'MOUNT_FAIL':'1'});assert not (state/'boot/attempt').exists();assert 'result=mount_failed' in run('status');run('restore')
  run('stage_rising');run('mount',False,extra={'NS_MISS':'1'});assert not (state/'boot/selection').exists();assert 'result=unverified' in run('status');run('restore');marker.unlink()
+ # Missing carrier archive uses generic only with no competing fallback.
+ assert 'profile=ready' in run('status',extra={'VARIANT':'GEN_NON_EEA'})
+ run('stage_rising',extra={'VARIANT':'GEN_NON_EEA'});assert str(stock) in (state/'boot/baseline').read_text();run('restore')
+ assert 'profile=blocked' in run('status',extra={'VARIANT':'GEN_NON_EEA','THEME':'1'})
+ assert 'profile=blocked' in run('status',extra={'VARIANT':'GEN_NON_EEA','PRODUCT_FILE':'custom.zip'})
+ competitor=w/'product/media/bootanimation.zip';competitor.parent.mkdir(parents=True);competitor.write_bytes(b'competing')
+ assert 'profile=blocked' in run('status',extra={'VARIANT':'GEN_NON_EEA'});competitor.unlink()
+ dark=media/'bootanimation-dark.zip';dark.write_bytes(b'dark')
+ assert 'profile=blocked' in run('status',extra={'VARIANT':'GEN_NON_EEA'});dark.unlink()
  # Native variant resolution is bounded; arbitrary paths/custom/fans are excluded.
  variant=media/'JD_ID';variant.mkdir();variant_stock=variant/'bootanimation.zip';variant_stock.write_bytes(b'original-variant')
  run('stage_rising',extra={'VARIANT':'JD_ID'});assert str(variant_stock) in (state/'boot/baseline').read_text()
