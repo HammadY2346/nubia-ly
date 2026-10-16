@@ -1,0 +1,8 @@
+package com.elitedarkkaiser.nubialy;
+/** Strict root-module reply, separate from app-only draft selection. */
+record BootAnimationState(boolean ready,String selection,String mounted,String result){
+ static BootAnimationState parse(String text){if(text==null||text.length()>1024)return null;String[] lines=text.trim().split("\\n",-1);if(lines.length!=5||!lines[0].equals("nubia-ly-boot-v1")||!(lines[1].equals("profile=ready")||lines[1].equals("profile=blocked"))||!lines[2].startsWith("selection=")||!lines[3].startsWith("mounted=")||!lines[4].startsWith("result="))return null;String selection=lines[2].substring(10),mounted=lines[3].substring(8),result=lines[4].substring(7);if(!known(selection)||!known(mounted)||!java.util.Set.of("none","staged","restored","mounted","confirmed","mount_failed","rolled_back","unverified","unknown").contains(result))return null;return new BootAnimationState(lines[1].equals("profile=ready"),selection,mounted,result);}
+ private static boolean known(String id){return id.equals("stock")||BootAnimations.find(id)!=null;}
+ String summary(){return (ready?"Ready for systemless staging.":"This firmware or root setup has not passed the animation checks.")+"\nNext boot: "+name(selection)+". Mounted for this boot: "+name(mounted)+"."+(result.equals("mount_failed")?"\nThe last mount failed; the original file stayed active.":result.equals("unverified")?"\nThe mount could not be verified and was disarmed for the next boot.":result.equals("rolled_back")?"\nThe guard restored stock after an incomplete boot.":"");}
+ private static String name(String id){var e=BootAnimations.find(id);return e==null?"Stock":e.name();}
+}

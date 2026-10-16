@@ -9,3 +9,5 @@ local-baseline.properties
 *.jks
 *.keystore
 /signing-private/
+
+/app/src/main/assets/bootanimations/

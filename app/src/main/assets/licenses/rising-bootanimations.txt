@@ -1,0 +1,4 @@
+Boot-animation source artwork: RisingOS-Revived/android_vendor_rising
+https://github.com/RisingOS-Revived/android_vendor_rising/tree/8e4650c0ba33de2dfcc1f9748bc2dcdc0d819371/prebuilts/bootanimation
+
+Rising, Cyberpunk, Valorant, Google and Google Monet archive assets retain their respective upstream artwork and branding. Their original ZIPs are included unchanged; app preview frames are downsampled derivatives. Archive identities and provenance are recorded in third_party/rising-bootanimations/catalog.json in the nubia-ly source repository.

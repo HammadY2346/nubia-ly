@@ -2,6 +2,7 @@
     <permission android:name="com.elitedarkkaiser.nubialy.permission.GUARD_DIAGNOSTIC"
         android:protectionLevel="signature" />
     <uses-permission android:name="com.elitedarkkaiser.nubialy.permission.GUARD_DIAGNOSTIC" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <queries><package android:name="com.android.systemui" /><package android:name="com.fingerprint.sensorservice" /></queries>
     <application android:allowBackup="false" android:label="nubia-ly"
         android:icon="@drawable/ic_nubialy" android:theme="@style/Theme.NubiaLy"
@@ -13,6 +14,11 @@
         <provider android:name=".GuardBrokerProvider"
             android:authorities="com.elitedarkkaiser.nubialy.guard"
             android:exported="true" android:grantUriPermissions="false" />
+        <receiver android:name=".BootResumeReceiver" android:exported="true"
+            android:permission="com.elitedarkkaiser.nubialy.permission.GUARD_DIAGNOSTIC">
+            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
+        </receiver>
+        <activity android:name=".BootAnimationActivity" android:exported="false" />
         <activity android:name=".ClockFontPickerActivity" android:exported="false" />
         <activity android:name=".FingerprintAnimationPickerActivity" android:exported="false" />
         <activity android:name=".FingerprintPickerActivity" android:exported="false" />

@@ -51,14 +51,15 @@ public final class GuardBrokerProvider extends ContentProvider {
                 if (allowed) {
                     reply.putString("permit_id", id);
                     reply.putLong("deadline_ms", android.os.SystemClock.elapsedRealtime() + ClockEnabledPolicy.HEALTH_MS);
-                    reply.putInt("clock_color", ClockColorPreferences.read(getContext()));
-                    reply.putInt("clock_size", ClockColorPreferences.size(getContext()));
-                    reply.putBoolean("clock_bold", ClockColorPreferences.bold(getContext()));
-                    reply.putBoolean("clock_seconds", ClockColorPreferences.seconds(getContext()));
-                    reply.putBoolean("clock_italic", ClockColorPreferences.italic(getContext()));
-                    reply.putInt("clock_spacing", ClockColorPreferences.spacing(getContext()));
-                    reply.putInt("clock_family", ClockColorPreferences.family(getContext()));
-                    reply.putBoolean("clock_hidden", ClockColorPreferences.hidden(getContext()));
+                    ClockSnapshot clock=StatusBarPreferences.activeClock(getContext(),id);
+                    reply.putInt("clock_color", clock.color());
+                    reply.putInt("clock_size", clock.size());
+                    reply.putBoolean("clock_bold", clock.bold());
+                    reply.putBoolean("clock_seconds", clock.seconds());
+                    reply.putBoolean("clock_italic", clock.italic());
+                    reply.putInt("clock_spacing", clock.spacing());
+                    reply.putInt("clock_family", clock.family());
+                    reply.putBoolean("clock_hidden", clock.hidden());
                     StatusBarStyle bar = StatusBarPreferences.active(getContext(), id);
                     reply.putInt("statusbar_color",StatusBarPreferences.activeColor(getContext(), id));
                     reply.putInt("clock_date",StatusBarPreferences.activeDate(getContext(),id));
