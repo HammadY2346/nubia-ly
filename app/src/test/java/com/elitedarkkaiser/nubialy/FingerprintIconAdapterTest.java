@@ -16,9 +16,10 @@ import static org.robolectric.Shadows.shadowOf;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk=35)
 public final class FingerprintIconAdapterTest {
-    private Context context(){var controller=Robolectric.buildActivity(android.app.Activity.class);controller.get().setTheme(R.style.Theme_NubiaLy);controller.setup();return controller.get();}
+    private android.app.Activity activity;
+    private Context context(){var controller=Robolectric.buildActivity(android.app.Activity.class);controller.get().setTheme(R.style.Theme_NubiaLy);controller.setup();activity=controller.get();return activity;}
     private void tap(View view,float x,float y){
-        ((android.app.Activity)view.getContext()).setContentView(view);
+        activity.setContentView(view);
         view.measure(View.MeasureSpec.makeMeasureSpec(180,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(180,View.MeasureSpec.EXACTLY));view.layout(0,0,180,180);
         long now=android.os.SystemClock.uptimeMillis();
         MotionEvent down=MotionEvent.obtain(now,now,MotionEvent.ACTION_DOWN,x,y,0),up=MotionEvent.obtain(now,now+30,MotionEvent.ACTION_UP,x,y,0);
