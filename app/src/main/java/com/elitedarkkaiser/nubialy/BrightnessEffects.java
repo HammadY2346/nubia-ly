@@ -9,7 +9,12 @@ public final class BrightnessEffects {
     public static final String[] NAMES={"Stock","Outline","Neumorph","Thin"};
     private BrightnessEffects(){}
     public static boolean draw(int style,Canvas canvas,GradientDrawable drawable,float density,BooleanSupplier allowed,QsOutlineRenderer.NativeDraw nativeDraw)throws Throwable{
-        if(style==1)return QsOutlineRenderer.draw(canvas,drawable,density,allowed,nativeDraw);
+        if(style==1){
+            if(!allowed.getAsBoolean()||drawable.getBounds().isEmpty())return false;
+            int saved=canvas.saveLayer(new RectF(drawable.getBounds()),null);boolean complete=false;
+            try{if(!QsOutlineRenderer.draw(canvas,drawable,density,allowed,nativeDraw)||!allowed.getAsBoolean())return false;complete=true;return true;}
+            finally{try{if(!complete)canvas.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);}finally{canvas.restoreToCount(saved);}}
+        }
         if(style==2)return QsTileEffects.draw(3,canvas,drawable,density,allowed,nativeDraw);
         if(style!=3||!allowed.getAsBoolean()||!Float.isFinite(density)||density<=0||drawable.getShape()!=GradientDrawable.RECTANGLE||drawable.getBounds().isEmpty())return false;
         RectF bounds=new RectF(drawable.getBounds());float height=Math.min(bounds.height(),4*density);
