@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 public final class AppearanceEditorNavigationTest {
     @Test public void everySectionOpensItsDetailPagesAndBackKeepsOverview(){
         ShadowBuild.setModel("NX809J");
-        String[][] routes={{"lock_screen","clock","date","fonts","fingerprint","widgets","charging"},{"quick_settings","style","brightness","tiles","labels"},{"volume","styles"},{"notifications","styles","appearance","behavior"},{"power_menu","styles"},{"status_bar","typography","date","color","icons","connectivity","inventory"}};
+        String[][] routes={{"lock_screen","clock","date","fonts","fingerprint","widgets","charging"},{"quick_settings","style","brightness","tiles","labels"},{"volume","styles"},{"notifications","styles","appearance","behavior"},{"power_menu","styles"},{"status_bar","typography","date","color","icons","battery","connectivity","inventory"}};
         for(String[] section:routes){
             var controller=Robolectric.buildActivity(ClockEditorActivity.class,new Intent().putExtra("section",section[0])).setup();var activity=controller.get();assertFalse(activity.isFinishing());EditorPages router=ReflectionHelpers.getField(activity,"pages");
             for(int i=1;i<section.length;i++){
@@ -52,6 +52,10 @@ public final class AppearanceEditorNavigationTest {
     }
     @Test public void connectivityAndPowerChoicesStayInTheSharedDraft()throws Exception{
         ShadowBuild.setModel("NX809J");var controller=Robolectric.buildActivity(ClockEditorActivity.class,new Intent().putExtra("section","status_bar")).setup();var activity=controller.get();var before=activity.getSharedPreferences("recovery",0).getAll();var decor=activity.getWindow().getDecorView();decor.findViewWithTag("wifi-style:1").performClick();decor.findViewWithTag("signal-style:8").performClick();decor.findViewWithTag("power-style:3").performClick();java.util.concurrent.ExecutorService worker=ReflectionHelpers.getField(activity,"worker");worker.submit(()->{}).get(3,java.util.concurrent.TimeUnit.SECONDS);org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();SurfaceStyle s=StatusBarPreferences.read(activity).surfaces();assertEquals(1,s.wifiStyle());assertEquals(8,s.signalStyle());assertEquals(3,s.powerStyle());assertEquals(before,activity.getSharedPreferences("recovery",0).getAll());controller.pause().stop().destroy();
+    }
+
+    @Test public void batterySelectionIsDraftOnlyAndSurvivesRecreation()throws Exception{
+        ShadowBuild.setModel("NX809J");var controller=Robolectric.buildActivity(ClockEditorActivity.class,new Intent().putExtra("section","status_bar")).setup();var activity=controller.get();var before=activity.getSharedPreferences("recovery",0).getAll();activity.getWindow().getDecorView().findViewWithTag("editor-route:status_bar:battery").performClick();activity.getWindow().getDecorView().findViewWithTag("battery-style:23").performClick();java.util.concurrent.ExecutorService worker=ReflectionHelpers.getField(activity,"worker");worker.submit(()->{}).get(3,java.util.concurrent.TimeUnit.SECONDS);org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(23,StatusBarPreferences.read(activity).surfaces().batteryStyle());assertEquals(before,activity.getSharedPreferences("recovery",0).getAll());controller.recreate();EditorPages router=ReflectionHelpers.getField(controller.get(),"pages");assertEquals("battery",router.page());assertTrue(controller.get().getWindow().getDecorView().findViewWithTag("battery-style:23").isSelected());controller.pause().stop().destroy();
     }
 
 }

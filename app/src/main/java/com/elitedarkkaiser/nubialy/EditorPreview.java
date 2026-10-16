@@ -37,7 +37,7 @@ final class EditorPreview extends View {
             paint.setTypeface(Typeface.create("sans-serif-medium",0));
             if(!d.bar.selected(StatusBarStyle.HIDE_NOTIFICATIONS))drawText(c,"●  ●",129,56,13,StatusBarStyle.appearance(d.bar.notificationScale(),d.bar.notificationOpacity()),d.bar.notificationTransform(),0xffeee8f5);
             if(!d.bar.selected(StatusBarStyle.HIDE_SYSTEM))drawText(c,"VoLTE",239,56,13,StatusBarStyle.appearance(d.bar.systemScale(),d.bar.systemOpacity()),d.bar.systemTransform(),d.bar.selected(StatusBarStyle.TINT)?d.iconColor:0xffeee8f5);
-            if(!d.bar.selected(StatusBarStyle.HIDE_BATTERY))drawText(c,"85%",315,56,14,StatusBarStyle.appearance(d.bar.batteryScale(),d.bar.batteryOpacity()),d.bar.batteryTransform(),0xffeee8f5);
+            if(!d.bar.selected(StatusBarStyle.HIDE_BATTERY)){if(s.batteryStyle()==0)drawText(c,"85%",315,56,14,StatusBarStyle.appearance(d.bar.batteryScale(),d.bar.batteryOpacity()),d.bar.batteryTransform(),0xffeee8f5);else BatteryRenderer.draw(s.batteryStyle(),c,new RectF(294,40,340,60),85,false,false,true,0xffeee8f5,0xffa8a2b0,()->true);}
         }
         paint.setAlpha(255);c.restore();
     }
