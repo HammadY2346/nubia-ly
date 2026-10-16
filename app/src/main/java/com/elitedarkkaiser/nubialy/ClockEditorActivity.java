@@ -6,6 +6,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Gravity;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
@@ -23,6 +24,10 @@ import java.util.concurrent.Executors;
 public final class ClockEditorActivity extends AppCompatActivity {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private SystemUiGuardClient client;
+    private FingerprintServiceClient fingerprintClient;
+    private MaterialButton fingerprintPicker;
+    private android.widget.ImageView fingerprintPreview;
+    private static final int PICK_FINGERPRINT=7402;
     private LinearLayout content;
     private TextView swatch, selection, saveStatus, previewStatus;
     private MaterialButton enable, restore, check;
@@ -36,7 +41,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private int spacing, fontFamily;
     private int statusMask, systemScale, notificationScale, batteryScale,systemOpacity,notificationOpacity,batteryOpacity,iconColor,dateMode,systemTransform,notificationTransform,batteryTransform,fanAppearance,pumpAppearance,refreshAppearance;
     private final int[] surfaceAppearance=new int[4],surfacePosition=new int[4];
-    private int surfaceHidden,tileShape,largeTileShape;
+    private int surfaceHidden,tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont;
     private final java.util.Set<String> hiddenSlots=new java.util.TreeSet<>();
     private LinearLayout iconSlots;
     private ChipGroup iconPresets;
@@ -56,9 +61,9 @@ public final class ClockEditorActivity extends AppCompatActivity {
         selected = ClockColorPreferences.read(this);
         sizePercent = ClockColorPreferences.size(this); bold = ClockColorPreferences.bold(this); seconds = ClockColorPreferences.seconds(this); italic = ClockColorPreferences.italic(this); spacing = ClockColorPreferences.spacing(this); fontFamily = ClockColorPreferences.family(this); hidden = ClockColorPreferences.hidden(this);
         StatusBarStyle bar = StatusBarPreferences.read(this); statusMask = bar.mask(); systemScale = bar.systemScale(); notificationScale = bar.notificationScale(); batteryScale = bar.batteryScale();systemOpacity=bar.systemOpacity();notificationOpacity=bar.notificationOpacity();batteryOpacity=bar.batteryOpacity();systemTransform=bar.systemTransform();notificationTransform=bar.notificationTransform();batteryTransform=bar.batteryTransform();fanAppearance=bar.fanAppearance();pumpAppearance=bar.pumpAppearance();refreshAppearance=bar.refreshAppearance();hiddenSlots.addAll(bar.hiddenSlots());iconColor=StatusBarPreferences.color(this);dateMode=StatusBarPreferences.date(this);
-        tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
+        widgetsHidden=bar.surfaces().widgetsHidden();fingerprintStyle=bar.surfaces().fingerprintStyle();fingerprintHidden=bar.surfaces().fingerprintHidden();lockClockFont=bar.surfaces().clockFont();tileShape=bar.surfaces().tileShape();largeTileShape=bar.surfaces().largeTileShape();surfaceHidden=bar.surfaces().hidden();for(int i=0;i<4;i++){surfaceAppearance[i]=bar.surfaces().appearance(i);surfacePosition[i]=bar.surfaces().position(i);}
         if (state != null && ClockColorPolicy.valid(state.getInt("selection", 0))) selected = state.getInt("selection");
-        client = new SystemUiGuardClient(this);
+        client = new SystemUiGuardClient(this);fingerprintClient=new FingerprintServiceClient(this);
         ScrollView scroll = new ScrollView(this);
         content = new LinearLayout(this); content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(24), dp(20), dp(24), dp(24)); scroll.addView(content); setContentView(scroll);
@@ -121,6 +126,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
         surfaceControls(surfaces,"Quick Settings main labels",0);surfaceControls(surfaces,"Quick Settings secondary labels",1);
         LinearLayout lockscreen=card("Lock screen");lockPanels.add((View)lockscreen.getParent());
         surfaceControls(lockscreen,"Lock-screen clock",2);surfaceControls(lockscreen,"Lock-screen date",3);
+        lockScreenExtras(lockscreen);
         if(getIntent().getBooleanExtra("surfaces",false))surfaces.post(()->scroll.smoothScrollTo(0,((View)surfaces.getParent()).getTop()));
         LinearLayout typography = card("Status-bar clock style");statusPanels.add((View)typography.getParent());
         TextView sizeLabel = text("", 15, true); typography.addView(sizeLabel);
@@ -345,7 +351,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private MaterialButton button(String title) { MaterialButton button=new MaterialButton(this);button.setText(title);button.setLayoutParams(new LinearLayout.LayoutParams(-1,-2));return button; }
     private int dp(int n) {return Math.round(n*getResources().getDisplayMetrics().density);}
     @Override protected void onSaveInstanceState(Bundle state) { state.putInt("selection", selected);super.onSaveInstanceState(state); }
-    @Override protected void onDestroy() {closed=true;if(client!=null)client.cancel();worker.shutdown();super.onDestroy();}
+    @Override protected void onDestroy() {closed=true;if(client!=null)client.cancel();if(fingerprintClient!=null)fingerprintClient.cancel();worker.shutdown();super.onDestroy();}
     private void dateChoices(LinearLayout parent,String title,String[] labels,int component){
         parent.addView(text(title,15,true));ChipGroup group=new ChipGroup(this);group.setSingleSelection(true);parent.addView(group);
         int selected=switch(component){case 0->ClockDatePolicy.base(dateMode);case 1->ClockDatePolicy.position(dateMode);case 2->ClockDatePolicy.separator(dateMode);default->ClockDatePolicy.letterCase(dateMode);};
@@ -386,11 +392,28 @@ public final class ClockEditorActivity extends AppCompatActivity {
         statusOpacity(box,title+" icon opacity",StatusBarStyle.indicatorOpacity(value),n->saveIndicator(category,StatusBarStyle.indicatorScale(indicatorSelection(category)),n));
     }
 
+    private void lockScreenExtras(LinearLayout parent){
+        parent.addView(text("Widgets below the clock",18,true));
+        String[] widgets={"Hide weather widget","Hide alarm widget","Hide battery widget"};for(int i=0;i<3;i++){final int bit=1<<i;var toggle=new com.google.android.material.materialswitch.MaterialSwitch(this);toggle.setText(widgets[i]);toggle.setChecked((widgetsHidden&bit)!=0);parent.addView(toggle);statusControls.add(toggle);toggle.setOnCheckedChangeListener((v,on)->{widgetsHidden=on?widgetsHidden|bit:widgetsHidden&~bit;saveStatusBar();});}
+        parent.addView(text("Fingerprint icon",18,true));var hide=new com.google.android.material.materialswitch.MaterialSwitch(this);hide.setText("Hide fingerprint icon");hide.setChecked(fingerprintHidden!=0);parent.addView(hide);statusControls.add(hide);hide.setOnCheckedChangeListener((v,on)->{fingerprintHidden=on?1:0;saveStatusBar();});
+        parent.addView(text("Enable nubia-ly for FingerprintSensorUi (com.fingerprint.sensorservice) in Vector as well as System UI, then reboot. Only the graphic changes. Keep touching the same sensor position to unlock. Enrollment, app authentication and always-on display use stock.",14,false));
+        com.elitedarkkaiser.nubialy.xposed.FingerprintGlyphDrawable.artworkResources(getResources());
+        fingerprintPreview=new android.widget.ImageView(this);fingerprintPreview.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);LinearLayout.LayoutParams iconSize=new LinearLayout.LayoutParams(dp(88),dp(88));iconSize.gravity=Gravity.CENTER_HORIZONTAL;parent.addView(fingerprintPreview,iconSize);
+        fingerprintPicker=button("UDFPS icon");parent.addView(fingerprintPicker);statusControls.add(fingerprintPicker);redrawFingerprint();
+        fingerprintPicker.setOnClickListener(v->{android.content.Intent intent=new android.content.Intent(this,FingerprintPickerActivity.class);intent.putExtra("selection",fingerprintStyle);startActivityForResult(intent,PICK_FINGERPRINT);});
+        parent.addView(text("Choose an icon on its own page, then press Enable customization to apply. The icon follows stock visibility, including face unlock.",14,false));
+        TextView serviceStatus=text("Fingerprint service has not been checked.",14,false);parent.addView(serviceStatus);MaterialButton serviceCheck=button("Check fingerprint service");parent.addView(serviceCheck);serviceCheck.setOnClickListener(v->{serviceStatus.setText("Checking fingerprint service…");fingerprintClient.check(serviceStatus::setText);});
+        parent.addView(text("Clock fonts",18,true));TextView fontPreview=text("12:34",40,false);parent.addView(fontPreview);MaterialButton choose=button("Browse clock fonts · "+LockClockFonts.FACES[lockClockFont].name());parent.addView(choose);statusControls.add(choose);Runnable redrawFont=()->{var face=LockClockFonts.FACES[lockClockFont];fontPreview.setTypeface(android.graphics.Typeface.create(face.family(),face.style()));choose.setText("Browse clock fonts · "+face.name());};redrawFont.run();
+        parent.addView(text("26 named system font styles, grouped by appearance. Fonts apply to text clocks, including Clip. Image-based clock digits keep their original artwork. Stock restores the vendor typeface.",14,false));
+        choose.setOnClickListener(v->{ScrollView scroll=new ScrollView(this);LinearLayout list=new LinearLayout(this);list.setOrientation(LinearLayout.VERTICAL);list.setPadding(dp(20),dp(12),dp(20),dp(12));scroll.addView(list);androidx.appcompat.app.AlertDialog dialog=new MaterialAlertDialogBuilder(this).setTitle("Clock fonts").setView(scroll).setNegativeButton("Close",null).create();String category="";for(int i=0;i<LockClockFonts.FACES.length;i++){final int value=i;var face=LockClockFonts.FACES[i];if(!category.equals(face.category())){category=face.category();list.addView(text(category,18,true));}TextView row=text((lockClockFont==i?"✓ ":"")+face.name()+"  ·  12:34",26,false);row.setTypeface(android.graphics.Typeface.create(face.family(),face.style()));row.setPadding(0,dp(16),0,dp(16));row.setOnClickListener(item->{lockClockFont=value;redrawFont.run();saveStatusBar();dialog.dismiss();});list.addView(row);}dialog.show();});
+    }
+    private void redrawFingerprint(){fingerprintPreview.setImageDrawable(fingerprintStyle==0?getDrawable(R.drawable.rising_fp_udfps_icon_default):new com.elitedarkkaiser.nubialy.xposed.FingerprintGlyphDrawable(fingerprintStyle,0xffc0a8ff));fingerprintPreview.setContentDescription(FingerprintStyles.NAMES[fingerprintStyle]);fingerprintPicker.setText("UDFPS icon · "+FingerprintStyles.NAMES[fingerprintStyle]);}
+    @Override protected void onActivityResult(int request,int result,android.content.Intent data){super.onActivityResult(request,result,data);if(request==PICK_FINGERPRINT&&result==RESULT_OK&&data!=null){int value=data.getIntExtra("selection",-1);if(FingerprintStyles.valid(value)){fingerprintStyle=value;redrawFingerprint();saveStatusBar();}}}
     private void shapeControls(LinearLayout parent,String title,boolean large){
         parent.addView(text(title,16,true));ChipGroup shapes=new ChipGroup(this);shapes.setSingleSelection(true);parent.addView(shapes);
         String[] names={"Stock","Square","Rounded square","Leaf"};for(int i=0;i<names.length;i++){final int value=i;Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(names[i]);chip.setCheckable(true);chip.setChecked((large?largeTileShape:tileShape)==i);chip.setTag(i);shapes.addView(chip);statusControls.add(chip);chip.setOnClickListener(v->{if(large)largeTileShape=value;else tileShape=value;for(int n=0;n<shapes.getChildCount();n++){Chip c=(Chip)shapes.getChildAt(n);c.setChecked((Integer)c.getTag()==value);}saveStatusBar();});}
     }
-    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape);}
+    private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont);}
     private void surfaceControls(LinearLayout parent,String title,int group){
         MaterialButton open=button(title+" appearance");parent.addView(open);statusControls.add(open);
         LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setVisibility(View.GONE);parent.addView(box);

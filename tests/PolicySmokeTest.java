@@ -42,6 +42,11 @@ public final class PolicySmokeTest {
         require(!GuardBrokerPolicy.permits(0, -1, "com.android.systemui"));
         require(!GuardBrokerPolicy.validStatus(GuardBrokerPolicy.UNAVAILABLE));
         require(!GuardBrokerPolicy.validStatus(999));
+        require(GuardBrokerPolicy.permitsFingerprint(1000,1000,"com.fingerprint.sensorservice"));
+        require(!GuardBrokerPolicy.permitsFingerprint(1000,1000,"com.android.systemui"));
+        require(!GuardBrokerPolicy.permitsFingerprint(1001,1000,"com.fingerprint.sensorservice"));
+        require(!GuardBrokerPolicy.permitsFingerprint(1000,-1,"com.fingerprint.sensorservice"));
+        require(!GuardBrokerPolicy.permitsFingerprint(1000,1000,null));
         System.out.println("Policy smoke tests passed: device, firmware, SDK, hash and no-apply gates.");
     }
     private static void require(boolean value) { if (!value) throw new AssertionError(); }

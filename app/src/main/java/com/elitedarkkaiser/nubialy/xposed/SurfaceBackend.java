@@ -1,5 +1,9 @@
 package com.elitedarkkaiser.nubialy.xposed;
 import android.os.Looper;
+import android.graphics.Typeface;
+import android.graphics.Paint;
+import android.util.TypedValue;
+import com.elitedarkkaiser.nubialy.LockClockFonts;
 import android.view.*;
 import android.widget.*;
 import com.elitedarkkaiser.nubialy.SurfaceStyle;
@@ -14,7 +18,10 @@ final class SurfaceBackend {
     private static final String CLIP="com.zte.mifavor.keyguard.settings.LockScreenClockClip";
     private static final Set<String> observedClockTypes=new TreeSet<>();
     private static final String LIVE="com.zte.mifavor.keyguard.KeyguardStatusView",ITEM="com.zte.mifavor.keyguard.settings.LockScreenClockStyleItem",CONTENT="com.zte.mifavor.keyguard.personalclock.ClockContentView",BASE="com.zte.mifavor.keyguard.settings.BaseLockScreenClock",ART="com.zte.mifavor.keyguard.settings.LockScreenClockArtword",DEFAULT="com.zte.mifavor.keyguard.settings.LockScreenClockDefault";
-    private static boolean ownerName(String name){return name.equals(WIDE)||name.equals(CIRCLE)||name.equals(LOCK)||name.equals(ART)||name.equals(DEFAULT)||name.equals(CLIP)||name.equals(CONTENT)||name.equals(LIVE)||name.equals(ITEM);}
+    private static final String WIDGET="com.zte.feature.keyguardwidget.";
+    private static final String[] WIDGET_TYPES={"WeatherWidgetViewTypeOne","WeatherWidgetViewTypeTwo","WeatherWidgetViewTypeThree","AlarmWidgetViewTypeOne","AlarmWidgetViewTypeTwo","BatteryWidgetView","BatteryWidgetViewTypeTwo"};
+    private static int widgetGroup(String name){for(int i=0;i<WIDGET_TYPES.length;i++)if(name.equals(WIDGET+WIDGET_TYPES[i]))return i<3?4:i<5?5:6;return -1;}
+    private static boolean ownerName(String name){return widgetGroup(name)>=0||name.equals(WIDE)||name.equals(CIRCLE)||name.equals(LOCK)||name.equals(ART)||name.equals(DEFAULT)||name.equals(CLIP)||name.equals(CONTENT)||name.equals(LIVE)||name.equals(ITEM);}
     private static final Map<ViewGroup,Boolean> roots=new WeakHashMap<>();
     private static final Map<View,State> states=new WeakHashMap<>();
     private static final List<XC_MethodHook.Unhook> hooks=new ArrayList<>();
@@ -24,9 +31,9 @@ final class SurfaceBackend {
     private record Frame(long generation,State state){}
     private static final class State {
         final WeakReference<ViewGroup> owner;final int group,scale,opacity,position;final boolean hide;
-        float x,y,a,tx,ty,r;int visibility;
+        float x,y,a,tx,ty,r;int visibility,fontDepth;Typeface fontStock,fontSelected;float textSize,fontFittedSize;boolean fontPadding;int fontAreaWidth,fontAreaHeight;
         State(View v,Target target){owner=new WeakReference<>(target.owner());group=target.group();int appearance=style.appearance(group);scale=StatusBarStyle.indicatorScale(appearance);opacity=StatusBarStyle.indicatorOpacity(appearance);position=style.position(group);hide=style.hide(group);
-            x=v.getScaleX();y=v.getScaleY();a=v.getAlpha();tx=v.getTranslationX();ty=v.getTranslationY();r=v.getRotation();visibility=v.getVisibility();}
+            x=v.getScaleX();y=v.getScaleY();a=v.getAlpha();tx=v.getTranslationX();ty=v.getTranslationY();r=v.getRotation();visibility=v.getVisibility();if(group==2&&v instanceof TextView text&&style.clockFont()!=0){fontStock=text.getTypeface();textSize=text.getTextSize();fontPadding=text.getIncludeFontPadding();var face=LockClockFonts.FACES[style.clockFont()];fontSelected=Typeface.create(face.family(),face.style());}}
     }
     static synchronized void install(ClassLoader loader){
         if(attempted)return;attempted=true;List<XC_MethodHook.Unhook> observers=new ArrayList<>();
@@ -49,6 +56,8 @@ final class SurfaceBackend {
             stage="live keyguard host fields";
             Class<?> live=XposedHelpers.findClass(LIVE,loader),item=XposedHelpers.findClass(ITEM,loader);
             if(live.getSuperclass()!=GridLayout.class||live.getDeclaredField("mClockLayout").getType()!=item||live.getDeclaredField("mDarkAmount").getType()!=float.class||item.getSuperclass()!=LinearLayout.class||item.getDeclaredField("mScene").getType()!=int.class||!item.getDeclaredField("mClock").getType().getName().equals("com.zte.mifavor.keyguard.settings.LockScreenClockStyleInterface"))throw new IllegalStateException("Live keyguard signatures");
+            List<Class<?>> lifecycleOwners=new ArrayList<>(Arrays.asList(wide,circle,lock,content,art,normal,clip,live,item));
+            for(String name:WIDGET_TYPES){Class<?> widget=XposedHelpers.findClass(WIDGET+name,loader);if(!LinearLayout.class.isAssignableFrom(widget))throw new IllegalStateException("Widget signature");lifecycleOwners.add(widget);}
             stage="view lifecycle hooks";
             observers.add(XposedBridge.hookMethod(View.class.getDeclaredMethod("onAttachedToWindow"),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(ready&&!p.hasThrowable()&&main()){try{target((View)p.thisObject);if(active)track((View)p.thisObject);}catch(Throwable unavailable){if(active)fail(unavailable);}}}}));
             observers.add(XposedBridge.hookMethod(View.class.getDeclaredMethod("onDetachedFromWindow"),new XC_MethodHook(){@Override protected void beforeHookedMethod(MethodHookParam p){if(!active||!main())return;View view=(View)p.thisObject;restore(view);if(view instanceof ViewGroup root){QsShapeBackend.release(root);for(View v:new ArrayList<>(states.keySet()))if(states.get(v).owner.get()==root)restore(v);roots.remove(root);}}}));
@@ -57,12 +66,12 @@ final class SurfaceBackend {
             // Observe the actual lifecycle implementations as vendor overrides need not
             // dispatch through View.onAttachedToWindow. Inflation also precedes attachment.
             XC_MethodHook discover=new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(!p.hasThrowable()&&main()&&p.thisObject instanceof ViewGroup root&&(ownerName(root.getClass().getName()))){roots.put(root,true);liveClockStatus();if(active)refresh();}}};
-            for(Class<?> owner:new Class<?>[]{wide,circle,lock,content,art,normal,clip,live,item})for(String name:new String[]{"onFinishInflate","onAttachedToWindow","onLayout","setDarkAmount","setPulsing","loadStyle","setScene","addClockView","updateClockView"}){
+            for(Class<?> owner:lifecycleOwners)for(String name:new String[]{"onFinishInflate","onAttachedToWindow","onLayout","setDarkAmount","setPulsing","loadStyle","setScene","addClockView","updateClockView"}){
                 for(Class<?> type=owner;type!=null;type=type.getSuperclass()){
                     boolean found=false;for(Method method:type.getDeclaredMethods())if(method.getName().equals(name)){observers.add(XposedBridge.hookMethod(method,discover));found=true;}if(found)break;
                 }
             }
-            ready=true;message="Surface observers ready.";
+            FingerprintBackend.install(loader);ready=true;message="Surface observers ready.";
         }catch(Throwable unavailable){for(var h:observers)try{h.unhook();}catch(Throwable ignored){}message="Surface source unavailable at "+stage+" ("+unavailable.getClass().getSimpleName()+").";}
     }
     private static boolean hasTextGetter(Class<?> owner,String name){
@@ -78,6 +87,7 @@ final class SurfaceBackend {
             String name=current.getClass().getName();
             if(current instanceof ViewGroup root&&ownerName(name)){
                 roots.put(root,true);
+                if(widgetGroup(name)>=0)return current==view&&liveWidget(root)?new Target(root,widgetGroup(name)):null;
                 if(name.equals(CONTENT)||name.equals(ITEM)||name.equals(LIVE))return null;
                 if(name.equals(ART)||name.equals(DEFAULT)||name.equals(CLIP)){
                     if(!normalPersonalScene(root))return null;
@@ -98,6 +108,13 @@ final class SurfaceBackend {
             }
             ViewParent parent=current.getParent();current=parent instanceof View v?v:null;
         }return null;
+    }
+    private static boolean liveWidget(ViewGroup widget){
+        View current=widget;for(int depth=0;depth<24&&current!=null;depth++){
+            if(current.getClass().getName().equals(LIVE))return ((Number)XposedHelpers.getObjectField(current,"mDarkAmount")).floatValue()==0;
+            if(current.getClass().getName().equals(CONTENT))return false;
+            ViewParent parent=current.getParent();current=parent instanceof View v?v:null;
+        }return false;
     }
     private static boolean normalPersonalScene(ViewGroup root){
         View current=root;ViewGroup item=null;
@@ -126,14 +143,14 @@ final class SurfaceBackend {
         if(selection==null||!selection.valid()||!main())throw new IllegalArgumentException();if(!end())throw new IllegalStateException("Surface restoration incomplete");style=selection;captured=restored=0;if(!style.any()){message="Stock Quick Settings and lock-screen text appearance.";return;}
         if(!ready||failed)throw new IllegalStateException(message);
         XC_MethodHook callback=new XC_MethodHook(){
-            @Override protected void beforeHookedMethod(MethodHookParam p){if(!active||writing)return;State state=states.get(p.thisObject);if(state==null)return;if(!main()){failed=true;return;}p.setObjectExtra("nubia-ly:surface",new Frame(generation,state));}
+            @Override protected void beforeHookedMethod(MethodHookParam p){if(!active||writing)return;State state=states.get(p.thisObject);if(state==null)return;if(!main()){failed=true;return;}if(((Method)p.method).getName().equals("setTypeface"))state.fontDepth++;p.setObjectExtra("nubia-ly:surface",new Frame(generation,state));}
             @Override protected void afterHookedMethod(MethodHookParam p){Object extra=p.getObjectExtra("nubia-ly:surface");if(!(extra instanceof Frame frame)||!active||writing||frame.generation()!=generation||states.get(p.thisObject)!=frame.state())return;View v=(View)p.thisObject;State s=frame.state();
-                try{if(p.hasThrowable())throw new IllegalStateException();switch(((Method)p.method).getName()){case "setScaleX"->s.x=v.getScaleX();case "setScaleY"->s.y=v.getScaleY();case "setAlpha"->s.a=v.getAlpha();case "setTranslationX"->s.tx=v.getTranslationX();case "setTranslationY"->s.ty=v.getTranslationY();case "setRotation"->s.r=v.getRotation();case "setVisibility"->s.visibility=v.getVisibility();}
-                    Target t=target(v);if(t==null||t.owner()!=s.owner.get()||t.group()!=s.group)restore(v);else paint(v,s);
+                try{if(((Method)p.method).getName().equals("setTypeface")&&--s.fontDepth>0)return;if(p.hasThrowable())throw new IllegalStateException();switch(((Method)p.method).getName()){case "setTextSize"->s.textSize=((TextView)v).getTextSize();case "setIncludeFontPadding"->s.fontPadding=((TextView)v).getIncludeFontPadding();case "setTypeface"->s.fontStock=((TextView)v).getTypeface();case "setScaleX"->s.x=v.getScaleX();case "setScaleY"->s.y=v.getScaleY();case "setAlpha"->s.a=v.getAlpha();case "setTranslationX"->s.tx=v.getTranslationX();case "setTranslationY"->s.ty=v.getTranslationY();case "setRotation"->s.r=v.getRotation();case "setVisibility"->s.visibility=v.getVisibility();}
+                    if(s.fontDepth>0)return;Target t=target(v);if(t==null||t.owner()!=s.owner.get()||t.group()!=s.group)restore(v);else paint(v,s);
                 }catch(Throwable unavailable){fail(unavailable);}
             }
         };
-        try{for(String property:new String[]{"setScaleX","setScaleY","setAlpha","setTranslationX","setTranslationY","setRotation"})hooks.add(XposedHelpers.findAndHookMethod(View.class,property,float.class,callback));hooks.add(XposedHelpers.findAndHookMethod(View.class,"setVisibility",int.class,callback));QsShapeBackend.begin(style.tileShape(),style.largeTileShape());active=true;refresh();if(failed||!QsShapeBackend.healthy())throw new IllegalStateException("Surface apply failed");message="Quick Settings and lock-screen styling active.";}
+        try{for(String property:new String[]{"setScaleX","setScaleY","setAlpha","setTranslationX","setTranslationY","setRotation"})hooks.add(XposedHelpers.findAndHookMethod(View.class,property,float.class,callback));hooks.add(XposedHelpers.findAndHookMethod(View.class,"setVisibility",int.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setTypeface",Typeface.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setTypeface",Typeface.class,int.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setTextSize",int.class,float.class,callback));hooks.add(XposedHelpers.findAndHookMethod(TextView.class,"setIncludeFontPadding",boolean.class,callback));FingerprintBackend.begin(style.fingerprintStyle(),style.fingerprintHidden()!=0);QsShapeBackend.begin(style.tileShape(),style.largeTileShape());active=true;refresh();if(failed||!QsShapeBackend.healthy()||!FingerprintBackend.healthy())throw new IllegalStateException("Surface apply failed");message="Quick Settings and lock-screen styling active.";}
         catch(Throwable unavailable){end();throw new IllegalStateException("Surface activation unavailable",unavailable);}
     }
     private static void fail(Throwable failure){failed=true;message="Surface callback failed ("+failure.getClass().getSimpleName()+"); restoration required.";}
@@ -141,13 +158,36 @@ final class SurfaceBackend {
         if(!active||writing||failed||!main()||!view.isAttachedToWindow())return;
         try{Target target=target(view);State s=states.get(view);if(target!=null)QsShapeBackend.track(target.owner());if(target==null){if(s!=null)restore(view);return;}
             if(s!=null&&(s.owner.get()!=target.owner()||s.group!=target.group())){if(!restore(view))return;s=null;}
-            if(s==null){if(style.appearance(target.group())==0&&style.position(target.group())==0&&!style.hide(target.group()))return;s=new State(view,target);states.put(view,s);captured++;}paint(view,s);
+            if(s==null){if(style.appearance(target.group())==0&&style.position(target.group())==0&&!style.hide(target.group())&&!(target.group()==2&&view instanceof TextView&&style.clockFont()!=0))return;s=new State(view,target);states.put(view,s);captured++;}paint(view,s);
         }catch(Throwable unavailable){fail(unavailable);}
     }
     private static void paint(View v,State s){writing=true;try{
         if(s.scale!=100){v.setScaleX(s.x*s.scale/100f);v.setScaleY(s.y*s.scale/100f);}if(s.opacity!=100)v.setAlpha(s.a*s.opacity/100f);
-        if(s.position!=0){float density=v.getResources().getDisplayMetrics().density;if(!Float.isFinite(density)||density<=0||!Float.isFinite(s.tx)||!Float.isFinite(s.ty)||!Float.isFinite(s.r))throw new IllegalStateException();if(StatusBarStyle.horizontal(s.position)!=0)v.setTranslationX(s.tx+StatusBarStyle.horizontal(s.position)*density);if(StatusBarStyle.vertical(s.position)!=0)v.setTranslationY(s.ty+StatusBarStyle.vertical(s.position)*density);if(StatusBarStyle.rotation(s.position)!=0)v.setRotation(s.r+StatusBarStyle.rotation(s.position));}if(s.hide)v.setVisibility(View.GONE);
+        if(s.position!=0){float density=v.getResources().getDisplayMetrics().density;if(!Float.isFinite(density)||density<=0||!Float.isFinite(s.tx)||!Float.isFinite(s.ty)||!Float.isFinite(s.r))throw new IllegalStateException();if(StatusBarStyle.horizontal(s.position)!=0)v.setTranslationX(s.tx+StatusBarStyle.horizontal(s.position)*density);if(StatusBarStyle.vertical(s.position)!=0)v.setTranslationY(s.ty+StatusBarStyle.vertical(s.position)*density);if(StatusBarStyle.rotation(s.position)!=0)v.setRotation(s.r+StatusBarStyle.rotation(s.position));}if(s.hide)v.setVisibility(View.GONE);if(s.fontSelected!=null)fitFont((TextView)v,s);
     }finally{writing=false;}}
+    private static void fitFont(TextView view,State state){
+        // Capture the stock layout allocation before changing its font. Do not
+        // chase later animation/layout bounds or compound a previous fitted size.
+        if(state.fontAreaHeight==0&&view.getHeight()>0&&view.getWidth()>0){
+            int h=view.getHeight()-view.getPaddingTop()-view.getPaddingBottom(),w=view.getWidth()-view.getPaddingLeft()-view.getPaddingRight();
+            if(h>0&&w>0){state.fontAreaHeight=h;state.fontAreaWidth=w;}
+        }
+        if(state.fontAreaHeight<=0||state.fontAreaWidth<=0)return;
+        Paint measure=new Paint(view.getPaint());measure.setTypeface(state.fontSelected);measure.setTextSize(state.textSize);
+        Paint.FontMetrics metrics=measure.getFontMetrics();float height=metrics.bottom-metrics.top;
+        // Reserve the widest numeral for every digit, so minute changes cannot
+        // resize the clock. Preserve separators and the vendor's time format.
+        float digitWidth=0;for(int digit=0;digit<10;digit++)digitWidth=Math.max(digitWidth,measure.measureText(Integer.toString(digit)));
+        float width=0;String text=view.getText().toString();for(int i=0;i<text.length();i++){char c=text.charAt(i);width+=Character.isDigit(c)?digitWidth:measure.measureText(String.valueOf(c));}
+        if(!Float.isFinite(height)||height<=0||!Float.isFinite(width))throw new IllegalStateException("Clock font metrics unavailable");
+        float factor=Math.min(1,state.fontAreaHeight/height);if(width>0)factor=Math.min(factor,state.fontAreaWidth/width);
+        float size=state.textSize*factor;state.fontFittedSize=size;if(!Float.isFinite(size)||size<=0)throw new IllegalStateException("Clock font fit unavailable");
+        if(!Objects.equals(view.getTypeface(),state.fontSelected))view.setTypeface(state.fontSelected);
+        // Full font padding keeps lower strokes inside the fixed allocation.
+        // Only text rendering changes: parent dimensions and transforms stay stock.
+        if(!view.getIncludeFontPadding())view.setIncludeFontPadding(true);
+        if(!near(view.getTextSize(),size))view.setTextSize(TypedValue.COMPLEX_UNIT_PX,size);
+    }
     private static boolean near(float a,float b){return Float.isFinite(a)&&Float.isFinite(b)&&Math.abs(a-b)<0.00001f;}
     private static boolean restore(View v){State s=states.get(v);if(s==null)return true;writing=true;try{
         if(s.scale!=100){v.setScaleX(s.x);v.setScaleY(s.y);if(!near(v.getScaleX(),s.x)||!near(v.getScaleY(),s.y))throw new IllegalStateException();}
@@ -155,10 +195,11 @@ final class SurfaceBackend {
         if(StatusBarStyle.horizontal(s.position)!=0){v.setTranslationX(s.tx);if(!near(v.getTranslationX(),s.tx))throw new IllegalStateException();}
         if(StatusBarStyle.vertical(s.position)!=0){v.setTranslationY(s.ty);if(!near(v.getTranslationY(),s.ty))throw new IllegalStateException();}
         if(StatusBarStyle.rotation(s.position)!=0){v.setRotation(s.r);if(!near(v.getRotation(),s.r))throw new IllegalStateException();}
+        if(s.fontSelected!=null){((TextView)v).setTypeface(s.fontStock);((TextView)v).setTextSize(TypedValue.COMPLEX_UNIT_PX,s.textSize);((TextView)v).setIncludeFontPadding(s.fontPadding);if(!near(((TextView)v).getTextSize(),s.textSize)||((TextView)v).getIncludeFontPadding()!=s.fontPadding||!Objects.equals(((TextView)v).getTypeface(),s.fontStock))throw new IllegalStateException();}
         if(s.hide){v.setVisibility(s.visibility);if(v.getVisibility()!=s.visibility)throw new IllegalStateException();}states.remove(v);restored++;return true;
     }catch(Throwable unavailable){failed=true;message="Surface restoration incomplete. Disable nubia-ly in Vector and reboot.";return false;}finally{writing=false;}}
-    static void refresh(){if(!active||failed||!main())return;for(View v:new ArrayList<>(states.keySet()))track(v);for(ViewGroup root:new ArrayList<>(roots.keySet()))if(root.isAttachedToWindow()){QsShapeBackend.track(root);ArrayDeque<View> queue=new ArrayDeque<>();queue.add(root);int count=0;while(!queue.isEmpty()&&count++<128){View v=queue.removeFirst();track(v);if(v instanceof ViewGroup group)for(int i=0;i<group.getChildCount()&&queue.size()<128;i++)queue.add(group.getChildAt(i));}}}
-    static boolean end(){generation++;active=false;for(View v:new ArrayList<>(states.keySet()))restore(v);for(var h:hooks)try{h.unhook();}catch(Throwable unavailable){failed=true;}hooks.clear();boolean shapeRestored=QsShapeBackend.end();return !failed&&states.isEmpty()&&shapeRestored;}
-    static boolean healthy(){return !failed&&QsShapeBackend.healthy();}
-    static String status(){int clock=0,date=0;for(State s:states.values()){if(s.group==2)clock++;if(s.group==3)date++;}return message+liveClockStatus()+" Lock-screen clock captured: "+clock+"; date captured: "+date+"; requested hide clock: "+style.hide(2)+"; requested hide date: "+style.hide(3)+"."+" Surface captures: "+captured+"; restored: "+restored+"; remaining: "+states.size()+". "+QsShapeBackend.status();}
+    static void refresh(){FingerprintBackend.refresh();if(!active||failed||!main())return;for(View v:new ArrayList<>(states.keySet()))track(v);for(ViewGroup root:new ArrayList<>(roots.keySet()))if(root.isAttachedToWindow()){QsShapeBackend.track(root);ArrayDeque<View> queue=new ArrayDeque<>();queue.add(root);int count=0;while(!queue.isEmpty()&&count++<128){View v=queue.removeFirst();track(v);if(v instanceof ViewGroup group)for(int i=0;i<group.getChildCount()&&queue.size()<128;i++)queue.add(group.getChildAt(i));}}}
+    static boolean end(){generation++;active=false;for(View v:new ArrayList<>(states.keySet()))restore(v);for(var h:hooks)try{h.unhook();}catch(Throwable unavailable){failed=true;}hooks.clear();boolean shapeRestored=QsShapeBackend.end(),fingerprintRestored=FingerprintBackend.end();return !failed&&states.isEmpty()&&shapeRestored&&fingerprintRestored;}
+    static boolean healthy(){return !failed&&QsShapeBackend.healthy()&&FingerprintBackend.healthy();}
+    static String status(){String fit="";int clock=0,date=0,weather=0,alarm=0,battery=0;for(State s:states.values()){if(s.fontSelected!=null)fit=" Font fit: "+s.fontAreaWidth+"x"+s.fontAreaHeight+" px; vendor size: "+s.textSize+" px; fitted size: "+s.fontFittedSize+" px.";if(s.group==2)clock++;if(s.group==3)date++;if(s.group==4)weather++;if(s.group==5)alarm++;if(s.group==6)battery++;}return message+" Widgets captured — weather: "+weather+"; alarm: "+alarm+"; battery: "+battery+"."+liveClockStatus()+" Lock-screen clock captured: "+clock+"; date captured: "+date+"; requested hide clock: "+style.hide(2)+"; requested hide date: "+style.hide(3)+"."+" Surface captures: "+captured+"; restored: "+restored+"; remaining: "+states.size()+". "+QsShapeBackend.status()+" "+FingerprintBackend.status()+" Lock-screen font: "+LockClockFonts.FACES[style.clockFont()].name()+" (text clock views only)."+fit;}
 }

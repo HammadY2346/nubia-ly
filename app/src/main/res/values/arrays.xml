@@ -1,1 +1,1 @@
-<resources><string-array name="xposed_scope"><item>com.android.systemui</item></string-array></resources>
+<resources><string-array name="xposed_scope"><item>com.android.systemui</item><item>com.fingerprint.sensorservice</item></string-array></resources>

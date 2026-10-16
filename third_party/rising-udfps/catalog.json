@@ -1,0 +1,927 @@
+{
+  "repository": "https://github.com/RisingOS-Revived/android_vendor_addons",
+  "commit": "6372b6b8a0ef870150e5a0e706c3b4faccceeed9",
+  "source": "themes/udfps/UdfpsIcons",
+  "icons": [
+    {
+      "name": "udfps_icon_default",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_default.xml",
+      "sha256": "f3c18c2891d2e2e7c07962c808ffdd9980c5661ce928f6c9ac0c69d471d474a0"
+    },
+    {
+      "name": "udfps_icon_rising",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_rising.webp",
+      "sha256": "21ed7e3b793c6ce9dcdf6bd3d3e4ad8a64fab94d5baf34dbb779c973fe8b9d96"
+    },
+    {
+      "name": "udfps_icon_miui",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_miui.webp",
+      "sha256": "d1c9200976008b2c9184b0a90625169c1830fe3e8ec21d92f2cc960ac4c5cc11"
+    },
+    {
+      "name": "oneplus_fp",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_oneplus_fp.png",
+      "sha256": "7a09357acf473a7eea171d1c32660bd3b831ac379c3a7dfe0950950cd6bc176f"
+    },
+    {
+      "name": "udfps_icon_op",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_op.webp",
+      "sha256": "4ac8abd42817cc17214ecb06d43b21a45795edc017b92e0c549241db75ed32c6"
+    },
+    {
+      "name": "udfps_icon_op_2077",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_op_2077.webp",
+      "sha256": "3161a9d7dbd9aeca24c5ffb65a4f16b0c08dedf092532249fc3fed1e59d1f1ee"
+    },
+    {
+      "name": "udfps_icon_op_rainbow",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_op_rainbow.webp",
+      "sha256": "1fc227891217f7982721d229bef4844baaa075ed69d6bdbf13b392249a5cd910"
+    },
+    {
+      "name": "udfps_icon_default_1",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_default_1.webp",
+      "sha256": "5fc90f0445ad3fefcd06135694194c249139185270ecdd80bb737e515297b12b"
+    },
+    {
+      "name": "udfps_icon_default_2",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_default_2.webp",
+      "sha256": "c68ec04cc59ceb3a8088f2192f41b8ac083e30cc82fc1e2ee5742aa61c70a434"
+    },
+    {
+      "name": "udfps_icon_default_3",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_default_3.webp",
+      "sha256": "44f017a4dbda327f9b53930d9c74df5d079b4b65c6fdbe5711d287dbb2246de1"
+    },
+    {
+      "name": "udfps_icon_default_4",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_default_4.webp",
+      "sha256": "f6d74cc0e56d701fc414168421fb2672e21f3b7c34a23b929f008ed5d3a3361f"
+    },
+    {
+      "name": "udfps_icon_default_5",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_default_5.webp",
+      "sha256": "b02906ceae0dc70e7bebf83d9133e2bbbdf8a6c146debf38a3f8d30394fc06c5"
+    },
+    {
+      "name": "udfps_icon_huawei",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_huawei.webp",
+      "sha256": "a0422253d1e1a2b459c14fff4503a651fa64696fb34acdd1c50ac7b59e616a0f"
+    },
+    {
+      "name": "udfps_icon_madness_v2",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_madness_v2.webp",
+      "sha256": "bbb40005101492e1d65caba4f8b5917f5a0493b694bc3a5ef14eff264bd062e8"
+    },
+    {
+      "name": "udfps_icon_unfunnyguy",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_unfunnyguy.webp",
+      "sha256": "69a23d1c74ce1e91f4129c707700cb42113889fabf8614c88431d35c4c01c41f"
+    },
+    {
+      "name": "udfps_icon_yield",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_yield.webp",
+      "sha256": "4fa153c764418135a96e9b5a4539468f4b612f876920c1509e3b1c20b805e414"
+    },
+    {
+      "name": "udfps_icon_misc1",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_misc1.webp",
+      "sha256": "2e124c203922859255024953b0b8ed4940087effde46419a73702f3bccb13fc7"
+    },
+    {
+      "name": "udfps_icon_misc2",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_misc2.webp",
+      "sha256": "a78b1dcf4871b8adfe5327cb621e2bcf591ed2962c4f3341dde0c9a3951b531e"
+    },
+    {
+      "name": "udfps_icon_misc3",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_misc3.webp",
+      "sha256": "464b341412c77b2d2492fe93bb6b57f11e8e7364cb16302e91ad5e4eac0b6188"
+    },
+    {
+      "name": "udfps_icon_misc4",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_misc4.webp",
+      "sha256": "b4e1540412b86cf34049a057e54efa064b330e0e006466d06761bb5dba97fe96"
+    },
+    {
+      "name": "udfps_icon_misc5",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_misc5.webp",
+      "sha256": "ce0bab8113fbf8a8bbf6f08042c6eca5c169d6e02202ecd32d688c2921471a54"
+    },
+    {
+      "name": "udfps_misc_1",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_misc_1.webp",
+      "sha256": "3c9a341a0f8bad0ff6978b90dc5487faf60d7437789c535e97c4c9a0b4c0aed9"
+    },
+    {
+      "name": "udfps_misc_2",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_misc_2.webp",
+      "sha256": "7819db2b312a169276bd20b07de3cdd4e116047d000702ca7f87d342c45790e1"
+    },
+    {
+      "name": "udfps_misc_3",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_misc_3.webp",
+      "sha256": "8a0e34d2d665ff63b566316442331fde78a488576641c0b06869192c2b5ef439"
+    },
+    {
+      "name": "udfps_misc_4",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_misc_4.webp",
+      "sha256": "86cdbc5c5a0a0036798d48b5ba88dd8d1a173afaad21d1a3d05a1a223532228b"
+    },
+    {
+      "name": "udfps_misc_5",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_misc_5.webp",
+      "sha256": "86e61fd197f2cdf86dda4414c3546e83e1f432edb28964183f9967a0c05b2971"
+    },
+    {
+      "name": "udfps_misc_6",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_misc_6.webp",
+      "sha256": "2460455efd807e366808670e47d07759613895f3246cb20e421686b9df4f8ab4"
+    },
+    {
+      "name": "udfps_misc_7",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_misc_7.webp",
+      "sha256": "e67dd68d62aa8af981582759b93e7a58481058a6560c6cccce017a7185eaab82"
+    },
+    {
+      "name": "udfps_icon_arc_reactor",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_arc_reactor.webp",
+      "sha256": "c2385537a1456bef3144548cca9dc7988d0e3435789e6402d5b72729b8224e51"
+    },
+    {
+      "name": "udfps_icon_batman",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_batman.webp",
+      "sha256": "4d07fd00c7d492045bd6ac07def87cd769a7b418214cc23575553bfb57ee2e1b"
+    },
+    {
+      "name": "udfps_icon_batman_flat",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_batman_flat.webp",
+      "sha256": "686699e499879d6e12ac03cd606abcb5dd7fb2711c3a6db95eef5c37b45d5aa8"
+    },
+    {
+      "name": "udfps_icon_cpt_america_flat",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_cpt_america_flat.webp",
+      "sha256": "3c88edf88024fbd0a66ecb0e830e7458152ac1d84522cfe681a5b36d4c6fd53a"
+    },
+    {
+      "name": "udfps_icon_cpt_america_flat_gray",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_cpt_america_flat_gray.webp",
+      "sha256": "58c9516d291f557e92aec7932b40b2a43e814529f4e5428e7774fe2444500fe2"
+    },
+    {
+      "name": "udfps_icon_dragon_black_flat",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_dragon_black_flat.webp",
+      "sha256": "1e38ffaab77ea0c86aa7a16835464f5a511d47a133bd40336ab501f2897461cc"
+    },
+    {
+      "name": "udfps_icon_fire_ice_ouroboros",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_fire_ice_ouroboros.webp",
+      "sha256": "57c40cb83af551a0aa03a161dc4273847e21d2d3b86d80c8df3dfc7147bf2118"
+    },
+    {
+      "name": "udfps_icon_keqings",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_keqings.webp",
+      "sha256": "fafde1b88c2117e3f4d050f470ee96f915abe10c3d871df2bb0dc93694119b18"
+    },
+    {
+      "name": "udfps_icon_mclaren",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_mclaren.png",
+      "sha256": "cdaddcd5aeba52925352bd0b13173e02d3348cb27f1d0be03d24517d371f383c"
+    },
+    {
+      "name": "udfps_icon_mi",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_mi.png",
+      "sha256": "954e2372d8c16095e3405c1ac4b45b4021b251a049e97daf2144687b88982a94"
+    },
+    {
+      "name": "udfps_icon_neon_arc",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_neon_arc.webp",
+      "sha256": "3700bd46a8fef107f23326c4e42e4012445d1600359d9979e83a4d2f457a2798"
+    },
+    {
+      "name": "udfps_icon_neon_arc_gray",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_neon_arc_gray.webp",
+      "sha256": "ff41a0399bae126244a94d0371eac39c93b291d4caed14e0eec84f6f2f9e35f8"
+    },
+    {
+      "name": "udfps_icon_neon_triangle",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_neon_triangle.webp",
+      "sha256": "4b1427e3d259d11a3ae8fe9e120ef57cf75cf23e3c0ed30b8e5a8781d53987c0"
+    },
+    {
+      "name": "udfps_icon_pacman",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_pacman.webp",
+      "sha256": "a5fc7da9fecc5dd9f688b889ffc436d9b83a06c894170774f79479d08104cd3c"
+    },
+    {
+      "name": "udfps_icon_pokeball",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_pokeball.webp",
+      "sha256": "4766ae80c39366762f70fd6cb5fb82bb304f179da7f6eaa6cc3c9b794fcd0e94"
+    },
+    {
+      "name": "udfps_icon_pokeball_1",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_pokeball_1.webp",
+      "sha256": "ebf91440c89cc57681086d8d465103fdb4f02ea337d4f6518449beb4d43400f5"
+    },
+    {
+      "name": "udfps_icon_pokeball_2",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_pokeball_2.webp",
+      "sha256": "d88d31c952760ee2433c4091fab901d921fb0e0ae7fcc472ffacb24f82edb9a8"
+    },
+    {
+      "name": "udfps_icon_rainbow_horn",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_rainbow_horn.webp",
+      "sha256": "35eef7ea84837970ac9e493a04ac8e811deb96c13ffd3988cee78991c6608f62"
+    },
+    {
+      "name": "udfps_icon_scratch_pink_blue",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_scratch_pink_blue.webp",
+      "sha256": "d159a0b14ac4829a52f73d4f3a56e6d2a4ba04d62475a9260cbef07edeb02dd1"
+    },
+    {
+      "name": "udfps_icon_scratch_red_blue",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_scratch_red_blue.webp",
+      "sha256": "1b6b759f742a4a95bf12a78f0bf4b1e653dc4162ce0744cd7095ec476cf1d1b2"
+    },
+    {
+      "name": "udfps_icon_shooky",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_shooky.webp",
+      "sha256": "ad833ff7fa73a7737eea5826e7542238aaa070f559c4eda2f4b88064ddcf01b0"
+    },
+    {
+      "name": "udfps_icon_shouganai",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_shouganai.webp",
+      "sha256": "a4299f1c790bbec5ba52d1735dca0b73de15b85c363c1439155a43f2336b063d"
+    },
+    {
+      "name": "udfps_icon_spiderman",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_spiderman.webp",
+      "sha256": "1edafc76f91546df67f5e1cb75a3b163c240ddc9fddc623838a5f7a922998dfe"
+    },
+    {
+      "name": "udfps_icon_spiral_blue",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_spiral_blue.webp",
+      "sha256": "4aaa6b7b5050ebad5a8c05b278824aa27ef9076e281d65e8416e04cbb46b1b02"
+    },
+    {
+      "name": "udfps_icon_sun_metro",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_sun_metro.webp",
+      "sha256": "5f44eac5ee4632ac525e2fc10332f35a5089b6ae1b727b91ce3f93a8d19243f4"
+    },
+    {
+      "name": "udfps_icon_genshin_fire",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_genshin_fire.webp",
+      "sha256": "2f1a36bf24f2691a3feaad6272d15c4bead11e03d099315e348879601bf8b445"
+    },
+    {
+      "name": "icon_coreflame_death",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_death.webp",
+      "sha256": "d498291a6a06164f5f5d3f5f3d3afea90f342319d7d0f9e0a54148745f65b00e"
+    },
+    {
+      "name": "icon_coreflame_earth",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_earth.webp",
+      "sha256": "b215a48b8c847ce9ca0e6f8e6b80d1b5a7f4d2ee64155c33534ec4c656adbfd8"
+    },
+    {
+      "name": "icon_coreflame_genesis",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_genesis.webp",
+      "sha256": "636c2902414ed7d56da948723de6325dcf5287cf45be34eaf8460c8545087a6d"
+    },
+    {
+      "name": "icon_coreflame_law",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_law.webp",
+      "sha256": "a5efcbc0d1e152f233e9109b94ce9e51f1e24d921bb1a84c65dfb1d33c88e7e9"
+    },
+    {
+      "name": "icon_coreflame_ocean",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_ocean.webp",
+      "sha256": "6048da35efb3c206d9b0087386e7c688bba6c1613c832469b66b38b01d7c56b4"
+    },
+    {
+      "name": "icon_coreflame_passage",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_passage.webp",
+      "sha256": "8dfb9b9188ff453263ba7d981c7d57215fb4df834d48d2715dae8e04ec2e7f8c"
+    },
+    {
+      "name": "icon_coreflame_reason",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_reason.webp",
+      "sha256": "88ea6b4b20b01d230f00f05a871e5937a2e731ec55ea96f240f2180de585c342"
+    },
+    {
+      "name": "icon_coreflame_romance",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_romance.webp",
+      "sha256": "84402ba46748ce9ca83de646f4b4d5e81213c17f7188150764a851d299c39f2b"
+    },
+    {
+      "name": "icon_coreflame_sky",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_sky.webp",
+      "sha256": "0fcc9b8ee2fc6b09b682957403b3bb4119073078c45c5246d0e6b8247d1d3902"
+    },
+    {
+      "name": "icon_coreflame_strife",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_strife.webp",
+      "sha256": "ce3f6c5ce7295564d191900882285620cc8c956861e9ade7e5c200bf60599431"
+    },
+    {
+      "name": "icon_coreflame_time",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_time.webp",
+      "sha256": "7745d407dff26220e4cc134ad8d1f7253c89e1cc30b5a499989acc5fe80e6ebf"
+    },
+    {
+      "name": "icon_coreflame_trickery",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_trickery.webp",
+      "sha256": "84a73bb29c627a465df72af46325909977e45c270223031af024587f732363b4"
+    },
+    {
+      "name": "icon_coreflame_worldbearing",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_icon_coreflame_worldbearing.webp",
+      "sha256": "45b5cdc76c7998109e805cd3c46823cc332bc057a4b0e14cb890895d399823c1"
+    },
+    {
+      "name": "path_abundance",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_abundance.webp",
+      "sha256": "e4520150984ce030efdc5cc7591d33cce35e830a67e37bea92a2be048bab3b17"
+    },
+    {
+      "name": "path_destruction",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_destruction.webp",
+      "sha256": "1a73377b4df85023d86ee50c0979c549823ab5e3f7383ccc217851f1836819b3"
+    },
+    {
+      "name": "path_elation",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_elation.webp",
+      "sha256": "15dd222c6c7c6afae24fd20401203ce8afe217defe5615e5306d54c7d683e179"
+    },
+    {
+      "name": "path_enigmata",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_enigmata.webp",
+      "sha256": "8c1843afb19d027292f88b15d202c032540afd610d897b80bbde90689268c312"
+    },
+    {
+      "name": "path_equilibrium",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_equilibrium.webp",
+      "sha256": "721e42975872c211bbfc74b203537181bc8be75d56acae6071c81e269de9f9f7"
+    },
+    {
+      "name": "path_erudition",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_erudition.webp",
+      "sha256": "f2f8cfe687cffe10fde95c4f3c36fe69e10ddab65a965923cef0cfb27a565f01"
+    },
+    {
+      "name": "path_harmony",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_harmony.webp",
+      "sha256": "0492242ef70e54885e6fe246f88aaeb0e749c6ad4e8e55196f6fa4de89cb53b1"
+    },
+    {
+      "name": "path_nihility",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_nihility.webp",
+      "sha256": "1495a8246ae8337ad3326b48ccf2c417205bca4c221494a061d5f4bd7a68bd7f"
+    },
+    {
+      "name": "path_order",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_order.webp",
+      "sha256": "318136373cbc986129596fd7c48252d9ebe0dc874c79f207bc8549451e3ed40a"
+    },
+    {
+      "name": "path_preservation",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_preservation.webp",
+      "sha256": "ae82aefd27705c3eee4bd69b563e40a25a8e92e6600daa4ba0fed65b79f59285"
+    },
+    {
+      "name": "path_propagation",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_propagation.webp",
+      "sha256": "ac740a79492dc72ecdc3061d3db3d0da8c7fa6195951b951a0f7f4f793f1e2e3"
+    },
+    {
+      "name": "path_remembrance",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_remembrance.webp",
+      "sha256": "26cc31d8be6b4d3780aac2bb551dd0fb17aa0663a749b7942fa22f8025e86576"
+    },
+    {
+      "name": "path_the_hunt",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_the_hunt.webp",
+      "sha256": "ebf03b4bf153c094d82c3294bef1270cdc38dd4b73b3e6edaac81656fe451af0"
+    },
+    {
+      "name": "path_trailblaze",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_trailblaze.webp",
+      "sha256": "06bce3e99b654ea363dc1a240e171f0b38f700f6d16059fae0101fb7ca362548"
+    },
+    {
+      "name": "path_voracity",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_path_voracity.webp",
+      "sha256": "c7f6537b00059ffeb9cd09267935392dd92fa3ffd9ebf0df09d37902acd83f62"
+    },
+    {
+      "name": "type_fire",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_type_fire.webp",
+      "sha256": "81a5aa71991062a692cba941903dc70c69a4e12f956472f592b4661430a9f6cd"
+    },
+    {
+      "name": "type_ice",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_type_ice.webp",
+      "sha256": "adcbedee680298250e13b938371bcb2d8bdd5eae188d3bae31f38199c32f2194"
+    },
+    {
+      "name": "type_imaginary",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_type_imaginary.webp",
+      "sha256": "dcfe5892956dc90956caa338beb78f10b36ab0b18468014c837faa4d6a07fa32"
+    },
+    {
+      "name": "type_lightning",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_type_lightning.webp",
+      "sha256": "2b570dce7e7b740ecf76289acbee5af4d8ba400609bed42c68d7c37ab86a1db8"
+    },
+    {
+      "name": "type_physical",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_type_physical.webp",
+      "sha256": "a9ee82f27ab380cbc360a76be95123edca33329b2cab845f578accabd413da3a"
+    },
+    {
+      "name": "type_quantum",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_type_quantum.webp",
+      "sha256": "301bfcf6e7c97ec5231fa00e34e7b9d89e385ec5a984b0ee9b9dd8da2e4f541a"
+    },
+    {
+      "name": "type_wind",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_type_wind.webp",
+      "sha256": "4314f9cc366f7596058f9caa53c6bab2dc97c164db7ccb825a428afb8b1b45c0"
+    },
+    {
+      "name": "profile_picture_acheron_ambush",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_acheron_ambush.webp",
+      "sha256": "9df4d7282cd17fe0b01b55de6293e33c11d08c388ac89e59d953b15e57c78d13"
+    },
+    {
+      "name": "profile_picture_aglaea_fashion",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_aglaea_fashion.webp",
+      "sha256": "20d0542aff1ae979d4afadbdb951325795585e6e19b2b6c337c434a3646e4889"
+    },
+    {
+      "name": "profile_picture_anaxa_ingenuity",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_anaxa_ingenuity.webp",
+      "sha256": "01453f97960a9c572002a1baf190a2491ca425a4713055121c484901c46ebe12"
+    },
+    {
+      "name": "profile_picture_aventurine_bullseye",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_aventurine_bullseye.webp",
+      "sha256": "b5836d9a7c80bfa09acd03dac70ecdb5c906ebfb0733f32a7f13f7b311f386fa"
+    },
+    {
+      "name": "profile_picture_awooawoo",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_awooawoo.webp",
+      "sha256": "4839d6069da83c77cc8d5926e69f244296a3c9d215d5a460213fa8817a9feb78"
+    },
+    {
+      "name": "profile_picture_bailu_medical_practice",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_bailu_medical_practice.webp",
+      "sha256": "12119ffa8db409bcbfb0803b436cd7110a98ede8bf30ad4d766a55dc01a4cc5a"
+    },
+    {
+      "name": "profile_picture_ball_bat_by_name",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_ball_bat_by_name.webp",
+      "sha256": "332c98ce65e4e3629c65ec31fdbbb36c18d62c066a8124ad69896e0791b0e53f"
+    },
+    {
+      "name": "profile_picture_bang_bang_bump",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_bang_bang_bump.webp",
+      "sha256": "e07a5b070ee094bf1cf304a579ca3f4a01520da1bcac17e8ae83cd362cccd630"
+    },
+    {
+      "name": "profile_picture_black_swan_recollection",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_black_swan_recollection.webp",
+      "sha256": "6a43a522a0d0f97be137a1a34a50366320a3423336fd7ae4c4fd5b22de050325"
+    },
+    {
+      "name": "profile_picture_blade_dinner_party",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_blade_dinner_party.webp",
+      "sha256": "f31970e9350210692d0ad8bb13a6fca56650eed8db14785724f5c736865b0069"
+    },
+    {
+      "name": "profile_picture_boothill_ambush",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_boothill_ambush.webp",
+      "sha256": "8f637ef86c509b82a56140836632c21ce774d078742e31405348a4718697f5d4"
+    },
+    {
+      "name": "profile_picture_bronya_celebration",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_bronya_celebration.webp",
+      "sha256": "13853764bcb79795a3537f8f6bf82843b639238f2a3fd4a7af29e78d7cfdcee7"
+    },
+    {
+      "name": "profile_picture_brother_hanu",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_brother_hanu.webp",
+      "sha256": "525818d75c4e28f33ea13fbead7b0ebae0ff54abe0bcb56c47caf938880e3682"
+    },
+    {
+      "name": "profile_picture_caelus_star_rail",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_caelus_star_rail.webp",
+      "sha256": "442f46d78ef09ce90fe0b0720594f0fb9078c30113f697b293a934767ccef4f5"
+    },
+    {
+      "name": "profile_picture_caelus_the_writer",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_caelus_the_writer.webp",
+      "sha256": "0df8d1b47e526ad95a7ff67cc8bfa3bebcab8c135048fcdf47d59cd3413d716f"
+    },
+    {
+      "name": "profile_picture_caelus_welcome",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_caelus_welcome.webp",
+      "sha256": "847811ac877648b74441144b3cc419287b20d7ad4776d223a31079ac850bbb28"
+    },
+    {
+      "name": "profile_picture_castorice_ingenuity",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_castorice_ingenuity.webp",
+      "sha256": "4057ebf0ed344dc88a5fbc702d8332f25c61738f08acff627c68a833b35c0ca2"
+    },
+    {
+      "name": "profile_picture_cerydra_conquest",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_cerydra_conquest.webp",
+      "sha256": "c4787c3044abb44dd1c6b36b53bc7ebf2f0a92327615a626a65428227023534b"
+    },
+    {
+      "name": "profile_picture_chef_pom_pom",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_chef_pom_pom.webp",
+      "sha256": "4d07704e3de3cd9cf3be8bc14005c4325cc037f395b5cc5dc5bb518b86c471b2"
+    },
+    {
+      "name": "profile_picture_cipher_sweet_slumber",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_cipher_sweet_slumber.webp",
+      "sha256": "3e9e994aaee7b051f42a51731678cd8522622caaf1a29f3322366bee1bd5dea2"
+    },
+    {
+      "name": "profile_picture_clockie",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_clockie.webp",
+      "sha256": "a2f90b0db695d80d862d5c08f5d0b9a7c2beb9bfaa64dfbda25f27fdd18f8683"
+    },
+    {
+      "name": "profile_picture_cyrene_keeping_promise",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_cyrene_keeping_promise.webp",
+      "sha256": "da5e92b30c9ea550c994fd80c8ffbcabce388242d1002edc278cc2585e6cdf22"
+    },
+    {
+      "name": "profile_picture_dan_heng_permansor_terrae_lurking",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_dan_heng_permansor_terrae_lurking.webp",
+      "sha256": "cd5eb955d7a197fbe551b431e2f288cf66a8dea9f58083eae4b393043159700b"
+    },
+    {
+      "name": "profile_picture_dan_heng_welcome",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_dan_heng_welcome.webp",
+      "sha256": "55b5c520c1abb5b524a099384548b71e852b3d416d10f92f6d395887be100785"
+    },
+    {
+      "name": "profile_picture_diting",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_diting.webp",
+      "sha256": "f83d9e70aa85504d0d862d5ae2bbe678c7608c6ce564ea48900b00099179ae17"
+    },
+    {
+      "name": "profile_picture_double_prosperity",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_double_prosperity.webp",
+      "sha256": "f755d570eb106765b707cae3d4dd90aaad74a48c822708fcfc593c18c4413f4d"
+    },
+    {
+      "name": "profile_picture_dr_ratio_academia",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_dr_ratio_academia.webp",
+      "sha256": "260810eb6609cf657385eeb9c9a1f560d69a41b4c6de91d2c52244286897dc6d"
+    },
+    {
+      "name": "profile_picture_dream_ticker",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_dream_ticker.webp",
+      "sha256": "c0ba5319087a2bd5b1d0223c1727aec92b05e4cf67397f2e74fe031a384cf839"
+    },
+    {
+      "name": "profile_picture_duomension_city_mobilization",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_duomension_city_mobilization.webp",
+      "sha256": "4f25c9589576293ad109a1c9bdd2cebac1d0c7683889db82acf8c5dffe40689b"
+    },
+    {
+      "name": "profile_picture_evernight_lurking",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_evernight_lurking.webp",
+      "sha256": "e2852478b7640fba7f25e7b6f539bf556a5abe04d81ebbd1a825e11eba7c6a50"
+    },
+    {
+      "name": "profile_picture_fast_and_furynuts",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_fast_and_furynuts.webp",
+      "sha256": "4d3492f7ea999d5a99ebf2c7c4e078cc0197ba66287acec4c6ee76cb13859d07"
+    },
+    {
+      "name": "profile_picture_feixiao_fitness",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_feixiao_fitness.webp",
+      "sha256": "f54ec2ac1c2693d7effde3df6eebe24c0217a919f8600869fcef0b03d45e3937"
+    },
+    {
+      "name": "profile_picture_final_victor",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_final_victor.webp",
+      "sha256": "df40962fe0b32fd9a1d0c81e91f0adbc759b0125590ee329fdb6645d652a23c0"
+    },
+    {
+      "name": "profile_picture_firefly_travel",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_firefly_travel.webp",
+      "sha256": "b8a9b4023eefe0cd55f854dc7357cbf0192d8aee89fefa5773aa0ef2dce57ca2"
+    },
+    {
+      "name": "profile_picture_firefly_vision",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_firefly_vision.webp",
+      "sha256": "87d6c3ca72331760d7cb20276ee4bdabf59d34f1e609b5a827d20ff734340365"
+    },
+    {
+      "name": "profile_picture_fu_xuan_in_leisure",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_fu_xuan_in_leisure.webp",
+      "sha256": "5c06d8a0d4ae43a5a2d4d655f69d47c7348e35ae3380aafa8d468fe6a900e6c2"
+    },
+    {
+      "name": "profile_picture_gepard_celebration",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_gepard_celebration.webp",
+      "sha256": "46c091fa8ce1aa81adbeca400eff05c5b004a07683a6bf6eef6e1081d3777515"
+    },
+    {
+      "name": "profile_picture_hamster_ball_knight",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_hamster_ball_knight.webp",
+      "sha256": "ae2bc844886c477abe57c5db821db427e20a5e2666af9e509bd32b6f3b6280b0"
+    },
+    {
+      "name": "profile_picture_herta_tea_break",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_herta_tea_break.webp",
+      "sha256": "c5774aee9f6eadb3639301ead54b98c2ad1ead5fab59be27651d49180e864fd3"
+    },
+    {
+      "name": "profile_picture_hi_come_for_a_test",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_hi_come_for_a_test.webp",
+      "sha256": "25a0aa4ddfb9d8b5dd58b9f20ee383b6dc56f1869cb141b51ad55bbb58bfdb0a"
+    },
+    {
+      "name": "profile_picture_himeko_welcome",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_himeko_welcome.webp",
+      "sha256": "247b48603d7b81f5d58af9051cae26db314c1cb9c032db87fb9de9bf7191e030"
+    },
+    {
+      "name": "profile_picture_hyacine_sweet_slumber",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_hyacine_sweet_slumber.webp",
+      "sha256": "9fbe8c9727b461a362adb4208faa8970dc9b9a5b30dccee824a0f0dee1275c48"
+    },
+    {
+      "name": "profile_picture_hysilens_conquest",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_hysilens_conquest.webp",
+      "sha256": "279257f04e7be8143c6d8132d8e8508708ca6f07a2926b7a1b02b760c57d677b"
+    },
+    {
+      "name": "profile_picture_janus_steed",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_janus_steed.webp",
+      "sha256": "a0a5f0a3d057b41a02fb4dd0a7e5bf03f067293273f4f650e81d2cc23141da35"
+    },
+    {
+      "name": "profile_picture_jiaoqiu_medical_practice",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_jiaoqiu_medical_practice.webp",
+      "sha256": "a0feb29502ed81273d6705665032c214b4d060ed41d604ea8ae1f5397fcffbb2"
+    },
+    {
+      "name": "profile_picture_jingliu_odyssey",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_jingliu_odyssey.webp",
+      "sha256": "d6147b61cc70ea61e722863077dc9837a4fc922156c04319a68f8ce14f85e9b3"
+    },
+    {
+      "name": "profile_picture_jing_yuan_in_leisure",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_jing_yuan_in_leisure.webp",
+      "sha256": "f491da696fa03aacf652a89347d2392db1285c027fe7eceab4b28cce33284220"
+    },
+    {
+      "name": "profile_picture_junjun",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_junjun.webp",
+      "sha256": "231ad9a7d1523d174a444dad2b8052f4fa87323ef489324e8bbf173318ba7b98"
+    },
+    {
+      "name": "profile_picture_kafka_dinner_party",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_kafka_dinner_party.webp",
+      "sha256": "9ab1184e1c962724c2dee08a757be52e7907a72df381f6fd25b2ecd03ec5cc36"
+    },
+    {
+      "name": "profile_picture_kakavasha",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_kakavasha.webp",
+      "sha256": "3137604670678262d34a61d151d63bf10699b4bd4737f5a19e4354d4d5a02096"
+    },
+    {
+      "name": "profile_picture_listen_up",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_listen_up.webp",
+      "sha256": "058ab3a40d38f57a9a7da2580b1ec4f58d7782bd8ed1232c9e96aa7a69457e2e"
+    },
+    {
+      "name": "profile_picture_march_7th_festival",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_march_7th_festival.webp",
+      "sha256": "33618410e5d0b6709e99fcbdd66406f086e7cdea565f313ed01722d6eebfc207"
+    },
+    {
+      "name": "profile_picture_march_7th_welcome",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_march_7th_welcome.webp",
+      "sha256": "d3c7a64d769dfe7789511cf3568b1ea54288923a16526aa4d0689ea20fabcb97"
+    },
+    {
+      "name": "profile_picture_mem",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_mem.webp",
+      "sha256": "e89aece9931116ad6481fefee542dd2eb90250127f0c788b3f23fd7a227a78bb"
+    },
+    {
+      "name": "profile_picture_moze_fitness",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_moze_fitness.webp",
+      "sha256": "b33b15316abd100fa571892e8ca884b96c84d489035eba5594b2f073c74d7e94"
+    },
+    {
+      "name": "profile_picture_mydei_delicacies",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_mydei_delicacies.webp",
+      "sha256": "bd6b6a1e957775490b9ef20dd8839e441f2f634f3fd011e4c2e73a8f90c1a395"
+    },
+    {
+      "name": "profile_picture_one_year_anniversary_commemoration",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_one_year_anniversary_commemoration.webp",
+      "sha256": "af38ca56178202fd7f6d1726d5f0ba5f6732f3fbd390b7a3c48c79e22c485d3b"
+    },
+    {
+      "name": "profile_picture_on_the_mural",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_on_the_mural.webp",
+      "sha256": "f86f151d7abbc927be1701d1ada9e3cb7deb71aa26160352b0fad04447cc6077"
+    },
+    {
+      "name": "profile_picture_origami_bird",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_origami_bird.webp",
+      "sha256": "826bdf9d018ab814725788f3d429563b83ac5898e002b52439f6b4fb28193fc3"
+    },
+    {
+      "name": "profile_picture_owlbert_bath",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_owlbert_bath.webp",
+      "sha256": "520fc359a438cf4f454a2a5d3e70b79d6b00a0628f8ce94dbe2a73f1bb331a5f"
+    },
+    {
+      "name": "profile_picture_peppy",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_peppy.webp",
+      "sha256": "7beb60899bd3927d54482916ea089debe1f96f3662f9323e15f9155dc2d90e04"
+    },
+    {
+      "name": "profile_picture_phainon_fashion",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_phainon_fashion.webp",
+      "sha256": "d79b074290e5d498eed221b8bea7454e478426f5bce423a191ab57a8cd8cd451"
+    },
+    {
+      "name": "profile_picture_polyxia",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_polyxia.webp",
+      "sha256": "3aea33e2017c94acba56ce56c85b04194b58df2d1f1f7da0376ab79da03b7f13"
+    },
+    {
+      "name": "profile_picture_rappa_opening",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_rappa_opening.webp",
+      "sha256": "5b4b840c43205c5cfc47a71bc697fbf526fcd00e0513138ce152f338c2b269dd"
+    },
+    {
+      "name": "profile_picture_ripples_of_past_reverie_keeping_promise",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_ripples_of_past_reverie_keeping_promise.webp",
+      "sha256": "ad978a348e18bc0ebfddfbec4bc3a67461aa2aea8bf30f159849991622bf2545"
+    },
+    {
+      "name": "profile_picture_ruan_mei_academia",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_ruan_mei_academia.webp",
+      "sha256": "cdbc7a0377763c26b788757e44c3b89cde31fa734177619a5dbb0f132f80646f"
+    },
+    {
+      "name": "profile_picture_ruan_mei_moments_delight",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_ruan_mei_moments_delight.webp",
+      "sha256": "b6df02ad69db4cb7f588a85dc9f0596bdbae7b9317c03826c5d12b86223e2724"
+    },
+    {
+      "name": "profile_picture_sampo_illusion",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_sampo_illusion.webp",
+      "sha256": "0265c5c1663df0863b54b1dbab203785e4dd7a4efd679fa4f9675a0c29b752cd"
+    },
+    {
+      "name": "profile_picture_sam_vision",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_sam_vision.webp",
+      "sha256": "c1bceca0ad1e2138f81514bc1a0b9e7a628cd1c38bb756d3d5bc6afc354230b4"
+    },
+    {
+      "name": "profile_picture_silver_wolf_opening",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_silver_wolf_opening.webp",
+      "sha256": "289b4d67b4e2cd0c839746d10fb4de2ca116cb8ab3f12db17a331b4777e7ef91"
+    },
+    {
+      "name": "profile_picture_snack_life",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_snack_life.webp",
+      "sha256": "583292ef1002b6545a630da80377f48d6a6ea681eb42b8122616655955647420"
+    },
+    {
+      "name": "profile_picture_sparkle_doll",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_sparkle_doll.webp",
+      "sha256": "31ac7edb8cf5b6a01c0a5852eda92ad76f5bdf63a6eada244160f05c2c9db0ee"
+    },
+    {
+      "name": "profile_picture_sparkle_illusion",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_sparkle_illusion.webp",
+      "sha256": "d021d7dd9d768cc1814d4184b3506f9b18be1e2e78769fd3655087d39fbe4f49"
+    },
+    {
+      "name": "profile_picture_sparxies_dance",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_sparxies_dance.webp",
+      "sha256": "848fcf726064fe52874a7e3b71024b4d2bc78c2532fd533b8eb36de9ae885bc8"
+    },
+    {
+      "name": "profile_picture_spirithief",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_spirithief.webp",
+      "sha256": "6989bec813834babc138f77e65dcc4daf103b1008c6ead82f2c029d901dab72c"
+    },
+    {
+      "name": "profile_picture_stelle_star_rail",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_stelle_star_rail.webp",
+      "sha256": "204d27c8f6f55769f0ef86ff1f93fff504090d0a2e45375316d157564d2c808e"
+    },
+    {
+      "name": "profile_picture_stelle_the_writer",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_stelle_the_writer.webp",
+      "sha256": "62f07c4176ed4588c62596eed8f1e8e3b9c903f403232feb695405f80ccfb8fa"
+    },
+    {
+      "name": "profile_picture_stelle_welcome",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_stelle_welcome.webp",
+      "sha256": "f80a065e4344b9487bc402b5fd1be02c147726ed1565c565683bc76fe957c790"
+    },
+    {
+      "name": "profile_picture_sunday_brilliant_youth",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_sunday_brilliant_youth.webp",
+      "sha256": "7a6a47c44b1c2f2add1019a6cfd448aea53d9008d44d746b7129de35252ea09a"
+    },
+    {
+      "name": "profile_picture_the_golden_nymph",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_the_golden_nymph.webp",
+      "sha256": "50652e4a90ebc4398fd71ead3a7e35e498180bb18b7b0861ab6b5bd5fc84f5b3"
+    },
+    {
+      "name": "profile_picture_the_herta_tea_break",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_the_herta_tea_break.webp",
+      "sha256": "18dbab03ba23a4e8b71c8bb215312629ea5f1a74c852694562ed39b090e3421c"
+    },
+    {
+      "name": "profile_picture_the_mini_dromas_is_growing_up",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_the_mini_dromas_is_growing_up.webp",
+      "sha256": "293f2711ed552ea886ad74084507ed87afdc38dcecfe1577d20d9cd361f18b01"
+    },
+    {
+      "name": "profile_picture_topaz_bullseye",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_topaz_bullseye.webp",
+      "sha256": "0ce9c82bf779a7a1154ca31095db6805249c73274eb1afdfea9c597e13d451d3"
+    },
+    {
+      "name": "profile_picture_trailblazing_in_progress",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_trailblazing_in_progress.webp",
+      "sha256": "642fbd0e9a7affe1c7d280ea382fc9def0de83652decf04e2224f27034a0116a"
+    },
+    {
+      "name": "profile_picture_trash_can",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_trash_can.webp",
+      "sha256": "c508b530ee5dac2e55213631f348edc0c3d3802baaea5de5ad49841ce9c40208"
+    },
+    {
+      "name": "profile_picture_trianne_doll",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_trianne_doll.webp",
+      "sha256": "020e4dfa30cfadc2cee55f28bf0fee2ef1d8cee2dd57778f5e867a6bf73824b4"
+    },
+    {
+      "name": "profile_picture_tribbie_delicacies",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_tribbie_delicacies.webp",
+      "sha256": "2f712eea9de3b6eae019fd7ca02030b47cef145b40a44c5faa1084fae4820597"
+    },
+    {
+      "name": "profile_picture_wanted_poster",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_wanted_poster.webp",
+      "sha256": "812df45bdc73836bd3301f5cf16e3246b142c95f87a7223a82875f912347dcbb"
+    },
+    {
+      "name": "profile_picture_welt_welcome",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_welt_welcome.webp",
+      "sha256": "154b0d323c43736f21ae1d153654513a1caa4a326e003b55305523a8d40e79d5"
+    },
+    {
+      "name": "profile_picture_wubbaboo",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_wubbaboo.webp",
+      "sha256": "43b9caa2efd2e3f1041627d8f1ee46f7abed662faf1f0c6e4e69de1f326b5853"
+    },
+    {
+      "name": "profile_picture_yanqing_dreamland",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_yanqing_dreamland.webp",
+      "sha256": "37caace04a8347a6b70251302564e9d5cb098465867235c1b81f8169cae24e6a"
+    },
+    {
+      "name": "profile_picture_yanqing_odyssey",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_yanqing_odyssey.webp",
+      "sha256": "8e5de4486b3ecf8349080bd41d575d3c5eb32e7beb9729bcc42ed305410989eb"
+    },
+    {
+      "name": "profile_picture_yao_guang_ethereal_dance",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_yao_guang_ethereal_dance.webp",
+      "sha256": "ab30186e4b39225f405892ebaa5f1b7e278ceab03ae57378a082b2acd883d01d"
+    },
+    {
+      "name": "profile_picture_you_cant_see_me",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_profile_picture_you_cant_see_me.webp",
+      "sha256": "fd2d73bc0705977b9289ab4dbefd822dc7bd5d80f07541d0ce0fd4fbc8fed4d3"
+    },
+    {
+      "name": "udfps_icon_transparent",
+      "path": "app/src/main/res/drawable-nodpi/rising_fp_udfps_icon_transparent.webp",
+      "sha256": "0ea9626b3178624e752809b1155d90e8d85946d67309fa5f7e40c25cfad96f5f"
+    }
+  ]
+}

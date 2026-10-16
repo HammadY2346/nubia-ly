@@ -2,6 +2,7 @@ package com.elitedarkkaiser.nubialy;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public final class SurfaceStyleTest {
+    @Test public void everyFingerprintStyleRoundTrips(){for(int id=0;id<FingerprintStyles.NAMES.length;id++){var style=new SurfaceStyle(0,0,0,0,0,0,0,0,0,0,0,0,id,0,0);assertTrue(style.valid());assertEquals(style,SurfaceStyle.decode(style.encode()));}}
     @Test public void boundedScopeAndLegacyDefaults(){
         assertEquals(SurfaceStyle.STOCK,SurfaceStyle.decode("0,0,0,0,0,0,0,0,0"));assertFalse(SurfaceStyle.STOCK.any());
         var chosen=new SurfaceStyle(15,StatusBarStyle.appearance(120,25),0,StatusBarStyle.appearance(80,100),0,StatusBarStyle.transform(-8,8,20),0,0,0,3);assertTrue(chosen.valid());assertEquals(chosen,SurfaceStyle.decode(chosen.encode()));
@@ -13,6 +14,10 @@ public final class SurfaceStyleTest {
             assertTrue(split.valid());assertEquals(split,SurfaceStyle.decode(split.encode()));
             assertEquals(small,split.tileShape());assertEquals(large,split.largeTileShape());
         }
+        var extra=new SurfaceStyle(12,0,0,0,0,0,0,0,0,2,3,7,4,1,25);
+        assertTrue(extra.valid());assertEquals(extra,SurfaceStyle.decode(extra.encode()));
+        for(String bad:new String[]{"0,0,0,0,0,0,0,0,0,0,0,8,0,0,0","0,0,0,0,0,0,0,0,0,0,0,0,189,0,0","0,0,0,0,0,0,0,0,0,0,0,0,0,2,0","0,0,0,0,0,0,0,0,0,0,0,0,0,0,26"})assertNull(SurfaceStyle.decode(bad));
+        java.util.Set<String> names=new java.util.HashSet<>();for(var face:LockClockFonts.FACES){assertTrue(names.add(face.name()));assertFalse(face.category().isEmpty());}assertEquals(26,names.size());
         assertFalse(StatusBarStyle.STOCK.withSurfaces(null).valid());assertEquals(SurfaceStyle.STOCK,StatusBarStyle.STOCK.surfaces());
     }
 }
