@@ -6,6 +6,12 @@ The catalog carries Copyright (C) 2024 The Evolution X Project and Apache Licens
 
 Changes: resource filenames are prefixed `rising_fp_` to avoid collisions. Images and vector contents are unchanged. nubia-ly uses these as static idle lock-screen graphics; vendor biometric behavior is unchanged.
 
+## Animation collection
+
+The complete UdfpsAnimations catalog from the same upstream commit is included as 40 animation entries (None plus 39 effects), alongside the phone's Stock choice. Animation XML notices are retained under `animations/`. These include The AospExtended Project (2021), The Evolution X Project (2024), and the notices appearing in each original XML file.
+
+Animation frames are resampled to fit a 256 by 256 pixel tile without changing aspect ratio, centered on transparent tiles and packed into eight-column WebP atlases at quality 95. Thumbnail previews are resampled separately. The manifest records source frame names/hashes, sequence timing and packed atlas hashes. These are modified packaging derivatives, not byte-identical source images. Playback uses the vendor's native scan duration; the picker loops the source sequence timing. Artwork and trademarks remain the property of their respective owners.
+
 
 
                                  Apache License
@@ -209,3 +215,624 @@ Changes: resource filenames are prefixed `rising_fp_` to avoid collisions. Image
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+Original animation XML notices:
+
+warp.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_miui_normal_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_pureview_future_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_miui_aod_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_bubble_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+udfps_miui_pop_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_op_mclaren_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_genshin_fire_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+udfps_pureview_dna_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+magic.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_pureview_molecular_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+cyber.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+worm_hole.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+keqings.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2024 The Alphadroid Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_miui_pulse_recognizing_white_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2019 Extended-UI
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+udfps_op_scanning_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+pacman.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_op_energy_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+udfps_miui_star_cas_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_miui_pulse_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_rog_supernova_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The ShapeShiftOS Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+scan.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_op_ripple_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+udfps_swirl_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+udfps_stardust_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+bloom.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_miui_aurora_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_op_stripe_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+
+udfps_op_wave_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_pureview_halo_ring_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_miui_rhythm_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+none.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2024 The Evolution X Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+
+
+electronic.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+fireworks.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_miui_light_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+smoke.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_rog_fusion_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The ShapeShiftOS Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_miui_aurora_cas_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The Evolution X Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+udfps_rog_pulsar_recognizing_anim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2019-2020 The ShapeShiftOS Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+
+simple.xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The AospExtended Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->

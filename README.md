@@ -201,3 +201,8 @@ Individual fan, pump and refresh-rate hide options are grouped under Load indivi
 ### Quick Settings and lock-screen style batch — 0.1.25
 
 Quick Settings circle tiles now offer Stock, Square, Rounded square and Leaf shapes by changing only the inspected gradient's shape/corners. Wide top tiles retain stock shape and colors, tile state/actions and layout remain stock. Main/secondary tile labels and normal Nubia lock-screen clock/date each gain visual size, opacity, horizontal/vertical offset, rotation and hiding. The Quick Settings and Lock screen cards open the grouped appearance editor. These selections share the existing frozen identity-bound Enable/Restore flow. AOD/pulsing suspends lock-screen changes. See [combined checklist](docs/QS_LOCKSCREEN_BATCH.md). Phone testing is pending.
+
+
+### Fingerprint animation batch — 0.1.37
+
+A separate animation picker adds Stock, None and 39 RisingOS effects with looping previews. Scoped native-frame substitution preserves biometric timing and windows. Host validation passes; Android build and phone validation remain pending. See [implementation, limitations and one phone batch](docs/UDFPS_ANIMATIONS.md).

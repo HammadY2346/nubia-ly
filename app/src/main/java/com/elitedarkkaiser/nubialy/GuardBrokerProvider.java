@@ -40,9 +40,9 @@ public final class GuardBrokerProvider extends ContentProvider {
             if(GuardBrokerPolicy.FINGERPRINT_METHOD.equals(method)) {
                 String id=GuardReader.inspectEnabled();boolean allowed=RecoveryStore.enabledAllowed(getContext(),id);
                 SurfaceStyle style=allowed?StatusBarPreferences.active(getContext(),id).surfaces():SurfaceStyle.STOCK;
-                if(allowed&&(style.fingerprintStyle()!=0||style.fingerprintHidden()!=0))allowed=RecoveryStore.claimSensorStartup(getContext(),callerPid);
+                if(allowed&&(style.fingerprintStyle()!=0||style.fingerprintHidden()!=0||style.fingerprintAnimation()!=0))allowed=RecoveryStore.claimSensorStartup(getContext(),callerPid);
                 reply.putInt("status",allowed?GuardBrokerPolicy.READABLE:GuardBrokerPolicy.BLOCKED);
-                if(allowed){reply.putString("permit_id",id);reply.putLong("deadline_ms",android.os.SystemClock.elapsedRealtime()+ClockEnabledPolicy.HEALTH_MS);reply.putInt("fingerprint_style",style.fingerprintStyle());reply.putBoolean("fingerprint_hidden",style.fingerprintHidden()!=0);}
+                if(allowed){reply.putString("permit_id",id);reply.putLong("deadline_ms",android.os.SystemClock.elapsedRealtime()+ClockEnabledPolicy.HEALTH_MS);reply.putInt("fingerprint_animation",style.fingerprintAnimation());reply.putInt("fingerprint_style",style.fingerprintStyle());reply.putBoolean("fingerprint_hidden",style.fingerprintHidden()!=0);}
             } else if (GuardBrokerPolicy.ENABLED_METHOD.equals(method) || GuardBrokerPolicy.STARTUP_METHOD.equals(method)) {
                 String id = GuardReader.inspectEnabled();
                 boolean allowed = RecoveryStore.enabledAllowed(getContext(), id);

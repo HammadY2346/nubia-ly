@@ -33,7 +33,7 @@ final class SensorFingerprintBackend {
             if(owner.getDeclaredField("mSensorView").getType()!=ImageView.class||owner.getDeclaredField("isQuickShow").getType()!=boolean.class||manager.getDeclaredField("floatWindowAuthenticateSensorView").getType()!=owner||manager.getDeclaredMethod("showFromSystemUI").getReturnType()!=boolean.class||svc.getDeclaredField("mFloatWindowManager").getType()!=manager||svc.getDeclaredField("mIsDoze").getType()!=boolean.class||svc.getDeclaredField("mStateMachine").getType()!=machine||!machine.getDeclaredMethod("getState").getReturnType().isEnum())throw new IllegalStateException("SensorService signatures");
             XC_MethodHook observe=new XC_MethodHook(){
                 @Override protected void beforeHookedMethod(MethodHookParam p){if(main()&&p.thisObject.getClass()==machine&&((Method)p.method).getName().equals("handleTpActionDownState")){pressed=true;event("restore before press");for(ImageView view:new ArrayList<>(states.keySet()))restore(view);}}
-                @Override protected void afterHookedMethod(MethodHookParam p){if(!main())return;if(p.thisObject.getClass()==machine&&((Method)p.method).getName().equals("handleTpActionDownState"))pressed=false;if(p.hasThrowable())return;try{if(p.thisObject.getClass().getName().equals(SERVICE)){if(((Method)p.method).getName().equals("onDestroy")){end();knownGraphics.clear();service.clear();return;}service=new WeakReference<>(p.thisObject);}
+                @Override protected void afterHookedMethod(MethodHookParam p){if(!main())return;if(p.thisObject.getClass()==machine&&((Method)p.method).getName().equals("handleTpActionDownState"))pressed=false;if(p.hasThrowable())return;try{if(p.thisObject.getClass().getName().equals(SERVICE)){if(((Method)p.method).getName().equals("onDestroy")){end();SensorAnimationBackend.end();knownGraphics.clear();service.clear();return;}service=new WeakReference<>(p.thisObject);}
                     String method=((Method)p.method).getName();if((method.equals("setSensorViewAlpha")||method.equals("setAuthenticateViewAlpha"))&&p.args.length>0&&p.args[0] instanceof Number alpha&&alpha.floatValue()<=0)event("vendor alpha zero");
                     if(method.equals("setSensorViewVisible")&&p.args.length>0&&Boolean.FALSE.equals(p.args[0]))event("vendor view hidden");
                     if(method.equals("removeSensorView")||method.equals("removeAuthenticateSensorWindow"))event("vendor removes sensor window");refresh();}catch(Throwable failure){fail(failure);}}};
@@ -57,6 +57,13 @@ final class SensorFingerprintBackend {
         Object state=XposedHelpers.callMethod(machine,"getState");if(!(state instanceof Enum<?> value)){gate="state unavailable";return false;}
         gate=value.name().equals("INITIALIZED")?"idle":"state "+value.name();return gate.equals("idle");
     }catch(Throwable unavailable){gate="state read unavailable";return false;}}
+    static View animationTarget(){if(!main())return null;try{
+        Object svc=service.get();if(svc==null||Boolean.TRUE.equals(XposedHelpers.getObjectField(svc,"isFingerprintDisabled"))||Boolean.TRUE.equals(XposedHelpers.getObjectField(svc,"mIsDoze")))return null;
+        Object power=XposedHelpers.getObjectField(svc,"mPowerManager"),keyguard=XposedHelpers.getObjectField(svc,"mKeyguardManager"),manager=XposedHelpers.getObjectField(svc,"mFloatWindowManager"),machine=XposedHelpers.getObjectField(svc,"mStateMachine"),owner=owner();
+        if(power==null||keyguard==null||manager==null||machine==null||owner==null||!Boolean.TRUE.equals(XposedHelpers.callMethod(power,"isInteractive"))||!Boolean.TRUE.equals(XposedHelpers.callMethod(keyguard,"getKeyguardShowing"))||!Boolean.TRUE.equals(XposedHelpers.callMethod(manager,"showFromSystemUI"))||Boolean.TRUE.equals(XposedHelpers.getObjectField(owner,"isQuickShow")))return null;
+        Object state=XposedHelpers.callMethod(machine,"getState");if(!(state instanceof Enum<?> value)||!(value.name().equals("INITIALIZED")||value.name().equals("AUTHENTICATE")))return null;
+        Object animation=XposedHelpers.getObjectField(manager,"floatWindowAnimalView");if(animation==null)return null;Object view=XposedHelpers.getObjectField(animation,"authAnimal");return view instanceof View target?target:null;
+    }catch(Throwable unavailable){return null;}}
     static boolean apply(int selection,boolean hide,long until){
         if(!main()||!com.elitedarkkaiser.nubialy.FingerprintStyles.valid(selection)||until<=SystemClock.elapsedRealtime()||until-SystemClock.elapsedRealtime()>ClockEnabledPolicy.HEALTH_MS)return false;
         if(failed||!ready)return false;
@@ -81,7 +88,7 @@ final class SensorFingerprintBackend {
         int color=((Number)XposedHelpers.getObjectField(service.get(),"mKeyguardColor")).intValue();if((color>>>24)==0)color=0xffffffff;
         state.custom=hidden?null:new FingerprintGlyphDrawable(style,color);writing=true;try{background(view,state.custom);if(view.getBackground()!=state.custom)throw new IllegalStateException("Fingerprint background rejected");}finally{writing=false;}
     }
-    static void refresh(){if(!main()||!active||failed)return;try{
+    static void refresh(){if(main())SensorAnimationBackend.refresh();if(!main()||!active||failed)return;try{
         if(SystemClock.elapsedRealtime()>=deadline){event("guard expired");end();message="Fingerprint guard expired; stock restored";return;}
         ImageView current=image();boolean allowed=eligible();
         for(ImageView view:new ArrayList<>(states.keySet()))if(view!=current||!view.isAttachedToWindow()||!allowed){event("restore: "+(!allowed?gate:view!=current?"view replaced":"detached"));if(!restore(view))return;if(view!=current||!view.isAttachedToWindow())knownGraphics.remove(view);}

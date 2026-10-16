@@ -100,6 +100,7 @@ with tempfile.TemporaryDirectory(prefix='nubialy-statusbar-') as work:
         p=work/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
     files=[str(p) for p in work.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/StatusBarStyle.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/SurfaceStyle.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/LockClockFonts.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/StatusBarBackend.java')]
     files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintStyles.java'))
+    files.append(str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/FingerprintAnimations.java'))
     subprocess.run(['java','com.sun.tools.javac.Main','-d',str(work/'classes'),*files],check=True)
     for mode in [[],['apply'],['restore'],['transform-apply'],['transform-restore']]:
         subprocess.run(['java','-cp',str(work/'classes'),'com.elitedarkkaiser.nubialy.xposed.StatusBarTest',*mode],check=True)
