@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Looper;
 import android.view.ViewGroup;
-import com.elitedarkkaiser.nubialy.QsOutlineRenderer;
+import com.elitedarkkaiser.nubialy.QsTileEffects;
 import de.robv.android.xposed.*;
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -13,15 +13,15 @@ import java.util.*;
 final class QsOutlineBackend {
     private static final String WIDE="com.zte.qs.tileimpl.QSTileViewWide",CIRCLE="com.zte.qs.tileimpl.QSTileViewCircle";
     private static final Map<GradientDrawable,WeakReference<ViewGroup>> owners=new WeakHashMap<>();
-    private static XC_MethodHook.Unhook hook;private static boolean active,failed;private static long generation;
-    static void begin(int style){if(style<0||style>1)throw new IllegalArgumentException();if(!end())throw new IllegalStateException("QS outline cleanup failed");if(style==0)return;
+    private static XC_MethodHook.Unhook hook;private static boolean active,failed;private static long generation;private static int selectedStyle;
+    static void begin(int style){if(style<0||style>7)throw new IllegalArgumentException();if(!end())throw new IllegalStateException("QS outline cleanup failed");selectedStyle=style;if(style==0)return;
         final long ticket=++generation;
         try{hook=XposedHelpers.findAndHookMethod(GradientDrawable.class,"draw",Canvas.class,new XC_MethodHook(){
             @Override protected void beforeHookedMethod(MethodHookParam p){
                 if(!active||failed||Looper.myLooper()!=Looper.getMainLooper()||!(p.thisObject instanceof GradientDrawable drawable))return;
                 WeakReference<ViewGroup> ref=owners.get(drawable);ViewGroup owner=ref==null?null:ref.get();
                 if(!eligible(owner,drawable))return;
-                try{boolean rendered=QsOutlineRenderer.draw((Canvas)p.args[0],drawable,owner.getResources().getDisplayMetrics().density,
+                try{boolean rendered=QsTileEffects.draw(style,(Canvas)p.args[0],drawable,owner.getResources().getDisplayMetrics().density,
                     ()->active&&!failed&&generation==ticket&&eligible(owner,drawable),
                     ()->XposedBridge.invokeOriginalMethod(p.method,p.thisObject,p.args));
                     if(rendered)p.setResult(null);
@@ -45,5 +45,5 @@ final class QsOutlineBackend {
     private static void invalidateOwners(){for(var ref:new ArrayList<>(owners.values())){ViewGroup owner=ref.get();if(owner!=null)try{owner.invalidate();}catch(Throwable unavailable){failed=true;}}}
     static boolean end(){generation++;active=false;invalidateOwners();owners.clear();if(hook!=null)try{hook.unhook();hook=null;}catch(Throwable unavailable){failed=true;}return hook==null;}
     static boolean healthy(){return !failed;}
-    static String status(){return "QS outline: "+(active?"enabled":"stock")+"; tracked: "+owners.size()+(failed?"; decoration stopped after failure.":".");}
+    static String status(){return "QS tile style: "+selectedStyle+" "+(active?"enabled":"stock")+"; tracked: "+owners.size()+(failed?"; decoration stopped after failure.":".");}
 }
