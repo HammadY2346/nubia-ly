@@ -79,8 +79,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom); return insets;
         });
         var editorToolbar=PersonalizationUi.toolbar(this,"Personalizations");content.addView(editorToolbar);
-        ChipGroup sections=new ChipGroup(this);sections.setSingleSelection(true);content.addView(sections);
-        pages=new EditorPages(this,editorToolbar,sections,scroll);
+        pages=new EditorPages(this,editorToolbar,scroll);
         editorOverview("lock_screen","Lock screen",new String[][]{{"clock","Clock","Size, opacity & position"},{"date","Date","Visibility & placement"},{"fonts","Clock font styles","Preview your typography"},{"fingerprint","Fingerprint","Icons & animations"},{"widgets","Widgets","Weather, alarm & battery"},{"charging","Charging information","Battery voltage, current & temperature"}});
         editorOverview("quick_settings","Quick Settings",new String[][]{{"style","Tile style","Outline, depth & layered effects"},{"brightness","Brightness slider","Outline, depth & a slim track"},{"tiles","Tile shapes","Large & small tiles"},{"labels","Label styles","Main & secondary text"}});
         editorOverview("notifications","Notifications",new String[][]{{"styles","Notification styles","Card backgrounds & layers"},{"appearance","Appearance controls","Background opacity & rounded corners"},{"behavior","Notification controls","Heads-up, history & app settings"},{"icons","Counts & icon limits","Status-bar overflow & icon slots"}});
@@ -203,8 +202,6 @@ public final class ClockEditorActivity extends AppCompatActivity {
         dateChoices(dateFormats,"Date letter case",ClockDatePolicy.CASE_LABELS,3);
         dateFormats.addView(text("Date uses your stock locale and timezone. Position, separator and letter case affect only the added date; time keeps its stock format. Long dates add width. Press Enable to apply your saved choices.",14,false));
         String initial=state==null?getIntent().getStringExtra("section"):state.getString("editor_section");if(initial==null)initial=getIntent().getBooleanExtra("surfaces",false)?"quick_settings":"status_bar";
-        String[] sectionIds={"status_bar","quick_settings","lock_screen","volume","notifications","power_menu"},sectionNames={"Status bar","Quick Settings","Lock screen","Volume","Notifications","Power menu"};
-        for(int i=0;i<sectionIds.length;i++){final String id=sectionIds[i];Chip chip=new Chip(this);chip.setId(View.generateViewId());chip.setText(sectionNames[i]);chip.setCheckable(true);sections.addView(chip);chip.setChecked(id.equals(initial));chip.setOnClickListener(v->{pages.show(id,"");chip.setChecked(true);});}
         pages.show(initial,state==null?"":state.getString("editor_page",""));
         LinearLayout controls = card("Apply your style");
         ((android.view.ViewGroup)saveStatus.getParent()).removeView(saveStatus);controls.addView(saveStatus);
