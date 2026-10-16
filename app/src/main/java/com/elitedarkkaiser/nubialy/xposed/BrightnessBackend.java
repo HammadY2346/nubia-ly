@@ -16,9 +16,12 @@ final class BrightnessBackend {
     private static final String OWNER="com.zte.controlcenter.view.ToggleSliderView",SLIDER="com.android.systemui.settings.brightness.ToggleSeekBar";
     private record Entry(WeakReference<SeekBar> slider,WeakReference<Drawable> root){}
     private static final Map<GradientDrawable,Entry> leaves=new WeakHashMap<>();
+    private static final Map<SeekBar,Boolean> observed=new WeakHashMap<>();
     private static final List<XC_MethodHook.Unhook> hooks=new ArrayList<>();
     private static ClassLoader loader;private static boolean active,failed;private static long generation;private static int selection;
     static void install(ClassLoader value){loader=value;}
+    static void observe(View view){if(main()&&view instanceof SeekBar slider&&view.getClass().getName().equals(SLIDER)){observed.put(slider,true);if(active&&owned(slider))slider.invalidate();}}
+    static void release(View view){if(view instanceof SeekBar slider){observed.remove(slider);leaves.entrySet().removeIf(e->e.getValue().slider().get()==slider);}}
     private static boolean main(){return Looper.myLooper()==Looper.getMainLooper();}
     static void begin(int style){
         if(style<0||style>3||!main())throw new IllegalArgumentException();if(!end())throw new IllegalStateException("Brightness cleanup incomplete");selection=style;if(style==0)return;
@@ -37,7 +40,7 @@ final class BrightnessBackend {
                 SeekBar view=entry.slider().get();
                 try{if(BrightnessEffects.draw(style,(Canvas)p.args[0],d,view.getResources().getDisplayMetrics().density,()->active&&!failed&&generation==ticket&&eligible(entry,d),()->XposedBridge.invokeOriginalMethod(p.method,p.thisObject,p.args)))p.setResult(null);}
                 catch(Throwable unavailable){failed=true;invalidate();}
-            }}));active=true;
+            }}));active=true;invalidate();
         }catch(Throwable unavailable){failed=true;end();throw new IllegalStateException("Brightness styling unavailable",unavailable);}
     }
     private static boolean owned(SeekBar slider){
@@ -61,7 +64,7 @@ final class BrightnessBackend {
         if(!owned(slider))return;Drawable root=slider.getProgressDrawable();GradientDrawable[] parts=layers(root);if(parts==null)return;
         Entry entry=new Entry(new WeakReference<>(slider),new WeakReference<>(root));for(GradientDrawable part:parts){Entry other=leaves.get(part);if(other!=null&&other.slider().get()!=slider)throw new IllegalStateException("Shared brightness drawable");leaves.put(part,entry);}
     }
-    private static void invalidate(){Set<SeekBar> views=new HashSet<>();for(Entry entry:new ArrayList<>(leaves.values())){SeekBar view=entry.slider().get();if(view!=null&&views.add(view))try{view.invalidate();}catch(Throwable unavailable){failed=true;}}}
+    private static void invalidate(){Set<SeekBar> views=new HashSet<>(observed.keySet());for(Entry entry:new ArrayList<>(leaves.values())){SeekBar view=entry.slider().get();if(view!=null)views.add(view);}for(SeekBar view:views)try{if(owned(view))view.invalidate();}catch(Throwable unavailable){failed=true;}}
     static boolean end(){generation++;active=false;invalidate();leaves.clear();boolean removed=true;for(var hook:new ArrayList<>(hooks))try{hook.unhook();hooks.remove(hook);}catch(Throwable unavailable){removed=false;failed=true;}return removed;}
     static boolean healthy(){return !failed;}
     static String status(){return "Brightness style: "+selection+"; tracked layers: "+leaves.size()+(failed?"; styling stopped.":".");}
