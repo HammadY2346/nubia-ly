@@ -5,9 +5,14 @@ root=Path(__file__).resolve().parents[1]
 module=ast.parse((root/'tests/test_volume_backend.py').read_text());namespace={'__file__':str(root/'tests/test_volume_backend.py')}
 exec(compile(ast.Module(body=[n for n in module.body if not isinstance(n,ast.With)],type_ignores=[]),'volume-doubles','exec'),namespace)
 sources={k:v for k,v in namespace['sources'].items() if not k.endswith('VolumeTest.java')}
+sources["android/view/View.java"]=sources["android/view/View.java"].replace("public class View ","public class View ").replace("public boolean isAttachedToWindow()", "public int getWidth(){return 160;}public int getHeight(){return 80;}public boolean isAttachedToWindow()")
 sources.update({
+'android/graphics/Canvas.java':'package android.graphics;public class Canvas {public int draws;public boolean failOnce;public Runnable during;public int saveLayerAlpha(float l,float t,float r,float b,int a){return 1;}public int save(){return 2;}public void restoreToCount(int s){}public void clipOutPath(Path p){}public void drawColor(int c,PorterDuff.Mode mode){}}',
+'android/graphics/Path.java':'package android.graphics;public class Path {public enum Direction {CW}public void addRoundRect(RectF b,float x,float y,Direction d){}}',
+'android/graphics/Color.java':'package android.graphics;public class Color {public static final int TRANSPARENT=0;}',
+'android/graphics/PorterDuff.java':'package android.graphics;public class PorterDuff {public enum Mode {CLEAR}}',
 'android/graphics/Rect.java':'package android.graphics;public class Rect {}',
-'android/graphics/RectF.java':'package android.graphics;public class RectF {public RectF(Rect r){}public RectF(float l,float t,float r,float b){}}',
+'android/graphics/RectF.java':'package android.graphics;public class RectF {public RectF(Rect r){}public RectF(float l,float t,float r,float b){}public boolean isEmpty(){return false;}}',
 'android/graphics/drawable/Drawable.java':'package android.graphics.drawable;public class Drawable {public android.graphics.Rect getBounds(){return new android.graphics.Rect();}}',
 'com/elitedarkkaiser/nubialy/NotificationEffects.java':'package com.elitedarkkaiser.nubialy;public class NotificationEffects {public static int decorated;public static boolean draw(int style,android.graphics.Canvas c,android.graphics.RectF b,float[] r,float density,java.util.function.BooleanSupplier allowed,QsOutlineRenderer.NativeDraw stock)throws Throwable{if(!allowed.getAsBoolean())return false;stock.draw();if(allowed.getAsBoolean())decorated++;return true;}}',
 'com/android/systemui/statusbar/notification/row/NotificationBackgroundView.java':'''package com.android.systemui.statusbar.notification.row;import android.graphics.*;import android.graphics.drawable.Drawable;import de.robv.android.xposed.XposedBridge;public class NotificationBackgroundView extends android.view.View {public Drawable mBackground=new Drawable();public float[] mCornerRadii=new float[8];public void draw(Canvas c,Drawable d){Runnable original=()->{if(c.failOnce){c.failOnce=false;throw new IllegalStateException();}c.draws++;if(c.during!=null)c.during.run();};if(XposedBridge.bypass)original.run();else XposedBridge.run(this,NotificationBackgroundView.class,"draw",new Class<?>[]{Canvas.class,Drawable.class},new Object[]{c,d},original);}}''',
@@ -23,6 +28,6 @@ with tempfile.TemporaryDirectory(prefix='nubialy-notifications-') as folder:
  folder=Path(folder)
  for name,content in sources.items():
   p=folder/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
- files=[str(p) for p in folder.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/NotificationBackend.java')]
+ files=[str(p) for p in folder.rglob('*.java')]+[str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/xposed/NotificationBackend.java'),str(root/'app/src/main/java/com/elitedarkkaiser/nubialy/NotificationControls.java')]
  subprocess.run(['java','com.sun.tools.javac.Main','-d',str(folder/'classes'),*files],check=True)
  subprocess.run(['java','-cp',str(folder/'classes'),'com.elitedarkkaiser.nubialy.xposed.NotificationTest'],check=True)

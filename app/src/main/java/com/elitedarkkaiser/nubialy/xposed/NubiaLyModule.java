@@ -16,7 +16,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public final class NubiaLyModule implements IXposedHookLoadPackage, de.robv.android.xposed.IXposedHookZygoteInit {
     private static String modulePath;
     @Override public void initZygote(StartupParam startup){modulePath=startup.modulePath;}
-    private static void loadFingerprintArtwork(){try{if(modulePath!=null){android.content.res.Resources artwork=android.content.res.XModuleResources.createInstance(modulePath,null);FingerprintGlyphDrawable.artworkResources(artwork);com.elitedarkkaiser.nubialy.FingerprintAnimationArtwork.resources(artwork);}}catch(Throwable unavailable){XposedBridge.log("nubia-ly: fingerprint artwork unavailable; imported icons remain blocked.");}}
+    private static void loadFingerprintArtwork(){try{if(modulePath!=null){android.content.res.Resources artwork=android.content.res.XModuleResources.createInstance(modulePath,null);FingerprintGlyphDrawable.artworkResources(artwork);com.elitedarkkaiser.nubialy.ConnectivityStyles.resources(artwork);com.elitedarkkaiser.nubialy.FingerprintAnimationArtwork.resources(artwork);}}catch(Throwable unavailable){XposedBridge.log("nubia-ly: fingerprint artwork unavailable; imported icons remain blocked.");}}
     @Override public void handleLoadPackage(XC_LoadPackage.LoadPackageParam param) {
         if ("com.elitedarkkaiser.nubialy".equals(param.packageName)
                 && "com.elitedarkkaiser.nubialy".equals(param.processName)) {

@@ -20,7 +20,7 @@ final class EditorPreview extends View {
             if(!s.hide(2))drawText(c,"12:34",180,100,54,s.appearance(2),s.position(2),0xfff1e8ff);
             paint.setTypeface(Typeface.create("sans-serif",0));if(!s.hide(3))drawText(c,"Thursday, 15 October",180,130,13,s.appearance(3),s.position(3),0xffeee6f5);
             String widgets="";if((s.widgetsHidden()&1)==0)widgets+="21°  ";if((s.widgetsHidden()&2)==0)widgets+="Alarm 7:00  ";if((s.widgetsHidden()&4)==0)widgets+="85%";
-            plain(c,widgets,180,160,12,0xffd9d1e1);
+            plain(c,widgets,180,160,12,0xffd9d1e1);if(s.chargingInfo()!=0){plain(c,"Super charging · 85%",180,181,10,0xffded3fa);plain(c,"Battery 4.420 V · +2,350 mA · 36.5 °C",180,197,9,0xffded3fa);}
             if(s.fingerprintHidden()==0){var icon=s.fingerprintStyle()==0?getContext().getDrawable(R.drawable.rising_fp_udfps_icon_default):new com.elitedarkkaiser.nubialy.xposed.FingerprintGlyphDrawable(s.fingerprintStyle(),0xffded3fa);if(icon!=null){icon.setBounds(159,209,201,251);icon.draw(c);}}
         }else if(section.equals("quick_settings")){
             for(int i=0;i<4;i++){float x=20+(i%2)*164,y=18+(i/2)*65;paint.setColor(i==0?0xffd3cbef:0xff55545f);shape(c,x,y,156,55,s.largeTileShape());
@@ -28,7 +28,8 @@ final class EditorPreview extends View {
                 if(!s.hide(1))drawText(c,i==0?"Connected":"Off",x+78,y+43,9,s.appearance(1),s.position(1),i==0?0xff514965:0xffc8c2d0);
             }
             for(int i=0;i<6;i++){paint.setColor(i==0?0xffd3cbef:0xff68646f);shape(c,23+i*54,151,34,22,s.tileShape());}
-        }else if(section.equals("notifications")){NotificationStylePreview.paint(c,s.notificationStyle(),360,height,1);
+        }else if(section.equals("notifications")){NotificationStylePreview.paint(c,s.notificationStyle(),360,height,1,s.notificationAppearance());
+        }else if(section.equals("power_menu")){PowerStylePreview.paint(c,s.powerStyle(),360,height,1);
         }else if(section.equals("volume")){VolumeStylePreview.paint(c,s.volumeStyle(),360,height,1);
         }else{
             paint.setTypeface(Typeface.create(ClockStylePolicy.familyName(d.family),(d.bold?1:0)|(d.italic?2:0)));

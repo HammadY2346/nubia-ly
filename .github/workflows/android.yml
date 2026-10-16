@@ -34,6 +34,7 @@ jobs:
           python3 tests/test_brightness_backend.py
           python3 tests/test_volume_backend.py
           python3 tests/test_notification_backend.py
+          python3 tests/test_personalization_controls.py
           python3 tests/test_fingerprint_catalog.py
           python3 tests/test_fingerprint_backend.py
           python3 tests/test_sensor_fingerprint_backend.py

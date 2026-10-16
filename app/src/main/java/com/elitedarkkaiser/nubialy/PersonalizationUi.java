@@ -36,6 +36,7 @@ final class PersonalizationUi {
         LinearLayout notificationColumn=new LinearLayout(a);notificationColumn.setOrientation(LinearLayout.VERTICAL);
         if(!stacked){volumeRow.addView(notificationColumn,new LinearLayout.LayoutParams(0,-2,1));}else dashboard.addView(notificationColumn,new LinearLayout.LayoutParams(-1,-2));
         notificationColumn.addView(tile(a,"Notifications","Card styles & layers",4,()->open.accept("notifications"),62),new LinearLayout.LayoutParams(-1,-2));
+        LinearLayout.LayoutParams powerParams=new LinearLayout.LayoutParams(-1,-2);powerParams.topMargin=dp(a,12);notificationColumn.addView(tile(a,"Power menu","Button styles",5,()->open.accept("power_menu"),62),powerParams);
         return dashboard;
     }
     private static MaterialCardView tile(Activity a,String title,String summary,int kind,Runnable action,int previewHeight){
@@ -51,6 +52,7 @@ final class PersonalizationUi {
         private final int kind;private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
         Artwork(Context c,int kind){super(c);this.kind=kind;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
         @Override protected void onDraw(Canvas canvas){super.onDraw(canvas);float w=getWidth(),h=getHeight();if(w<=0||h<=0)return;
+            if(kind==5){PowerStylePreview.paint(canvas,0,w,h,getResources().getDisplayMetrics().density);return;}
             if(kind==3){VolumeStylePreview.paint(canvas,0,w,h,getResources().getDisplayMetrics().density);return;}
             canvas.save();canvas.scale(w/160f,h/((kind==0||kind==3)?238f:62f));
             if(kind==0){
