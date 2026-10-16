@@ -24,6 +24,7 @@ final class SystemIconPackBackend {
     private static final Map<ImageView,Boolean> targets=new WeakHashMap<>();
     private static final Map<Integer,String> resourceKeys=new HashMap<>();
     private static final List<XC_MethodHook.Unhook> draws=new ArrayList<>();
+    private static Class<?> qsIconClass;
     private static java.lang.reflect.Method drawMethod;
     private static int pack,drawCount;private static boolean ready,active;
     private static boolean main(){return Looper.myLooper()==Looper.getMainLooper();}
@@ -40,13 +41,14 @@ final class SystemIconPackBackend {
         try{String id=image.getResources().getResourceEntryName(image.getId());if(id.equals("wifi_signal")||id.equals("mobile_signal"))return false;}catch(Throwable absent){}
         View v=image;boolean qs=false;for(int i=0;i<18&&v!=null;i++){
         String name=v.getClass().getName();if(name.equals("com.android.systemui.statusbar.phone.NotificationIconContainer"))return false;
-        if(name.equals("com.android.systemui.qs.tileimpl.QSIconViewImpl"))qs=true;
+        if(qsIconClass!=null&&qsIconClass.isInstance(v))qs=true;
         if(name.equals("com.android.systemui.statusbar.phone.PhoneStatusBarView"))return true;
         if(qs)return true;
         v=v.getParent() instanceof View parent?parent:null;
     }return false;}
     static void observe(View view){if(!main()||!(view instanceof ImageView image))return;targets.remove(image);sources.remove(image);artwork.remove(image);if(scope(image)){targets.put(image,true);if(active)image.invalidate();}}
     static void install(ClassLoader loader){try{
+        qsIconClass=XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSIconViewImpl",loader);
         XposedBridge.hookMethod(Resources.class.getDeclaredMethod("getDrawableForDensity",int.class,int.class,Resources.Theme.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(main()&&!p.hasThrowable()&&p.getResult() instanceof Drawable d)remember(d,resourceKey((Resources)p.thisObject,(Integer)p.args[0]));}});
         XposedBridge.hookMethod(ImageView.class.getDeclaredMethod("setImageResource",int.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(!main()||p.hasThrowable())return;ImageView image=(ImageView)p.thisObject;String k=resourceKey(image.getResources(),(Integer)p.args[0]);if(k!=null){remember(image.getDrawable(),k);sources.put(image,new Source(image.getDrawable(),k));}}});
         drawMethod=ImageView.class.getDeclaredMethod("onDraw",Canvas.class);ready=true;

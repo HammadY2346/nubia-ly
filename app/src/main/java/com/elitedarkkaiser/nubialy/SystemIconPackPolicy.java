@@ -7,7 +7,7 @@ public final class SystemIconPackPolicy {
         if(name==null)return null;
         int wifi=ConnectivityResourcePolicy.level(true,name);
         if(wifi>=0)return "wifi_"+wifi;
-        if(name.matches("ic_qs_wifi_[0-4]"))return "wifi_"+name.charAt(name.length()-1);
+        if(name.matches("ic_qs_wifi_(?:[4-7]_)?[0-4]"))return "wifi_"+name.charAt(name.length()-1);
         if(name.matches("ic_signal_cellular_[0-4]_4_bar"))return "signal_"+name.charAt(19);
         return switch(name){
             case "qs_airplane_icon_on","qs_airplane_icon_off","intl_ic_qs_airplane","stat_sys_airplane_mode","ic_signal_airplane","ic_qs_airplane" -> "airplane";
