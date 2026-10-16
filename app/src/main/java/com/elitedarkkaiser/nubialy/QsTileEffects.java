@@ -31,7 +31,7 @@ public final class QsTileEffects {
                 }
                 case 5->gradient(canvas,b,p,0x60000000,0x00000000,false);
                 case 6->{
-                    p.setColor(0x30000000);canvas.drawRect(b,p);p.setColor(0x48ffffff);float inset=4*unit;RectF capsule=new RectF(b.left+inset,b.top+inset,b.left+inset+Math.min(b.height()-2*inset,b.width()*0.40f),b.bottom-inset);canvas.drawRoundRect(capsule,capsule.height()/2,capsule.height()/2,p);
+                    p.setColor(0x30000000);canvas.drawRect(b,p);p.setColor(0x48ffffff);float inset=4*unit;RectF capsule=new RectF(b.left+inset,b.top+inset,b.left+inset+Math.min(b.height()-2*inset,b.width()-2*inset),b.bottom-inset);canvas.drawRoundRect(capsule,capsule.height()/2,capsule.height()/2,p);
                 }
                 case 7->{gradient(canvas,b,p,0x0cffffff,0x10000000,false);bevel(canvas,tile,b,p,1.5f*unit,0x65ffffff,0x35000000);}
                 default->throw new IllegalArgumentException();
