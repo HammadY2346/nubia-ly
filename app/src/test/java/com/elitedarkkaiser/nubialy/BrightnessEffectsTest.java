@@ -13,12 +13,12 @@ import static org.junit.Assert.*;
 public final class BrightnessEffectsTest {
     @Test public void nativeClipStillDeterminesProgressAtEveryLevel()throws Throwable{
         for(int style=1;style<=3;style++)for(int level:new int[]{0,1,2500,5000,9999,10000}){
-            GradientDrawable fill=new GradientDrawable();fill.setColor(Color.GREEN);fill.setCornerRadius(16);fill.setBounds(0,0,160,40);
+            final int selected=style;
+            GradientDrawable fill=new GradientDrawable(){@Override public void draw(Canvas c){try{assertTrue(BrightnessEffects.draw(selected,c,this,1,()->true,()->super.draw(c)));}catch(Throwable failure){throw new AssertionError(failure);}}};fill.setColor(Color.GREEN);fill.setCornerRadius(16);fill.setBounds(0,0,160,40);
             ClipDrawable clip=new ClipDrawable(fill,Gravity.LEFT,ClipDrawable.HORIZONTAL);clip.setBounds(0,0,160,40);clip.setLevel(level);
             Bitmap bitmap=Bitmap.createBitmap(160,40,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(bitmap);int count=canvas.getSaveCount();
-            // ClipDrawable establishes its native clip before dispatching GradientDrawable.draw.
-            int saved=canvas.save();if(level==0)canvas.clipRect(0,0,0,40);else canvas.clipRect(0,0,160-(160*(10000-level)/10000),40);
-            assertTrue(BrightnessEffects.draw(style,canvas,fill,1,()->true,()->fill.draw(canvas)));canvas.restoreToCount(saved);
+            // Exercise the real platform ClipDrawable and its zero-level early return.
+            clip.draw(canvas);
             assertEquals(count,canvas.getSaveCount());assertEquals(level,clip.getLevel());assertSame(fill,clip.getDrawable());assertEquals(new Rect(0,0,160,40),fill.getBounds());
             int end=level==0?0:160-(160*(10000-level)/10000);for(int x=end;x<160;x++)for(int y=0;y<40;y++)assertEquals(0,bitmap.getPixel(x,y));
             if(level>=5000)assertTrue(Color.alpha(bitmap.getPixel(40,20))>0);
