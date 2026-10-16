@@ -375,7 +375,7 @@ public final class ClockEditorActivity extends AppCompatActivity {
     private void editorOverview(String section,String title,String[][] items){
         LinearLayout preview=editorPanel(section,"preview",title+" preview");
         EditorPreview artwork=new EditorPreview(this,section,()->new EditorPreview.Draft(currentStatusBar(),selected,iconColor,sizePercent,bold,italic,hidden,fontFamily,spacing/100f));
-        editorPreviews.add(artwork);preview.addView(artwork,new LinearLayout.LayoutParams(-1,dp(section.equals("lock_screen")?280:section.equals("quick_settings")?180:100)));
+        editorPreviews.add(artwork);preview.addView(artwork,new LinearLayout.LayoutParams(-1,dp(section.equals("lock_screen")?280:section.equals("quick_settings")?180:section.equals("volume")?220:100)));
         preview.addView(text("Draft preview · sample content",12,false));
         LinearLayout overview=editorPanel(section,"", "Make it yours");
         for(String[] item:items){

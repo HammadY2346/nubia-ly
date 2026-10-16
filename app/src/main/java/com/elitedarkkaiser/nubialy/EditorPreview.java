@@ -11,7 +11,7 @@ final class EditorPreview extends View {
     private int tileStyle;
     private final String section;private final Supplier<Draft> draft;private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
     EditorPreview(Context context,String section,Supplier<Draft> draft){super(context);this.section=section;this.draft=draft;setContentDescription("Illustrative "+section.replace('_',' ')+" draft preview");}
-    @Override protected void onDraw(Canvas c){super.onDraw(c);if(getWidth()==0)return;Draft d=draft.get();SurfaceStyle s=d.bar.surfaces();tileStyle=s.qsStyle();float height=section.equals("lock_screen")?280:section.equals("quick_settings")?180:100;
+    @Override protected void onDraw(Canvas c){super.onDraw(c);if(getWidth()==0)return;Draft d=draft.get();SurfaceStyle s=d.bar.surfaces();tileStyle=s.qsStyle();float height=section.equals("lock_screen")?280:section.equals("quick_settings")?180:section.equals("volume")?220:100;
         c.save();c.scale(getWidth()/360f,getHeight()/height);
         paint.setShader(new LinearGradient(0,0,360,height,new int[]{0xff494253,0xff272932,0xff414a50},null,Shader.TileMode.CLAMP));c.drawRoundRect(0,0,360,height,28,28,paint);paint.setShader(null);
         if(section.equals("lock_screen")){
