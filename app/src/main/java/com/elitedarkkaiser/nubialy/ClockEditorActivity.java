@@ -633,8 +633,9 @@ public final class ClockEditorActivity extends AppCompatActivity {
     }
     private void shapeControls(LinearLayout parent,String title,boolean large){
         parent.addView(text(title,18,true));
-        String[] names={"Stock","Square","Rounded square","Leaf"};
+        String[] names={"Stock","Square","Rounded square","Leaf","Pill"};
         java.util.List<MaterialCardView> cards=new java.util.ArrayList<>();
+        final Slider[] roundRef=new Slider[1];final TextView[] roundLabelRef=new TextView[1];
         boolean stacked=getResources().getConfiguration().fontScale>1.3f||getResources().getConfiguration().screenWidthDp<360;
         LinearLayout row=null;
         for(int i=0;i<names.length;i++){
@@ -643,12 +644,19 @@ public final class ClockEditorActivity extends AppCompatActivity {
             MaterialCardView card=new MaterialCardView(this);card.setRadius(dp(24));card.setCardElevation(0);card.setCardBackgroundColor(getColor(R.color.surface_container_high));card.setClickable(true);card.setFocusable(true);card.setTag("tile-shape:"+(large?"large:":"small:")+value);
             LinearLayout body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setGravity(Gravity.CENTER);body.setPadding(dp(14),dp(16),dp(14),dp(10));body.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
             View sample=new View(this);GradientDrawable shape=new GradientDrawable();shape.setColor(getColor(R.color.primary));
-            if(i==3)shape.setCornerRadii(new float[]{dp(22),dp(22),dp(2),dp(2),dp(22),dp(22),dp(2),dp(2)});else shape.setCornerRadius(dp(i==1?2:i==2?12:28));sample.setBackground(shape);body.addView(sample,new LinearLayout.LayoutParams(dp(large?90:48),dp(48)));
+            if(i==3)shape.setCornerRadii(new float[]{dp(22),dp(22),dp(2),dp(2),dp(22),dp(22),dp(2),dp(2)});else shape.setCornerRadius(dp(i==1?2:i==2?12:i==4?24:28));sample.setBackground(shape);body.addView(sample,new LinearLayout.LayoutParams(dp(large?90:48),dp(48)));
             TextView label=text(names[i],14,false);label.setGravity(Gravity.CENTER);body.addView(label);card.addView(body);cards.add(card);statusControls.add(card);
             LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(stacked?-1:0,-2,stacked?0:1);params.setMargins(dp(4),dp(4),dp(4),dp(4));row.addView(card,params);
-            card.setOnClickListener(v->{if(large)largeTileShape=value;else tileShape=value;for(int n=0;n<cards.size();n++){MaterialCardView option=cards.get(n);boolean checked=n==value;option.setStrokeWidth(dp(checked?3:0));option.setStrokeColor(getColor(R.color.primary));option.setSelected(checked);option.setContentDescription(names[n]+(checked?", selected":""));}saveStatusBar();});
+            card.setOnClickListener(v->{if(large)largeTileShape=value;else tileShape=value;for(int n=0;n<cards.size();n++){MaterialCardView option=cards.get(n);boolean checked=n==value;option.setStrokeWidth(dp(checked?3:0));option.setStrokeColor(getColor(R.color.primary));option.setSelected(checked);option.setContentDescription(names[n]+(checked?", selected":""));}if(roundRef[0]!=null){roundRef[0].setValue(0);roundLabelRef[0].setText("Custom roundness: off");}saveStatusBar();});
         }
         int selection=large?largeTileShape:tileShape;for(int i=0;i<cards.size();i++){MaterialCardView card=cards.get(i);card.setStrokeWidth(dp(i==selection?3:0));card.setStrokeColor(getColor(R.color.primary));card.setSelected(i==selection);card.setContentDescription(title+", "+names[i]+(i==selection?", selected":""));}
+        int currentShape=large?largeTileShape:tileShape;int custom0=currentShape>=100?currentShape-100:0;
+        TextView roundLabel=text(custom0==0?"Custom roundness: off":"Custom roundness: "+custom0+"%",15,true);parent.addView(roundLabel);roundLabelRef[0]=roundLabel;
+        Slider round=new Slider(this);round.setValueFrom(0);round.setValueTo(50);round.setStepSize(2);round.setValue(custom0);parent.addView(round);statusControls.add(round);roundRef[0]=round;
+        round.addOnChangeListener((sl,value,fromUser)->{if(!fromUser)return;int v=(int)value;
+            if(v>0){if(large)largeTileShape=100+v;else tileShape=100+v;for(MaterialCardView c:cards){c.setStrokeWidth(dp(0));c.setSelected(false);}}
+            else{if(large)largeTileShape=0;else tileShape=0;for(int n=0;n<cards.size();n++){MaterialCardView c=cards.get(n);boolean ck=n==0;c.setStrokeWidth(dp(ck?3:0));c.setStrokeColor(getColor(R.color.primary));c.setSelected(ck);}}
+            roundLabel.setText(v==0?"Custom roundness: off":"Custom roundness: "+v+"%");saveStatusBar();});
     }
     private SurfaceStyle currentSurfaces(){return new SurfaceStyle(surfaceHidden,surfaceAppearance[0],surfaceAppearance[1],surfaceAppearance[2],surfaceAppearance[3],surfacePosition[0],surfacePosition[1],surfacePosition[2],surfacePosition[3],tileShape,largeTileShape,widgetsHidden,fingerprintStyle,fingerprintHidden,lockClockFont,fingerprintAnimation,qsStyle,brightnessStyle,volumeStyle,notificationStyle,wifiStyle,signalStyle,powerStyle,notificationAppearance,notificationBehavior,chargingInfo,batteryStyle,batteryPercent,batteryCharge,notificationCount,notificationLimit,qsColumns,qsRows,qsOptions,iconPack);}
     private void surfaceControls(LinearLayout parent,String title,int group){
