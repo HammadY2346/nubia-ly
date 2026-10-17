@@ -47,16 +47,16 @@ public final class MainActivity extends AppCompatActivity {
         content.addView(label("Personalizations", 34, true));
         content.addView(label("Your REDMAGIC. Your style.", 16, false));
         spacer(24);
-        if (!CompatibilityPolicy.isNx809j(Build.MODEL, Build.DEVICE)) {
+        if (!CompatibilityPolicy.isSupportedDevice(Build.MODEL, Build.DEVICE)) {
             content.addView(label("Device not supported", 24, true));
-            content.addView(label("This first release is restricted to REDMAGIC 11 Pro (NX809J).", 16, false));
+            content.addView(label("This build supports REDMAGIC 11 Pro (NX809J) and REDMAGIC 10 Pro / 10S Pro (NX789J) on Android 15 or 16.", 16, false));
             MaterialButton close = button("Close app");
             close.setOnClickListener(v -> finish());
             content.addView(close);
             return;
         }
         int setupStart=content.getChildCount();
-        LinearLayout device = card("Your device", "REDMAGIC 11 Pro · NX809J");
+        LinearLayout device = card("Your device", (Build.MODEL != null && Build.MODEL.startsWith("NX789J") ? "REDMAGIC 10 Pro / 10S Pro · " : "REDMAGIC 11 Pro · ") + Build.MODEL + " · Android " + Build.VERSION.RELEASE);
         compatibility = label("Firmware has not been checked.", 15, false);
         device.addView(compatibility);
         inspectButton = button("Check firmware");
