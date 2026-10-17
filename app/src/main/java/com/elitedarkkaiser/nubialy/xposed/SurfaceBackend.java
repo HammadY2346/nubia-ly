@@ -25,7 +25,7 @@ final class SurfaceBackend {
     private static final Map<ViewGroup,Boolean> roots=new WeakHashMap<>();
     private static final Map<View,State> states=new WeakHashMap<>();
     private static final List<XC_MethodHook.Unhook> hooks=new ArrayList<>();
-    private static boolean attempted,ready,active,writing;private static volatile boolean failed;private static long generation;
+    private static boolean attempted,ready,active,writing,liveKeyguard;private static volatile boolean failed;private static long generation;
     private static SurfaceStyle style=SurfaceStyle.STOCK;private static int captured,restored;private static String message="Surface observers unavailable.";
     private record Target(ViewGroup owner,int group){}
     private record Frame(long generation,State state){}
@@ -54,9 +54,17 @@ final class SurfaceBackend {
             if(clip.getSuperclass()!=base||!TextView.class.isAssignableFrom(clip.getDeclaredField("mDateView").getType()))throw new IllegalStateException("Clip date signature");
             for(String field:new String[]{"mClockHourView","mClockMinuteView","mClockMinuteMaskView"})if(!TextView.class.isAssignableFrom(clip.getDeclaredField(field).getType()))throw new IllegalStateException("Clip clock signature");
             stage="live keyguard host fields";
-            Class<?> live=XposedHelpers.findClass(LIVE,loader),item=XposedHelpers.findClass(ITEM,loader);
-            if(live.getSuperclass()!=GridLayout.class||live.getDeclaredField("mClockLayout").getType()!=item||live.getDeclaredField("mDarkAmount").getType()!=float.class||item.getSuperclass()!=LinearLayout.class||item.getDeclaredField("mScene").getType()!=int.class||!item.getDeclaredField("mClock").getType().getName().equals("com.zte.mifavor.keyguard.settings.LockScreenClockStyleInterface"))throw new IllegalStateException("Live keyguard signatures");
-            List<Class<?>> lifecycleOwners=new ArrayList<>(Arrays.asList(wide,circle,lock,content,art,normal,clip,live,item));
+            // Optional: the NX809J (RM11) live lock-screen clock host
+            // com.zte.mifavor.keyguard.KeyguardStatusView is absent on some firmware
+            // (NX789J/Android 15 keeps mClockLayout on KeyguardStatusViewAdapt instead).
+            // When its exact signature is missing, skip only the live-clock sub-feature;
+            // every other surface still installs and applies.
+            List<Class<?>> lifecycleOwners=new ArrayList<>(Arrays.asList(wide,circle,lock,content,art,normal,clip));
+            try{
+                Class<?> live=XposedHelpers.findClass(LIVE,loader),item=XposedHelpers.findClass(ITEM,loader);
+                if(live.getSuperclass()!=GridLayout.class||live.getDeclaredField("mClockLayout").getType()!=item||live.getDeclaredField("mDarkAmount").getType()!=float.class||item.getSuperclass()!=LinearLayout.class||item.getDeclaredField("mScene").getType()!=int.class||!item.getDeclaredField("mClock").getType().getName().equals("com.zte.mifavor.keyguard.settings.LockScreenClockStyleInterface"))throw new IllegalStateException("Live keyguard signatures");
+                lifecycleOwners.add(live);lifecycleOwners.add(item);liveKeyguard=true;
+            }catch(Throwable liveUnavailable){liveKeyguard=false;}
             for(String name:WIDGET_TYPES){Class<?> widget=XposedHelpers.findClass(WIDGET+name,loader);if(!LinearLayout.class.isAssignableFrom(widget))throw new IllegalStateException("Widget signature");lifecycleOwners.add(widget);}
             stage="view lifecycle hooks";
             observers.add(XposedBridge.hookMethod(View.class.getDeclaredMethod("onAttachedToWindow"),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(ready&&!p.hasThrowable()&&main()){try{NotificationIconBackend.observe((View)p.thisObject);ConnectivityBackend.observe((View)p.thisObject);SystemIconPackBackend.observe((View)p.thisObject);NotificationBackend.observe((View)p.thisObject);BrightnessBackend.observe((View)p.thisObject);target((View)p.thisObject);if(active)track((View)p.thisObject);}catch(Throwable unavailable){if(active)fail(unavailable);}}}}));
