@@ -150,6 +150,9 @@ public final class ClockEditorActivity extends AppCompatActivity {
         LinearLayout brightnessPanel=editorPanel("quick_settings","brightness","Brightness slider");brightnessStyleControls(brightnessPanel);
         LinearLayout surfaces=editorPanel("quick_settings","tiles","Tile shapes");
         surfaces.addView(text("Choose independent shapes for large and small tiles. Label appearance keeps tile actions unchanged. Press Enable to apply saved choices.",14,false));
+        MaterialButton oneui=button("Apply One UI-style look");surfaces.addView(oneui);statusControls.add(oneui);
+        surfaces.addView(text("One tap: pill large & small tiles, filled tile style and a denser 5-column grid. Tweak anything afterwards, then press Enable. Panel pull-down stays stock.",13,false));
+        oneui.setOnClickListener(v->{tileShape=4;largeTileShape=4;qsStyle=0;qsColumns=5;final StatusBarStyle value=currentStatusBar();enabled(false);worker.execute(()->{boolean saved=StatusBarPreferences.save(getApplicationContext(),value);runOnUiThread(()->{if(alive()){if(saved){finish();startActivity(new android.content.Intent(this,ClockEditorActivity.class).putExtra("surfaces",true).putExtra("section","quick_settings"));}else{enabled(true);saveStatus.setText("Could not apply the One UI-style preset.");}}});});});
         shapeControls(surfaces,"Large QS tiles",true);
         shapeControls(surfaces,"Small QS tiles",false);
         surfaces.addView(text("Large QS tiles are the four wide tiles at the top. Small QS tiles are the tiles below brightness. Each group has its own shape. Press Enable to apply.",14,false));
