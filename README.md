@@ -19,12 +19,12 @@
 
 **nubia-ly brings an Iconify-inspired customization experience to stock Nubia/REDMAGIC System UI**, with a RisingOS-inspired Material interface. Make the status bar, Quick Settings, lock screen, notifications, volume panel and power menu feel like yours—then finish with a systemless boot animation.
 
-Built and phone-tested on the **REDMAGIC 11 Pro (NX809J), running stock Android 16**, with a community port to the **REDMAGIC 10 Pro / 10S Pro (NX789J) on Android 15/16** by **HammadY2346**. Each area has its own dashboard entry and focused editor, with visual choices, saved drafts and explicit application.
+Built and phone-tested on the **REDMAGIC 11 Pro (NX809J), running stock Android 16**, with a community port to the **REDMAGIC 10 Pro / 10S Pro (NX789J) on Android 15/16** by **Hammad Yasin**. Each area has its own dashboard entry and focused editor, with visual choices, saved drafts and explicit application.
 
 nubia-ly is a standalone app. [Redmagic 11 Toolbox](https://github.com/austineyoung2000/Redmagic-11-Toolbox) handles hardware, gaming, cooling and lighting; nubia-ly handles personalization. They have separate packages, modules and release lifecycles.
 
 > [!IMPORTANT]
-> Support targets **NX809J stock Android 16** (original) and **NX789J / REDMAGIC 10 Pro & 10S Pro on Android 15 and 16** (community port by HammadY2346). Other REDMAGIC models, custom ROMs and firmware revisions need separate validation. Root access and Vector are required for System UI customization. The boot-animation loader additionally checks the supported KernelSU setup and exact firmware player.
+> Support targets **NX809J stock Android 16** (original) and **NX789J / REDMAGIC 10 Pro & 10S Pro on Android 15 and 16** (community port by Hammad Yasin). Other REDMAGIC models, custom ROMs and firmware revisions need separate validation. Root access and Vector are required for System UI customization. The boot-animation loader additionally checks the supported KernelSU setup and exact firmware player.
 
 ## Screenshots
 
@@ -204,6 +204,6 @@ Pinned boot assets are prepared by CI before Android compilation. See [asset pro
 - **[Vector / JingMatrix](https://github.com/JingMatrix/Vector)** and the **[Xposed API](https://api.xposed.info/)** — runtime framework and hook API.
 - **[Android Open Source Project](https://source.android.com/)** and **[Material Components](https://github.com/material-components/material-components-android)** — platform and native interface components.
 - **EliteDarkKaiser / Austin Young** and device testers — NX809J research, implementation and phone validation.
-- **HammadY2346** — REDMAGIC 10 Pro / 10S Pro (NX789J) port, Android 15/16: device & SDK gates, SELinux root-assisted guard read, dual-firmware live lock-screen clock host, and Pill / custom-roundness / One UI-style QS tiles. Phone-tested on NX789J.
+- **Hammad Yasin** — REDMAGIC 10 Pro / 10S Pro (NX789J) port, Android 15/16: device & SDK gates, SELinux root-assisted guard read, dual-firmware live lock-screen clock host, and Pill / custom-roundness / One UI-style QS tiles. Phone-tested on NX789J.
 
 Upstream notices and asset provenance remain with their respective files in [`third_party/`](third_party/) and the app's bundled notices. Credits do not grant a blanket license to third-party artwork. Proprietary stock firmware/APKs supplied for inspection are not distributed in this repository.
