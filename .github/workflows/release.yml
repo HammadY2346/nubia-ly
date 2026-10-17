@@ -38,7 +38,7 @@ jobs:
           import re
           text = Path('app/build.gradle.kts').read_text()
           assert re.search(r'versionName\s*=\s*"1\.0\.0"', text), 'Expected 1.0.0'
-          assert re.search(r'versionCode\s*=\s*69\b', text), 'Expected version code 69'
+          assert re.search(r'versionCode\s*=\s*70\b', text), 'Expected version code 70'
           PY
           if gh release view v1.0.0 >/dev/null 2>&1; then
             echo 'exists=true' >> "$GITHUB_OUTPUT"

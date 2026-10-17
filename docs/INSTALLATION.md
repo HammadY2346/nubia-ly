@@ -24,7 +24,7 @@ After later reboots, saved **enabled** features resume in the background after t
 
 ## Updating from a test build
 
-Install the official signed APK over the existing installation to preserve settings. Version 1.0.0 uses version code 69 and the same persistent project signing key as the official signed test builds. Replace the guard only if its version changed or it is absent; this release uses guard 0.1.15. Reboot after updating to load the new runtime code.
+Install the official signed APK over the existing installation to preserve settings. Version 1.0.0 uses version code 70 and the same persistent project signing key as the official signed test builds. Replace the guard only if its version changed or it is absent; this release uses guard 0.1.15. Reboot after updating to load the new runtime code.
 
 If Android reports a signature conflict, check whether the installed app came from an ephemeral/unsigned fork build. Official and fork signing keys can differ; Android cannot update one with the other. Uninstalling removes local app settings, so do not uninstall simply to resolve an unknown installer error.
 

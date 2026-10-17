@@ -16,6 +16,9 @@ import java.util.*;
 /** Draw-only, scoped replacement. Native drawables and their state are never mutated. */
 final class SystemIconPackBackend {
     private record Source(Drawable drawable,String key){}
+    private record Tile(String spec,boolean transientState,String stateKey){}
+    private static final Map<Object,String> soundModes=new WeakHashMap<>();
+    private static final Map<ImageView,Tile> tiles=new WeakHashMap<>();
     private record Art(String key,Drawable drawable){}
     private static final Map<Drawable,String> drawableKeys=new WeakHashMap<>();
     private static final Map<Drawable.ConstantState,String> stateKeys=new WeakHashMap<>();
@@ -76,6 +79,17 @@ final class SystemIconPackBackend {
             View v=image;for(int i=0;i<8&&v!=null;i++){if(qsIconClass!=null&&qsIconClass.isInstance(v)){int color=XposedHelpers.getIntField(v,"mTint");return color==0?null:color;}v=v.getParent() instanceof View parent?parent:null;}
         }catch(Throwable unsupported){}return null;
     }
+    private static void tileChanged(ImageView image,Object state){
+        try{String spec=(String)XposedHelpers.getObjectField(state,"spec");String stateKey; synchronized(soundModes){stateKey=soundModes.get(state);}
+            if("rotation".equals(spec))stateKey=(Boolean)XposedHelpers.getObjectField(state,"value")?"rotate":"portrait";
+            tiles.put(image,new Tile(spec,(Boolean)XposedHelpers.getObjectField(state,"isTransient"),stateKey));}catch(Throwable absent){tiles.remove(image);}
+        boundChanged(image);
+    }
+    private static String resolvedKey(ImageView image,Drawable nativeIcon){
+        String nativeKey=boundKey(image);if(nativeKey==null)nativeKey=key(nativeIcon);
+        Tile tile=tiles.get(image);
+        return tile==null?nativeKey:SystemIconPackPolicy.tileKey(tile.spec(),tile.transientState(),tile.stateKey()!=null?tile.stateKey():nativeKey);
+    }
     private static void boundChanged(ImageView image){sources.remove(image);if(active&&image.isAttachedToWindow())image.invalidate();}
     private static boolean scope(ImageView image){
         try{String id=image.getResources().getResourceEntryName(image.getId());if(id.equals("wifi_signal")||id.equals("mobile_signal"))return false;}catch(Throwable absent){}
@@ -93,10 +107,16 @@ final class SystemIconPackBackend {
         drawableResourceIconClass=XposedHelpers.findClass("com.android.systemui.qs.tileimpl.QSTileImpl$DrawableIconWithRes",loader);
         statusIconClass=XposedHelpers.findClass("com.android.systemui.statusbar.StatusBarIconView",loader);
         Class<?> state=XposedHelpers.findClass("com.android.systemui.plugins.qs.QSTile$State",loader);
-        XposedBridge.hookMethod(qsIconClass.getDeclaredMethod("updateIcon",ImageView.class,state,boolean.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(main()&&!p.hasThrowable())boundChanged((ImageView)p.args[0]);}});
+        XposedBridge.hookMethod(qsIconClass.getDeclaredMethod("updateIcon",ImageView.class,state,boolean.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(main()&&!p.hasThrowable())tileChanged((ImageView)p.args[0],p.args[1]);}});
         XposedBridge.hookMethod(statusIconClass.getDeclaredMethod("updateDrawable",boolean.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(main()&&!p.hasThrowable())boundChanged((ImageView)p.thisObject);}});
         XposedBridge.hookMethod(Resources.class.getDeclaredMethod("getDrawableForDensity",int.class,int.class,Resources.Theme.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(main()&&!p.hasThrowable()&&p.getResult() instanceof Drawable d)remember(d,resourceKey((Resources)p.thisObject,(Integer)p.args[0]));}});
-        XposedBridge.hookMethod(ImageView.class.getDeclaredMethod("setImageResource",int.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(!main()||p.hasThrowable())return;ImageView image=(ImageView)p.thisObject;String k=resourceKey(image.getResources(),(Integer)p.args[0]);if(k!=null){remember(image.getDrawable(),k);sources.put(image,new Source(image.getDrawable(),k));}}});
+        XposedBridge.hookMethod(ImageView.class.getDeclaredMethod("setImageResource",int.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){if(!main()||p.hasThrowable())return;ImageView image=(ImageView)p.thisObject;String k=resourceKey(image.getResources(),(Integer)p.args[0]);if(k!=null){remember(image.getDrawable(),k);sources.remove(image);}}});
+        try{Class<?> sound=XposedHelpers.findClass("com.zte.qs.tiles.SoundVibrateTile",loader);
+            Class<?> booleanState=XposedHelpers.findClass("com.android.systemui.plugins.qs.QSTile$BooleanState",loader);
+            XposedBridge.hookMethod(sound.getDeclaredMethod("handleUpdateState",booleanState,Object.class),new XC_MethodHook(){@Override protected void afterHookedMethod(MethodHookParam p){
+                if(p.hasThrowable())return;try{int mode=XposedHelpers.getIntField(p.thisObject,"mCurrentMode");synchronized(soundModes){soundModes.put(p.args[0],mode==0?"silent":mode==1?"vibrate":"ring");}}catch(Throwable unsupported){}
+            }});
+        }catch(Throwable unavailable){/* Other firmware can still resolve verified native ringer aliases. */}
         drawMethod=ImageView.class.getDeclaredMethod("onDraw",Canvas.class);ready=true;
     }catch(Throwable unavailable){ready=false;}}
     static void begin(int value){if(!main()||!SystemIconPacks.valid(value))throw new IllegalArgumentException();end();pack=value;drawCount=qsBindings=statusBindings=tintSkips=0;unmatched.clear();sources.clear();if(value==0)return;if(!ready)throw new IllegalStateException("Icon pack observer unavailable");
@@ -104,7 +124,7 @@ final class SystemIconPackBackend {
             if(!active||!main())return;ImageView image=(ImageView)p.thisObject;if(!image.isAttachedToWindow())return;
             Boolean target=targets.get(image);if(target==null){target=scope(image);targets.put(image,target);}if(!target)return;
             Drawable nativeIcon=image.getDrawable();if(nativeIcon==null)return;
-            Source source=sources.get(image);if(source==null||source.drawable()!=nativeIcon){String k=boundKey(image);if(k==null)k=key(nativeIcon);source=new Source(nativeIcon,k);if(k==null&&unmatched.size()<6)unmatched.add(nativeIcon.getClass().getSimpleName());sources.put(image,source);}if(source.key()==null)return;
+            Source source=sources.get(image);if(source==null||source.drawable()!=nativeIcon){String k=resolvedKey(image,nativeIcon);source=new Source(nativeIcon,k);if(k==null&&unmatched.size()<6)unmatched.add(nativeIcon.getClass().getSimpleName());sources.put(image,source);}if(source.key()==null)return;
             try{Art cached=artwork.get(image);if(cached==null||!cached.key().equals(source.key())){Drawable d=SystemIconPacks.artwork(pack,source.key());if(d==null)return;cached=new Art(source.key(),d);artwork.put(image,cached);}
                 Drawable d=cached.drawable();d.setColorFilter(null);if(image.getImageTintList()!=null)d.setTint(image.getImageTintList().getColorForState(image.getDrawableState(),image.getImageTintList().getDefaultColor()));else{ColorFilter filter=image.getColorFilter();if(filter==null)filter=nativeIcon.getColorFilter();if(filter==null){Integer color=boundColor(image);if(color==null){tintSkips++;return;}d.setTint(color);}else{d.setTintList(null);d.setColorFilter(filter);}}
                 Rect bounds=nativeIcon.getBounds();if(bounds.isEmpty())return;d.setBounds(bounds);d.setAlpha(image.getImageAlpha());d.setState(image.getDrawableState());d.setLayoutDirection(image.getLayoutDirection());
