@@ -171,7 +171,7 @@ public final class MainActivity extends AppCompatActivity {
         LinearLayout setup=foldout("Setup & device", "Firmware, root access and Vector",false);for(View v:setupViews)setup.addView(v);
         LinearLayout tools=foldout("Recovery & diagnostics", "Restore tools, guard checks and technical details",false);for(View v:recoveryViews)tools.addView(v);
         refreshSafetyStatus();
-        content.addView(label(BuildConfig.VERSION_NAME+" · nubia-ly", 12, false));
+        content.addView(label(BuildConfig.VERSION_NAME+" · nubia-ly · NX809J + NX789J · RM10 port: HammadY2346", 12, false));
     }
 
     @Override protected void onResume() {
