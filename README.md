@@ -12,7 +12,7 @@
 ![Root](https://img.shields.io/badge/Root-required-ffbe98?style=flat-square)
 ![Framework](https://img.shields.io/badge/Framework-Vector-bdb1ff?style=flat-square)
 
-[**Download builds**](https://github.com/austineyoung2000/nubia-ly/actions/workflows/android.yml) · [**Installation**](#installation) · [**Features**](#features) · [**Report an issue**](https://github.com/austineyoung2000/nubia-ly/issues)
+[**Releases**](https://github.com/austineyoung2000/nubia-ly/releases) · [**Installation**](#installation) · [**Features**](#features) · [**Report an issue**](https://github.com/austineyoung2000/nubia-ly/issues)
 
 </div>
 
@@ -25,11 +25,24 @@ nubia-ly is a standalone app. [Redmagic 11 Toolbox](https://github.com/austineyo
 > [!IMPORTANT]
 > Support currently targets **NX809J stock Android 16 only**. Other REDMAGIC models, custom ROMs and firmware revisions need separate validation. Root access and Vector are required for System UI customization. The boot-animation loader additionally checks the supported KernelSU setup and exact firmware player.
 
+## Screenshots
+
+<table>
+  <tr>
+    <th>Icon pack picker</th>
+    <th>Quick Settings layout</th>
+  </tr>
+  <tr>
+    <td align="center"><img src=".github/screenshots/icon-packs.jpg" width="260" alt="nubia-ly icon pack picker with visual style cards" /></td>
+    <td align="center"><img src=".github/screenshots/quick-settings.jpg" width="260" alt="REDMAGIC Quick Settings with a customized six-large-tile and five-column layout" /></td>
+  </tr>
+</table>
+
 ## Features
 
 | Area | Make it yours |
 | --- | --- |
-| **Status bar** | Clock fonts, color, size, weight, seconds, spacing and dates; individual icon visibility; icon colors, opacity and placement; Wi-Fi and mobile signal artwork. |
+| **Status bar** | Clock fonts, color, size, weight, seconds, spacing and dates; individual icon visibility; icon colors, opacity and placement; Wi-Fi and mobile signal artwork; 16 coordinated Status bar/QS icon packs. |
 | **Battery** | Stock plus 24 alternatives, inside/outside/hidden percentage, charging-symbol visibility and adjustable size. |
 | **Quick Settings** | Independent portrait/landscape grids, native large-tile arrangements, label position and line limits, brightness placement and sun-icon visibility; separate large/small tile shapes, outline/layered treatments and brightness-slider styles. |
 | **Lock screen** | Clock/date appearance, built-in clock fonts, fingerprint icons and animations, plus measured charging diagnostics beneath the stock charging message. |
@@ -47,6 +60,12 @@ nubia-ly is a standalone app. [Redmagic 11 Toolbox](https://github.com/austineyo
 - **Systemless boot artwork:** the original animation archive stays untouched. A verified file bind supplies the chosen archive for the next boot.
 
 Tile actions, volume levels, biometric authentication and power actions remain controlled by the native firmware. Quick Settings uses the existing native tile views and pager; tile size and spacing controls are not exposed.
+
+### Shared icon packs
+
+Open **Status bar → Icon packs** to choose Stock or one of 16 RisingOS families: Acherus, Aurora, Circular, Filled, Gradicon, Kai, Lorn, Nostalgic, OxygenOS, Outline, Plumpy, Pavlova UI, Rounded, Sam, Victor and Xperia. Standard Quick Settings tiles are matched by function, including REDMAGIC resource aliases. Data uses the pack’s signal glyph. Quick Share, Device controls and QR scanning are included, plus nubia-ly companion glyphs for Game Space, Light Strip, fan and liquid cooling. Missing upstream artwork uses documented family-weight fallback vectors. Existing independent Wi-Fi and mobile-signal choices stay available and override the pack in the Status bar when a non-stock style is selected.
+
+Selection saves a draft; **Enable customization** applies it. Unsupported resources, connectivity warnings and transitional states keep their native artwork. Pack coverage varies; this does not replace application notification icons, firmware APKs or system files. Restore and the guard revoke draw-time styling, and enabled choices use the existing saved-feature resume flow.
 
 ### Quick Settings layouts
 
@@ -70,17 +89,19 @@ Selections save a draft until **Enable customization**. **Restore stock appearan
 | Runtime framework | [Vector](https://github.com/JingMatrix/Vector) with a compatible Zygisk environment |
 | Companion module | **nubia-ly Recovery Guard**, installed through your root manager |
 | App package | `com.elitedarkkaiser.nubialy` |
-| Current app / guard | `0.1.65-lifecycle` (66) / `0.1.15` (16) |
+| Current app / guard | `1.0.0` (70) / `0.1.15` (16) |
 
 Recommended Vector scopes are **System UI** (`com.android.systemui`) and **Fingerprint SensorService** (`com.fingerprint.sensorservice`). The latter is used for the firmware's separate fingerprint renderer. These are the app's declared scopes.
 
 ## Installation
 
-1. Open [GitHub Actions](https://github.com/austineyoung2000/nubia-ly/actions/workflows/android.yml) and select a **successful build from `main`**.
-2. Download `nubia-ly-signed-test-apk` or `nubia-ly-signed-release-apk`, plus `nubia-ly-guard-test-module` from that run. GitHub may require sign-in to download artifacts.
-3. Extract the downloaded artifact archives. Install the **APK**, then install the **inner guard module ZIP** through your root manager. Do not flash GitHub's outer artifact ZIP.
-4. Enable nubia-ly in Vector, keep its declared scopes selected, grant root access in your root manager and **reboot**.
-5. Open nubia-ly and check **Setup & device**. Choose styles, then press **Enable customization** to apply them.
+1. Download **`nubia-ly-v1.0.0.apk`** and **`nubia-ly-guard-v0.1.15.zip`** from [GitHub Releases](https://github.com/austineyoung2000/nubia-ly/releases). Use the APK and companion module assets; GitHub's source-code archives are not installable modules.
+2. Install the APK. Open your root manager's **Modules** page and install the guard ZIP, then enable the module.
+3. In **Vector → Modules**, enable **nubia-ly**. Keep **System UI** (`com.android.systemui`) and **Fingerprint SensorService** (`com.fingerprint.sensorservice`) selected in its scope.
+4. Reboot, unlock the phone and open nubia-ly. Grant its root request, then check **Setup & device** for the module/runtime status.
+5. Choose your styles. Press **Enable customization** to apply the saved choices. The enabled features resume in the background after the first unlock on later boots; the dashboard does not need to stay open.
+
+See the [complete installation and update guide](docs/INSTALLATION.md) for framework prerequisites, upgrades, test builds and recovery. Official release APKs use the persistent project signing key; release assets include `SHA256SUMS.txt` for download verification.
 
 For an existing installation upgraded to the first-unlock resume build, press Enable once to capture the enabled clock settings. Later boots restore the saved enabled state without requiring another Apply.
 

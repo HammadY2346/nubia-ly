@@ -9,6 +9,7 @@ sources['de/robv/android/xposed/XC_MethodHook.java']=sources['de/robv/android/xp
 sources['de/robv/android/xposed/XposedBridge.java']=sources['de/robv/android/xposed/XposedBridge.java'].replace('public static boolean bypass;', '''public static java.util.Set<XC_MethodHook.Unhook> hookAllConstructors(Class<?> c,XC_MethodHook h){return java.util.Set.of();}
 public static Object call(Object o,Class<?> c,String name,Class<?>[] types,Object[] args,java.util.function.Supplier<Object> original){try{var m=c.getDeclaredMethod(name,types);var p=new XC_MethodHook.MethodHookParam();p.thisObject=o;p.method=m;p.args=args;var list=new ArrayList<>(hooks.getOrDefault(m,List.of()));for(var cb:list)cb.beforeHookedMethod(p);if(!p.skip)p.result=original.get();Collections.reverse(list);for(var cb:list)cb.afterHookedMethod(p);return p.result;}catch(Throwable e){throw new RuntimeException(e);}}
 public static boolean bypass;''')
+sources['com/elitedarkkaiser/nubialy/SystemIconPacks.java']='package com.elitedarkkaiser.nubialy;public class SystemIconPacks {public static final String[] NAMES={"Stock","Acherus"};public static boolean valid(int p){return p>=0&&p<=16;}public static android.graphics.drawable.Drawable artwork(int p,String key){return new android.graphics.drawable.Drawable();}}'
 sources.update({
 'android/graphics/ColorFilter.java':'package android.graphics;public class ColorFilter {}',
 'android/graphics/Rect.java':'package android.graphics;public class Rect {public boolean isEmpty(){return false;}}',
