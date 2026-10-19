@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        <item>cn.nubia.gameassist</item>
+        <item>cn.nubia.gamelauncher</item>
+        <item>cn.nubia.gamehelpmodule</item>
+        <item>cn.nubia.gamelab</item>
+        <item>cn.nubia.gamehighlights</item>
+        <item>com.zte.beautify</item>
+        <item>com.zte.fingerprints</item>
+        <item>com.fingerprint.sensorservice</item>
+        <item>com.zte.mifavor.launcher</item>
+        <item>com.android.systemui</item>
+        <item>com.hammad.rmtweaks</item>
+    </string-array>
+</resources>
