@@ -4,7 +4,7 @@ on:
     branches: [rm-tweaks]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,7 +23,24 @@ jobs:
       - name: Install SDK
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Build
-        run: gradle --no-daemon assembleRelease
+        id: build
+        run: |
+          set -o pipefail
+          gradle --no-daemon assembleRelease 2>&1 | tee build.log
+      - name: Publish build log (on failure)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          grep -n -E "error:|e: |warning: \[|FAILED|What went wrong|Caused by|\.java:[0-9]+" build.log | head -300 > build-errors.txt || true
+          tail -120 build.log >> build-errors.txt
+          B64=$(base64 -w0 build-errors.txt)
+          SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/ci-logs/last-build-errors.txt?ref=rm-tweaks" --jq .sha 2>/dev/null || true)
+          if [ -n "$SHA" ]; then
+            gh api -X PUT "repos/${GITHUB_REPOSITORY}/contents/ci-logs/last-build-errors.txt" -f message="ci: build errors ${GITHUB_SHA::7} [skip ci]" -f content="$B64" -f branch=rm-tweaks -f sha="$SHA" >/dev/null
+          else
+            gh api -X PUT "repos/${GITHUB_REPOSITORY}/contents/ci-logs/last-build-errors.txt" -f message="ci: build errors ${GITHUB_SHA::7} [skip ci]" -f content="$B64" -f branch=rm-tweaks >/dev/null
+          fi
       - name: Rename
         run: |
           mkdir -p out

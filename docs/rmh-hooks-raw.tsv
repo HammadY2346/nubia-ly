@@ -1,0 +1,338 @@
+file	line	nearest_class	method	params
+A3/a.java	162		getInstance	
+A3/a.java	170		getCurrentUserInfo	
+A3/a.java	184		getSrcId	tVar
+A3/a.java	220		setDownloadTime	k.b0(new Object[]{String.class})
+A3/a.java	227		isFree	tVar
+A3/a.java	235		getIsCharge	tVar
+A3/a.java	243		isTimeLimitFree	tVar
+A3/a.java	253		getInstance	
+A3/a.java	264		setDownloadTime	k.b0(new Object[]{String.class})
+A3/a.java	271		isFree	tVar
+A3/a.java	279		getIsCharge	tVar
+A3/a.java	287		isTimeLimitFree	tVar
+A3/a.java	297		getInstance	
+A3/a.java	313		setFuncAndExec	k.b0(new Object[]{Runnable.class, String.class})
+A3/a.java	319		setDownloadTime	k.b0(new Object[]{String.class})
+A3/a.java	326		isFree	tVar
+A3/a.java	332		getIsCharge	tVar
+A3/a.java	338		isTimeLimitFree	tVar
+A3/a.java	347		getInstance	
+A3/a.java	360		startDownloadTask	k.b0(new Object[]{cls14, cls12})
+A3/a.java	365		downloadResource	k.b0(new Object[]{String.class})
+A3/a.java	369		trackResourceClickEvent	k.b0(new Object[]{cls2, String.class})
+A3/a.java	382		startDownloadTask	k.b0(new Object[]{cls14, cls12, String.class})
+A3/a.java	387		downloadResource	k.b0(new Object[]{String.class})
+A3/a.java	391		trackResourceClickEvent	k.b0(new Object[]{cls2, String.class})
+A3/a.java	411		setDownloadTime	k.b0(new Object[]{String.class})
+A3/a.java	418		isFree	tVar
+A3/a.java	426		getIsCharge	tVar
+A3/a.java	434		isTimeLimitFree	tVar
+A3/a.java	445		getInstance	
+A3/b.java	70		getSrcId	tVar
+A3/b.java	77		isFree	tVar
+A3/b.java	84		getIsCharge	tVar
+A3/b.java	91		isTimeLimitFree	tVar
+A3/b.java	98		getInstance	
+A3/b.java	102		getCurrentUserInfo	
+A3/b.java	109		doDownload	k.b0(new Object[]{String.class, cls4})
+A3/b.java	119		doDownload	k.b0(new Object[]{String.class, cls4})
+A3/b.java	127		doDownload	k.b0(new Object[]{String.class, cls4})
+A3/c.java	193	androidx.preference.TwoStatePreference	getPreferenceKey	
+A3/c.java	284	androidx.preference.TwoStatePreference	isChecked	
+A3/c.java	289	androidx.preference.TwoStatePreference	isChecked	
+A3/c.java	321	androidx.preference.TwoStatePreference	setChecked	k.b0(new Object[]{Boolean.TYPE})
+A3/c.java	413		getFromType	t.f4873d
+A3/c.java	636		getResolvedLongPressOnPowerBehavior	tVar
+A3/c.java	675		getDefaultApplication	k.b0(new Object[]{String.class})
+A3/c.java	700	android.app.role.ASSISTANT	performHapticFeedback	k.b0(new Object[]{cls, String.class})
+A3/c.java	706	android.app.role.ASSISTANT	showGlobalActions	tVar
+A3/c.java	733	android.app.role.ASSISTANT	performHapticFeedback	k.b0(new Object[]{cls, String.class})
+A3/c.java	739		showGlobalActions	tVar
+A3/c.java	754		performHapticFeedback	k.b0(new Object[]{cls, String.class})
+A3/c.java	759		launchAssist	k.b0(new Object[]{Bundle.class})
+A3/c.java	779		getTileLabel	
+A3/c.java	798	cn.nubia.gameassist.performance.PerformanceModeController	setBiabloModeEnable	k.b0(new Object[]{String.class, cls2, cls2})
+A3/c.java	813	cn.nubia.gameassist.performance.PerformanceModeController	isOpenSuperResolution	
+A3/c.java	821	cn.nubia.gameassist.performance.PerformanceModeController	getPerformanceMode	k.b0(new Object[]{String.class})
+A3/c.java	827	cn.nubia.gameassist.performance.PerformanceModeController	setBiabloModeEnable	k.b0(new Object[]{String.class, cls2, cls2})
+A3/c.java	865	cn.nubia.gameassist.performance.PerformanceModeController	getCurrentPkg	
+A3/c.java	960		updateBattery	
+A3/d.java	97		getSrcId	tVar
+A3/d.java	107		isFree	tVar
+A3/d.java	113		getInstance	
+A3/d.java	120		getCurrentUserInfo	
+A3/d.java	130		setDownloadTime	k.b0(new Object[]{String.class})
+A3/d.java	135		getInstance	
+A3/d.java	151		startDownloadTask	
+A3/d.java	161		startDownloadTask	
+A3/e.java	32	com.zte.beautify.model.remote.zteaccount.ZteAccountManager	themeDownload	k.b0(new Object[]{cls})
+A3/e.java	43	com.zte.beautify.view.common.preview.BeautyPreviewActivity$OnlineResourceDownloadListener	ResourceDownload	k.b0(new Object[]{cls})
+A3/e.java	52	com.zte.beautify.model.local.data.Bean	getIsCharge	tVar
+A3/e.java	63	com.zte.beautify.model.remote.zteaccount.ZteAccountManager	aodDownload	tVar
+A3/g.java	65	com.zte.beautify.view.common.tools.Utilities	getThemeResourceFeature	t.f4873d
+A3/g.java	70	com.zte.beautify.view.common.tools.Utilities	getStringSystemProperties	k.b0(new Object[]{String.class})
+B2/a.java	20	com.android.settings.datetime.TimePreferenceController	getSummary	
+B3/a.java	483	android.os.UpdateEngine	applyPayload	M3.k.b0(new Object[]{String.class, cls2, cls2, cls})
+P2/b.java	23		onTimeChanged	
+S2/g.java	36			
+T0/C.java	229	com.android.server.wifi.WifiSettingsStore	isAirplaneSensitive	
+T0/C.java	240	com.android.server.wifi.WifiCountryCode	setTelephonyCountryCode	M3.k.b0(new Object[]{String.class})
+T0/C.java	254	com.android.server.wifi.WifiNative	setStaMacAddress	M3.k.b0(new Object[]{String.class, MacAddress.class})
+T0/C.java	268	com.android.server.wifi.WifiNative	setApMacAddress	M3.k.b0(new Object[]{String.class, MacAddress.class})
+T0/C.java	279	com.android.server.bluetooth.BluetoothManagerService	onAirplaneModeChanged	
+V2/a.java	34	com.android.server.locksettings.LockSettingsStrongAuth	rescheduleStrongAuthTimeoutAlarm	
+V2/a.java	42	com.android.server.power.ThermalManagerService	onTemperatureChanged	k.b0(new Object[]{"android.os.Temperature", Boolean.TYPE})
+W2/b.java	128	com.android.server.SystemServiceManager	loadClassFromLoader	M3.k.b0(new Object[]{String.class, ClassLoader.class})
+W2/b.java	160	com.android.server.wm.InputMonitor	getTouchOcclusionMode	
+W2/b.java	189	com.android.server.notification.NotificationAttentionHelper$Signals	buzzBeepBlinkLocked	M3.k.b0(new Object[]{h9, h10})
+W2/b.java	195	com.android.server.notification.NotificationAttentionHelper$Signals	clearSoundLocked	
+W2/b.java	212	com.android.server.datacollection.ZteTrackManager	init	M3.k.b0(new Object[]{Context.class})
+W2/b.java	217	com.android.server.datacollection.ZteTrackManager	init	M3.k.b0(new Object[]{Context.class})
+W2/b.java	229	com.android.server.wm.WindowState	isSecureLocked	
+W2/b.java	245	android.window.ScreenCaptureInternal$CaptureArgs	nativeCaptureDisplay	
+W2/b.java	249	android.window.ScreenCaptureInternal$CaptureArgs	nativeCaptureLayers	
+W2/b.java	265	android.window.ScreenCapture$CaptureArgs	nativeCaptureDisplay	
+W2/b.java	269	android.window.ScreenCapture$CaptureArgs	nativeCaptureLayers	
+W2/b.java	281	com.android.server.display.DisplayControl	createVirtualDisplay	
+W2/b.java	292	android.view.SurfaceControl	createDisplay	
+W2/b.java	303	com.android.server.display.VirtualDisplayAdapter	createVirtualDisplayLocked	
+W2/b.java	313	com.android.server.wm.ActivityTaskManagerService	registerScreenCaptureObserver	
+W2/b.java	324	com.android.server.wm.WindowManagerService	registerScreenRecordingCallback	
+W2/b.java	334	android.window.ScreenCapture$ScreenshotHardwareBuffer	containsSecureLayers	
+W2/b.java	346	android.view.SurfaceControl	nativeSetFlags	M3.k.b0(new Object[]{cls, cls, cls2, cls2})
+W2/b.java	357	com.android.server.power.PowerManagerService	getScreenOffTimeoutLocked	M3.k.b0(new Object[]{cls3, cls3})
+W2/b.java	369	android.util.apk.ApkSignatureVerifier	getMinimumSignatureSchemeVersionForTargetSdk	M3.k.b0(new Object[]{Integer.TYPE})
+W2/b.java	386	com.android.server.policy.PhoneWindowManager	powerLongPress	M3.k.b0(new Object[]{Long.TYPE})
+W2/b.java	399	com.android.server.wm.AlertWindowNotification	post	
+W2/b.java	403	com.android.server.wm.AlertWindowNotification	onPostNotification	
+W2/b.java	415	com.android.server.pm.ResolveIntentHelper	isCtsTesting	
+W2/b.java	431	android.app.WindowReplyUtils	isForceSupportWhiteListForWR	M3.k.b0(new Object[]{String.class})
+W2/b.java	443	com.android.server.wm.ActivityTaskManagerService	isReachWrMaxSizeForMulti	
+W2/b.java	466	com.android.systemui.usb.UsbDebuggingActivity	onCreate	M3.k.b0(new Object[]{Bundle.class})
+W2/b.java	499	com.android.server.audio.AudioService	checkSafeMediaVolume	
+W2/b.java	505	com.android.server.audio.AudioService	checkSafeMediaVolume	
+W2/b.java	509	com.android.server.audio.AudioService	raiseVolumeDisplaySafeMediaVolume	
+W2/b.java	512	com.android.server.audio.AudioService	willDisplayWarningAfterCheckVolume	
+W2/h.java	76	com.android.server.audio.AudioService	checkNoteAppOp	
+W2/h.java	81	com.android.server.audio.AudioService	volumeAdjustmentAllowedByDnd	
+W2/h.java	86	com.android.server.audio.AudioService	onPlaybackConfigChange	
+W2/h.java	100	com.android.server.audio.AudioService	adjustStreamVolume	
+W2/h.java	105	com.android.server.audio.AudioService	setStreamVolume	
+W2/l.java	280	com.android.server.wm.ActivityTaskManagerService	windowReplySizeForMulti	tVar3
+W2/l.java	303	com.android.server.wm.ActivityTaskManagerService	getFreeformRootTasksVisibleListWrForMulti	tVar3
+W2/l.java	333	com.android.server.wm.TaskDisplayAreaMifavor	alertMessageForReachMultiWrMaxSizeWr	M3.k.b0(new Object[]{"com.android.server.wm.ActivityTaskManagerService"})
+W2/l.java	363	com.android.server.wm.ActivityTaskSupervisor	startActivityFromRecents	M3.k.b0(new Object[]{cls, cls, cls, "com.android.server.wm.SafeActivityOptions"})
+W2/l.java	373	com.android.server.wm.SafeActivityOptions	startActivityFromRecentsForWR	M3.k.b0(new Object[]{cls, cls, cls, cls, "com.android.server.wm.SafeActivityOptions"})
+W2/l.java	424	com.android.server.wm.TaskDisplayAreaMifavor	checkTaskSupportForCompWr	M3.k.b0(new Object[]{Context.class, ComponentName.class})
+W2/l.java	449	com.android.server.wm.TaskDisplayAreaMifavor	checkTaskSupportWr	M3.k.b0(new Object[]{Context.class, "com.android.server.wm.Task"})
+W2/l.java	472	com.android.server.wm.Task	isSupportWindowReplyState	M3.k.b0(new Object[]{"com.android.server.wm.ActivityRecord", Context.class})
+W2/l.java	484	com.android.server.wm.ActivityRecord	isSupportWindowReplyState	M3.k.b0(new Object[]{"com.android.server.wm.Task", Context.class})
+W2/l.java	495	com.android.server.wm.TaskNotSupportWindowReplyStateWr	isSupportWindowReplyStateForTask	M3.k.b0(new Object[]{"com.android.server.wm.Task", Context.class})
+W2/l.java	506	com.android.server.wm.Task	isResizeable	M3.k.b0(new Object[]{"com.android.server.wm.ActivityRecord"})
+W2/l.java	532	com.android.server.wm.Task	isSupportResize	M3.k.b0(new Object[]{Context.class, ComponentName.class})
+W2/l.java	571	com.android.server.wm.ActivityClientController	checkTaskSupportForCompWr	M3.k.b0(new Object[]{ComponentName.class})
+W2/l.java	594	com.android.server.wm.ActivityClientController	checkTaskSupportForPkgWr	M3.k.b0(new Object[]{String.class})
+W2/l.java	624	com.android.server.wm.ActivityRecord	supportsFreeformInDisplayArea	M3.k.b0(new Object[]{h12})
+W2/l.java	648	com.android.server.wm.ActivityRecord	supportsMultiWindow	tVar2
+W2/l.java	673	com.android.server.wm.ActivityRecord	supportsMultiWindowInDisplayArea	M3.k.b0(new Object[]{h12})
+W2/l.java	705		supportsFreeformInDisplayArea	M3.k.b0(new Object[]{h12})
+W2/m.java	612	android.app.Activity	onDestroy	
+X2/a.java	27	com.baidu.input.clipboard.manager.BDClipboardManager	c	k.b0(new Object[]{String.class})
+X2/a.java	32	com.baidu.input.clipboard.manager.BDClipboardManager	filter	k.b0(new Object[]{CharSequence.class, cls, cls, Spanned.class, cls, cls})
+X2/a.java	60	com.baidu.input.clipboard.panel.view.EditClipboardItemActivity	a	k.b0(new Object[]{String.class})
+Y2/c.java	143	com.android.quickstep.views.OverviewActionsView	onFinishInflate	
+Y2/c.java	147	com.android.quickstep.util.RecentsOrientedState	update	k.b0(new Object[]{cls, cls})
+Z2/a.java	36	com.zte.cn.doubleapp.common.UpdateUtils	getSupportApps	
+Z2/a.java	46	com.zte.cn.doubleapp.common.Utils	showLimitedApps	k.b0(new Object[]{Context.class})
+a3/C0516a.java	85	com.zte.fingerprint.theme.FingerprintAnimProcess	isCustomizeForWutheringWaves	tVar
+a3/C0516a.java	91	com.zte.fingerprint.theme.FingerprintAnimProcess	isCustomizeForWutheringWaves809J	tVar
+a3/C0516a.java	96	com.zte.fingerprint.theme.FingerprintAnimProcess	isCustomizeForFighting	tVar
+a3/C0516a.java	101	com.zte.fingerprint.theme.FingerprintAnimProcess	getAllFpAnim	
+a3/C0516a.java	111	com.fingerprint.sensorservice.utils.Utils	isCustomizeForWutheringWaves	tVar
+a3/C0516a.java	117	com.fingerprint.sensorservice.utils.Utils	isCustomizeForFighting	tVar
+b3/C0586a.java	260		getContext	
+b3/C0586a.java	274	cn.nubia.gameassist	getPackageName	
+b3/C0586a.java	280	cn.nubia.gameassist	getCheckedId	
+b3/C0586a.java	287	cn.nubia.gameassist	setData	k.b0(new Object[]{int[].class, int[].class, cls3})
+b3/b.java	208	cn.nubia.gameassist.dessert.policy.ActiveModeController	resetActiveModeSharedPreAllKey	
+b3/b.java	213	cn.nubia.gameassist.dessert.policy.ActiveModeController	removeActiveModeSharedPreKey	k.b0(new Object[]{String.class})
+b3/b.java	220	android.os.Handler	sendEmptyMessageDelayed	k.b0(new Object[]{cls, cls3})
+b3/b.java	226	android.os.Handler	sendMessageDelayed	k.b0(new Object[]{Message.class, cls3})
+b3/b.java	235	cn.nubia.gameassist.utils.Utils	initView	k.b0(new Object[]{f7797e.b().loadClass("android.view.ViewGroup")})
+b3/b.java	241	cn.nubia.gameassist.plugin.config.PluginConfig	isPluginEnable	k.b0(new Object[]{Context.class, String.class, String.class})
+b3/b.java	249	cn.nubia.gameassist.plugin.config.PluginConfig	isPluginEnable	k.b0(new Object[]{Context.class, String.class})
+b3/b.java	255	cn.nubia.gameassist.plugin.config.PluginConfig	getBoolean	k.b0(new Object[]{String.class})
+b3/b.java	259	cn.nubia.gameassist.plugin.config.PluginConfig	getBoolean	k.b0(new Object[]{String.class, cls2})
+b3/b.java	265	cn.nubia.plugin.gameratio.GameRatioSettingsPanel	setData	k.b0(new Object[]{f7798f.b().loadClass("cn.nubia.plugin.gameratio.GameRatioData")})
+b3/b.java	273	cn.nubia.gameassist.performance.PerformanceViewController	getPerformanceMode	t.f4873d
+b3/b.java	278	cn.nubia.gameassist.utils.Utils	isChickenMode	k.b0(new Object[]{Context.class})
+b3/b.java	288	cn.nubia.plugin.superresolution.SuperResolutionViewController	updateEnableSwitchPkg	k.b0(new Object[]{String.class, cls2})
+b3/b.java	298	cn.nubia.gameassist.performance.PerformanceModeController	getPerformanceMode	k.b0(new Object[]{String.class})
+b3/b.java	307	cn.nubia.gameassist.performance.PerformanceModeController	getInt	k.b0(new Object[]{ContentResolver.class, String.class, cls})
+b3/b.java	315	cn.nubia.plugin.superresolution.SuperResolutionViewController	L	k.b0(new Object[]{String.class, cls2})
+b3/b.java	324	cn.nubia.gameassist.performance.PerformanceModeController	getPerformanceMode	k.b0(new Object[]{String.class})
+b3/c.java	50	cn.nubia.gameassist.plugin.panel.PluginTilesAdapter	lambda$onBindViewHolder$0	k.b0(new Object[]{h5, View.class})
+b3/c.java	64	cn.nubia.gameassist.panel.GameAssistWindowManager	lambda$hideWindow$9	
+c3/C0617a.java	21	cn.zte.gamefloat.gamekeys.entity.GameChickenModeDialog$ChickenModeDialog	show	
+d3/C0628a.java	25		L	tVar
+d3/C0628a.java	33		M	tVar
+d3/C0628a.java	38	cn.nubia.gamehighlights.Activity.MainActivity$g$a	c	k.b0(new Object[]{Integer.TYPE})
+e3/C0642h.java	28	cn.nubia.gamehelper.utils.PackageUtils	isBlackPackageName	k.b0(new Object[]{Integer.TYPE})
+e3/C0642h.java	32	cn.nubia.gamehelper.utils.PackageUtils	findViewById	k.b0(new Object[]{Integer.TYPE})
+e3/C0642h.java	36	cn.nubia.gamehelper.utils.PackageUtils	getBoolean	k.b0(new Object[]{String.class})
+e3/C0642h.java	40	cn.nubia.gamehelper.utils.PackageUtils	getBoolean	k.b0(new Object[]{String.class, Boolean.TYPE})
+e3/C0644j.java	123	cn.nubia.gamehelper.utils.PackageUtils	getBlackPackageSet	
+e3/C0644j.java	140	cn.nubia.gamehelper.db.DbHelper	isPackageCanUseMacro	k.b0(new Object[]{String.class})
+e3/C0644j.java	152	cn.nubia.gamehelper.db.GameTouchProvider	query	
+e3/C0644j.java	163	cn.nubia.gamehelper.manager.GameMotionHelperManager	canUseMacro	
+e3/C0644j.java	171	cn.nubia.gamehelper.manager.GameMotionHelperManager	canDrawOverlays	k.b0(new Object[]{Context.class})
+e3/C0644j.java	179	cn.nubia.gamehelper.MacroSwitch	isSpeedModeEnable	
+e3/C0644j.java	188	cn.nubia.gamehelper.utils.DeviceUtil	isUI85	
+e3/C0644j.java	197	cn.nubia.gamehelper.bean.RecordMotionBean	getSpeed	
+e3/C0644j.java	210	cn.nubia.gamehelper.manager.GameMotionHelperManager	notifyChange	k.b0(new Object[]{String.class})
+e3/C0644j.java	220	cn.nubia.gamehelper.manager.GameMotionHelperManager	recoveryMotion	k.b0(new Object[]{String.class})
+e3/C0644j.java	233	cn.nubia.gamehelper.db.GameTouchProvider	recordMotionCall	k.b0(new Object[]{Bundle.class})
+e3/C0644j.java	238	cn.nubia.gamehelper.db.GameTouchProvider	call	k.b0(new Object[]{String.class, String.class, Bundle.class})
+e3/C0644j.java	251	cn.nubia.gamehelper.travel.action.TravelAction	playScript	t.f4873d
+f3/C0685a.java	180		isGameSwitchOn	t.f4873d
+f3/C0685a.java	221		setChecked	k.b0(new Object[]{ImageView.class, cls})
+f3/C0685a.java	225		isShowMoreVideo	k.b0(new Object[]{cls})
+f3/C0686b.java	73	android.os.Handler	postDelayed	k.b0(new Object[]{Runnable.class, Long.TYPE})
+f3/C0686b.java	83	cn.nubia.gamelab.toy.SGameToy	scheduleDetectRunnable	tVar
+f3/C0686b.java	89	cn.nubia.gamelab.toy.SGameToy	startDetectBitmap	tVar
+g3/C0722a.java	47	cn.nubia.gamelauncher.gamecontrolpanel.GameFunctionAllocationView$10	onClick	k.b0(new Object[]{View.class})
+g3/C0722a.java	55	cn.nubia.gamelauncher.gamecontrolpanel.GameFunctionAllocationView	updateUI	k.b0(new Object[]{cls})
+g3/C0722a.java	62	cn.nubia.gamelauncher.gamecontrolpanel.GameFunctionAllocationView	disableRedMagicTime	
+g3/C0722a.java	66	cn.nubia.gamelauncher.gamecontrolpanel.GameFunctionAllocationView	enableRedMagicTime	
+g3/C0722a.java	71	cn.nubia.gamelauncher.gamecontrolpanel.GameFunctionAllocationView	initView	tVar
+g3/C0722a.java	77	cn.nubia.gamelauncher.gamecontrolpanel.GameFunctionAllocationView	setChoiceGameSettings	k.b0(new Object[]{cls})
+g3/C0722a.java	85	cn.nubia.tgk.TgkHelper	disableTgkFunction	k.b0(new Object[]{String.class})
+g3/C0722a.java	94	cn.nubia.tgk.TgkMapView	getGameKeyLinkMotionState	tVar
+g3/C0722a.java	99	cn.nubia.tgk.TgkHelper	getTgkDisableOpt	k.b0(new Object[]{ContentResolver.class, String.class})
+g3/C0722a.java	107	cn.nubia.gamelauncher.gamecontrolpanel.config.PluginConfig	getBlackList	k.b0(new Object[]{Context.class, String.class})
+g3/C0722a.java	113	cn.nubia.gamelauncher.gamecontrolpanel.config.PluginConfig	getBoolean	k.b0(new Object[]{String.class})
+g3/C0722a.java	117	cn.nubia.gamelauncher.gamecontrolpanel.config.PluginConfig	getBoolean	k.b0(new Object[]{String.class, cls})
+h3/C0748b.java	38	cn.nubia.filebrowser.mtpserver.mtp.MtpDatabase	addEmulatedStorage	
+h3/C0748b.java	53	cn.nubia.filebrowser.mtpserver.mtp.MtpServer	addStorage	k.b0(new Object[]{c0748b.b().loadClass("cn.nubia.filebrowser.mtpserver.mtp.MtpStorage")})
+i3/C0789a.java	24	cn.nubia.neostore.model.ConfigMgrImp	H0	t.f4873d
+i3/C0789a.java	38	cn.nubia.neostore.service.DownloadService	f	k.b0(new Object[]{cls})
+j3/a.java	35	com.android.nfc.NfcService	sendMessage	
+j3/a.java	41	com.android.nfc.NfcService	playSound	k.b0(new Object[]{Integer.TYPE})
+k3/C0823a.java	123	com.android.packageinstaller.PackageInstallerActivity	getCookUI	k.b0(new Object[]{cls2, cls2, cls2, Boolean.TYPE, String.class, String.class})
+k3/C0823a.java	150	com.android.packageinstaller.InstallStaging$StagingAsyncTask	onPostExecute	
+k3/C0823a.java	171	com.android.packageinstaller.InstallStart	getCallingPackageNameForUid	k.b0(new Object[]{Integer.TYPE})
+m3/C0869a.java	179	android.os.Handler	sendEmptyMessageDelayed	k.b0(new Object[]{cls, cls2})
+m3/C0869a.java	186	android.os.Handler	sendMessageDelayed	k.b0(new Object[]{Message.class, cls2})
+m3/C0869a.java	192	com.zte.game.plugintrigger.policy.PolicyManager	getLegalRangeValue	k.b0(new Object[]{cls2, cls2, cls2, cls2})
+m3/C0869a.java	205	com.zte.game.plugintrigger.policy.PolicyManager$PolicyIntervalHandler	sendMessageDelayed	k.b0(new Object[]{Message.class, cls2})
+n3/C0902b.java	143	com.zte.wr.WindowReplyIconManager	iconShowIsError	k.b0(new Object[]{cls})
+n3/C0902b.java	174	com.zte.wr.WindowReplyService	onStartCommand	k.b0(new Object[]{Intent.class, cls, cls})
+o3/C0972a.java	113		getValue	t.f4873d
+o3/C0972a.java	123		setValue	k.b0(new Object[]{Integer.TYPE})
+o3/C0972a.java	570		setHour	k.b0(new Object[]{cls})
+o3/c.java	87	com.android.ztescreenshot.recordscreen.RecordScreenView	startRecord	
+o3/c.java	92	com.android.ztescreenshot.recordscreen.RecordScreenView	stopRecord	
+o3/c.java	99	com.android.ztescreenshot.cropimage.CropImageService	onStartCommand	k.b0(new Object[]{Intent.class, cls, cls})
+o3/c.java	105	com.android.ztescreenshot.cropimage.CropImageService	onDestroy	
+o3/c.java	108	com.android.ztescreenshot.cropimage.CropImageService	saveAndExit	
+o3/g.java	111	com.android.systemui.statusbar.phone.fragment.CollapsedStatusBarFragment	onViewCreated	
+o3/g.java	115	com.android.systemui.statusbar.phone.PhoneStatusBarView	onFinishInflate	
+p3/C1006a.java	165	com.zte.settings.notification.MfvBatteryPercentagePreferenceController	isAvailable	
+p3/C1006a.java	180	com.zte.settings.development.EnableAdbInstallPreferenceController	handlePreferenceTreeClick	
+p3/C1006a.java	185	com.zte.settings.development.EnableAdbInstallPreferenceController	onActivityResult	
+p3/C1006a.java	189	com.zte.settings.development.EnableAdbInstallPreferenceController	launchAuthCompActivity	
+p3/C1006a.java	193	com.zte.settings.development.EnableAdbInstallPreferenceController	launchNubiaActivity	
+p3/C1006a.java	249	com.zte.mifavor.widget.TimePickerDialogZTE	updateTitle	k.b0(new Object[]{loadClass2, cls2, cls2})
+p3/C1006a.java	257	com.zte.mifavor.widget.NumberPickerZTE	setMaxValue	k.b0(new Object[]{cls2})
+p3/C1006a.java	261	com.zte.mifavor.widget.NumberPickerZTE	setDisplayedValues	k.b0(new Object[]{String[].class})
+p3/C1006a.java	265	com.zte.mifavor.widget.TimePickerZTE	updateAmPmControl	t.f4873d
+p3/C1006a.java	269	com.zte.mifavor.widget.TimePickerZTE	onTimeChanged	k.b0(new Object[]{c1006a.b().loadClass("com.zte.mifavor.widget.NumberPickerZTE"), cls2, cls2})
+p3/C1006a.java	273	com.zte.mifavor.widget.TimePickerZTE	onValueChange	k.b0(new Object[]{c1006a.b().loadClass("com.zte.mifavor.widget.NumberPickerZTE"), cls2, cls2})
+p3/C1006a.java	289	android.provider.Settings$System	putInt	k.b0(new Object[]{ContentResolver.class, String.class, Integer.TYPE})
+p3/b.java	161		isStatusBar	
+p3/b.java	164		isQuickStatusBar	
+p3/b.java	167		isPhoneCallView	
+p3/b.java	170		isKeyguardDoze	
+p3/b.java	512		setValue	k.b0(new Object[]{cls})
+p3/b.java	549		getHour	tVar
+p3/b.java	554		getCurrentHour	tVar
+p3/b.java	579		setMinValue	k.b0(new Object[]{cls})
+p3/b.java	583		setMaxValue	k.b0(new Object[]{cls})
+p3/b.java	587		setValue	k.b0(new Object[]{cls})
+p3/b.java	790	com.zte.settings.connecteddevice.UsbModeUtils	setCurrentMode	
+p3/b.java	811	com.zte.settings.connecteddevice.UsbModeUtils	setCurrentMode	
+p3/c.java	27	com.zte.settings.connecteddevice.UsbModeUtils	setCurrentMode	
+p3/c.java	32	com.zte.settings.connecteddevice.UsbModeChooserActivity	onCreate	k.b0(new Object[]{Bundle.class})
+q3/C1056a.java	25	com.zte.mifavor.views.MFVBatteryViewLayout	updateBatteryLevelText	
+q3/C1056a.java	38	com.zte.mifavor.views.MFVBatteryViewLayout	onDarkChanged	k.b0(new Object[]{ArrayList.class, Float.TYPE, Integer.TYPE})
+q3/C1057b.java	64	com.android.systemui.SystemUIApplication	updateBattery	
+q3/C1057b.java	67	com.android.systemui.SystemUIApplication	onBatteryLevelChanged	k.b0(new Object[]{cls, cls2, cls2, cls2, cls})
+r3/C1103a.java	93	com.android.wm.shell.onehanded.OneHandedTutorialHandler	scheduleOffset	k.b0(new Object[]{cls, cls})
+r3/C1103a.java	101	com.android.wm.shell.onehanded.OneHandedTutorialHandler	getTutorialTargetLayoutParams	
+r3/C1103a.java	194	com.zte.adapt.mifavor.volume.VolumeDialogImplAdapt	richTapVibrateForVolumeKeyLongPress	
+r3/C1103a.java	204	com.android.systemui.clipboardoverlay.ClipboardListener	forceSuppressOverlay	
+s3/C1111a.java	190	com.zte.mifavor.keyguard.settings.LockScreenClockDefault	updateClockFont	k.b0(new Object[]{c1111a.b().loadClass("com.zte.mifavor.keyguard.personalclock.MyClockStyleModel$StyleData")})
+s3/C1111a.java	198	com.zte.mifavor.keyguard.settings.LockScreenClockDefault	updateClockFont	k.b0(new Object[]{c1111a.b().loadClass("com.zte.mifavor.keyguard.personalclock.MyClockStyleModel$StyleData")})
+t3/C1173b.java	41	com.android.systemui.statusbar.KeyguardIndicationController	setIndicationArea	k.b0(new Object[]{ViewGroup.class})
+u3/C1258a.java	77	com.android.systemui.statusbar.phone.CentralSurfacesImpl	makeStatusBarView	
+u3/C1258a.java	89	com.zte.feature.volume.MfvVolumeDialog	shouldKeyguardHandleVolumeKeys	
+u3/C1258a.java	99	com.zte.feature.charging.ChargingFeature	hideChargingViewDelayed	
+u3/C1258a.java	104	com.zte.feature.charging.ChargingFeature	startChargingAnimation	k.b0(new Object[]{Long.TYPE})
+u3/C1258a.java	108	com.android.systemui.keyguard.KeyguardViewMediator	onStartedWakingUp	
+u3/C1258a.java	116	com.zte.feature.charging.ChargeUtils	isRedmagicConfigCustom	t.f4873d
+u3/C1258a.java	123	com.zte.feature.charging.ChargeUtils	getChargeBitmapByIndex	k.b0(new Object[]{cls2, Resources.class, cls, int[].class, BitmapFactory.Options.class, cls, cls2})
+u3/b.java	220	com.android.systemui.statusbar.policy.Clock	updateShowSeconds	
+v3/C1274a.java	22	com.zte.controlcenter.widget.CCHeaderView	onFinishInflate	
+w3/C1311a.java	172	com.zte.utils.QsDimenUtils$Companion	getTileColumns	
+w3/C1311a.java	181	com.zte.feature.qs.layout.QsCustomizerModule	getColumns	
+w3/C1311a.java	188	com.zte.feature.qs.layout.QsCustomizerModule	getTileColumns	k.b0(new Object[]{cls})
+w3/C1311a.java	195	com.zte.feature.qs.layout.QsCustomizerModule	getRows	k.b0(new Object[]{cls})
+w3/C1311a.java	202	com.zte.feature.qs.layout.QsCustomizerModule	updateMaxRows	k.b0(new Object[]{cls, cls})
+w3/C1311a.java	210	com.zte.controlcenter.view.ControlCenterTileLayout	onMeasure	k.b0(new Object[]{cls, cls})
+w3/C1311a.java	221	com.zte.controlcenter.widget.CCHeaderView	postStartActivityDismissingKeyguard	k.b0(new Object[]{Intent.class})
+w3/C1311a.java	227	com.zte.controlcenter.widget.CCHeaderView	handleClickDate	
+w3/C1311a.java	233	com.zte.controlcenter.widget.CCHeaderView	handleClickSearch	
+w3/C1311a.java	243	com.zte.controlcenter.widget.CCHeaderView	shouldQsCarrierVisible	
+w3/C1311a.java	249	com.zte.controlcenter.widget.CCHeaderView	showSearchButton	
+x3/C1317a.java	205	com.zte.feature.doze	dozeTimeTick	tVar
+x3/C1317a.java	238	com.zte.feature.doze.AodClock.AodClockStyle.AodClockStyleHorizen	onFinishInflate	tVar
+x3/b.java	582	com.zte.mifavor.views.MFVBatteryViewLayout	updateVisibility	k.b0(new Object[]{Boolean.TYPE})
+x3/b.java	589	com.zte.mifavor.views.MFVBatteryViewLayout	updateChargeViewColor	
+x3/c.java	235	com.zte.feature.doze.AodClock.AodClockStyle.MyAodStyleModel$StyleData	isShowDateTime	t.f4873d
+y3/C1384a.java	115	com.zte.mifavor.views.MFVBatteryViewLayout	getLevelDisplayMode	
+y3/C1384a.java	121	com.zte.mifavor.views.MFVBatteryViewLayout	updateBatteryLayout	M3.k.b0(new Object[]{cls, Boolean.TYPE})
+y3/C1386c.java	57	android.content.Context	getSmallTime	M3.t.f4873d
+y3/D.java	686	com.android.systemui.statusbar.phone.PhoneStatusBarView	onFinishInflate	
+y3/g.java	681	com.android.systemui.statusbar.phone.PhoneStatusBarView	onFinishInflate	
+y3/g.java	685	com.android.systemui.statusbar.phone.PhoneStatusBarView	updateStatusBarHeight	M3.k.b0(new Object[]{Context.class})
+y3/g.java	688	com.android.internal.policy.SystemBarUtils	getStatusBarHeight	M3.k.b0(new Object[]{Context.class})
+y3/g.java	692	com.android.systemui.statusbar.phone.PhoneStatusBarView	updateSystemIconsContainerHeight	
+y3/i.java	229	com.zte.feature.notification.NotificationUtil	shouldShowAppIcon	M3.k.b0(new Object[]{ApplicationInfo.class})
+y3/i.java	233	com.zte.feature.notification.NotificationUtil	getAppIconBackgroundDrawable	M3.k.b0(new Object[]{String.class, cls2})
+y3/i.java	242	com.zte.feature.notification.module.NotificationBackground	adjustNotificationIcon	M3.k.b0(new Object[]{View.class})
+y3/i.java	262	com.android.systemui.statusbar.phone.PhoneStatusBarView	onFinishInflate	
+y3/i.java	273	com.zte.feature.speed.StatusBarNetSpeedMFV	init	
+y3/i.java	281	com.zte.mifavor.views.MFVBatteryViewLayout	onFinishInflate	
+y3/i.java	290	com.android.systemui.statusbar.phone.KeyguardStatusBarView	onFinishInflate	
+y3/i.java	306	com.android.systemui.statusbar.StatusBarIconView	isIconBlocked	
+y3/i.java	316	com.android.systemui.statusbar.phone.NotificationIconContainer	shouldForceOverflow	M3.k.b0(new Object[]{cls, cls, Float.TYPE, cls})
+y3/i.java	321	com.android.systemui.statusbar.phone.NotificationIconContainer	initResources	M3.t.f4873d
+y3/i.java	389	com.zte.feature.speed.StatusBarNetSpeedMFV	init	
+y3/i.java	401	com.zte.feature.speed.StatusBarNetSpeedPolicy$NetSpeedState	updateNetSpeedDisplay	M3.k.b0(new Object[]{h15})
+y3/i.java	412	com.zte.feature.speed.SpeedControllerImpl	updateNetSpeed	
+y3/i.java	420	com.zte.feature.fake.FakeNotchFeature	updateBlackVisibility	M3.k.b0(new Object[]{cls2, cls2, cls2})
+y3/i.java	428	com.zte.feature.fake.FakeNotchFeature	setVisibility	M3.k.b0(new Object[]{cls})
+y3/j.java	121	com.android.systemui.statusbar.policy.Clock	updateClock	
+y3/k.java	80		MutableStateFlow	
+y3/k.java	436		getSubId	
+y3/k.java	485		MutableStateFlow	
+y3/v.java	380	com.android.systemui.statusbar.phone.PhoneStatusBarView	onFinishInflate	
+y3/v.java	384	com.android.systemui.statusbar.phone.PhoneStatusBarView	onDetachedFromWindow	
+y3/x.java	135	com.android.systemui.statusbar.phone.ui.IconManager	addHolder	M3.k.b0(new Object[]{cls, String.class, Boolean.TYPE, h6})
+y3/x.java	141	com.android.systemui.statusbar.phone.ui.IconManager	addView	M3.k.b0(new Object[]{View.class, cls, ViewGroup.LayoutParams.class})
+y3/x.java	146	com.android.systemui.statusbar.phone.ui.IconManager	setVisibility	M3.k.b0(new Object[]{cls})
+y3/y.java	25	com.zte.feature.signal.WifiUtils$Companion	getWifiSignalStrengthIconId	M3.k.b0(new Object[]{cls2, cls, cls, cls, cls2, cls2})
+z3/C1407b.java	104	com.android.systemui.volume.VolumeDialogControllerImpl	updateStreamLevelW	
+z3/C1407b.java	115	com.android.systemui.volume.VolumeDialogImpl	updateVolumeRowH	
+z3/C1408c.java	20	com.android.systemui.volume.VolumeDialogImpl	showSafetyWarningH	
