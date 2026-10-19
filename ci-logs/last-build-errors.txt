@@ -1,0 +1,78 @@
+43:/home/runner/work/nubia-ly/nubia-ly/app/src/main/java/com/hammad/rmtweaks/xposed/SystemUiHooks.java:72: error: cannot find symbol
+48:/home/runner/work/nubia-ly/nubia-ly/app/src/main/java/com/hammad/rmtweaks/xposed/SystemUiHooks.java:90: error: cannot find symbol
+53:Note: /home/runner/work/nubia-ly/nubia-ly/app/src/main/java/com/hammad/rmtweaks/Prefs.java uses or overrides a deprecated API.
+54:Note: Recompile with -Xlint:deprecation for details.
+57:> Task :app:compileReleaseJavaWithJavac FAILED
+62:* What went wrong:
+70:BUILD FAILED in 1m 15s
+
+Welcome to Gradle 8.7!
+
+Here are the highlights of this release:
+ - Compiling and testing with Java 22
+ - Cacheable Groovy script compilation
+ - New methods in lazy collection properties
+
+For more details see https://docs.gradle.org/8.7/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:generateReleaseBuildConfig
+> Task :app:javaPreCompileRelease
+> Task :app:generateReleaseResValues
+> Task :app:checkReleaseAarMetadata
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources
+> Task :app:packageReleaseResources
+> Task :app:mergeReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease
+> Task :app:parseReleaseLocalResources
+> Task :app:processReleaseMainManifest
+> Task :app:processReleaseManifest
+> Task :app:extractProguardFiles
+> Task :app:mergeReleaseJniLibFolders
+> Task :app:mergeReleaseNativeLibs NO-SOURCE
+> Task :app:stripReleaseDebugSymbols NO-SOURCE
+> Task :app:extractReleaseNativeSymbolTables NO-SOURCE
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:desugarReleaseFileDependencies
+> Task :app:mergeReleaseStartupProfile
+> Task :app:checkReleaseDuplicateClasses
+> Task :app:processReleaseManifestForPackage
+> Task :app:mergeReleaseArtProfile
+> Task :app:processReleaseResources
+> Task :app:mergeExtDexRelease
+
+> Task :app:compileReleaseJavaWithJavac
+/home/runner/work/nubia-ly/nubia-ly/app/src/main/java/com/hammad/rmtweaks/xposed/SystemUiHooks.java:72: error: cannot find symbol
+                        Context c = de.robv.android.xposed.AndroidAppHelper.currentApplication();
+                                                          ^
+  symbol:   class AndroidAppHelper
+  location: package de.robv.android.xposed
+/home/runner/work/nubia-ly/nubia-ly/app/src/main/java/com/hammad/rmtweaks/xposed/SystemUiHooks.java:90: error: cannot find symbol
+                Context c = de.robv.android.xposed.AndroidAppHelper.currentApplication();
+                                                  ^
+  symbol:   class AndroidAppHelper
+  location: package de.robv.android.xposed
+Note: /home/runner/work/nubia-ly/nubia-ly/app/src/main/java/com/hammad/rmtweaks/Prefs.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+2 errors
+
+> Task :app:compileReleaseJavaWithJavac FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/build-1792433390457.json
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileReleaseJavaWithJavac'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+BUILD FAILED in 1m 15s
+23 actionable tasks: 23 executed
