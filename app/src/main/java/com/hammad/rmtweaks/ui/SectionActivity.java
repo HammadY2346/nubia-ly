@@ -1,6 +1,11 @@
 package com.hammad.rmtweaks.ui;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +20,20 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.hammad.rmtweaks.Features;
+import com.hammad.rmtweaks.Frames;
 import com.hammad.rmtweaks.Prefs;
 import com.hammad.rmtweaks.R;
 
 public class SectionActivity extends AppCompatActivity {
     private Features.Section section;
+    private final ActivityResultLauncher<Uri> pickFolder = registerForActivityResult(
+            new ActivityResultContracts.OpenDocumentTree(), uri -> {
+                if (uri == null) return;
+                int n = Frames.importFolder(this, uri);
+                Toast.makeText(this, n == 0 ? "No image frames found in that folder" : n + " frames imported", Toast.LENGTH_LONG).show();
+                RecyclerView list = findViewById(R.id.list);
+                if (list.getAdapter() != null) list.getAdapter().notifyDataSetChanged();
+            });
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +67,13 @@ public class SectionActivity extends AppCompatActivity {
             final MaterialSwitch sw = v.findViewById(R.id.toggle);
             final TextView value = v.findViewById(R.id.value);
             View card = v.findViewById(R.id.card);
-            if (f.type == Features.Type.SWITCH) {
+            if (f.type == Features.Type.ACTION) {
+                sw.setVisibility(View.GONE);
+                value.setVisibility(View.VISIBLE);
+                int n = Frames.count(SectionActivity.this);
+                value.setText(n == 0 ? "Pick folder" : n + " frames");
+                card.setOnClickListener(x -> pickFolder.launch(null));
+            } else if (f.type == Features.Type.SWITCH) {
                 sw.setVisibility(View.VISIBLE);
                 value.setVisibility(View.GONE);
                 sw.setOnCheckedChangeListener(null);

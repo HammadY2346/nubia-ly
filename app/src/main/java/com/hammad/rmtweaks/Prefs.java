@@ -36,6 +36,7 @@ public final class Prefs {
     public static int enabledCount(Context c, Features.Section s) {
         int n = 0;
         for (Features.Feature f : s.features) {
+            if (f.type == Features.Type.ACTION) continue;
             if (f.type == Features.Type.SWITCH ? on(c, f.key) : choice(c, f.key) > 0) n++;
         }
         return n;

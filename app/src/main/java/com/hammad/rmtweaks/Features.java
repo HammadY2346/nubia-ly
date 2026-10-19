@@ -10,7 +10,7 @@ public final class Features {
     public static final String PREFS = "tweaks";
     public static final String PKG = "com.hammad.rmtweaks";
 
-    public enum Type { SWITCH, CHOICE }
+    public enum Type { SWITCH, CHOICE, ACTION }
 
     public static final class Feature {
         public final String key, title, desc;
@@ -62,6 +62,11 @@ public final class Features {
     public static final String FP_WW = "fp_wuthering_waves";
     public static final String FP_LTY = "fp_lty";
     public static final String FP_SAGA = "fp_golden_saga";
+
+    public static final String CHARGE_SET = "charge_set";
+    public static final String CHARGE_IMPORT = "charge_import";
+    public static final String CHARGE_EVERY_LOCK = "charge_every_lock";
+    public static final String[] CHARGE_SETS = {"Stock", "Black Myth: Wukong collab (3-stage)", "RedMagic wired frames", "RedMagic wireless frames", "Classic Mifavor (layered)", "Custom frames (imported below)"};
 
     /** Theme variants: {label, theme-resource-feature, variant-id}. Index 0 = off. */
     public static final String[][] THEME_VARIANTS = {
@@ -128,7 +133,16 @@ public final class Features {
         new Feature(FP_SAGA, "GOLDEN SAGA edition", "Unlocks the GOLDEN SAGA reskins.")
     );
 
-    public static final Section[] SECTIONS = {GAME, LAUNCHER, THEME};
+    public static final Section SYSTEMUI = new Section("systemui", "System UI",
+        "Charging animation and lock screen",
+        R.drawable.ic_bolt,
+        new String[]{"com.android.systemui"},
+        new Feature(CHARGE_SET, "Charging animation", "Which frame set System UI plays when the charger is connected. Custom frames come from the folder you import below.", Type.CHOICE, CHARGE_SETS, 0),
+        new Feature(CHARGE_IMPORT, "Import custom charging frames…", "Pick a folder of PNG/WEBP/JPG frames (sorted by file name). They are copied into RM Tweaks and served to System UI.", Type.ACTION, null, 0),
+        new Feature(CHARGE_EVERY_LOCK, "Play charging animation on every screen-on", "Shows the animation each time the lock screen appears while charging, not only when the charger is plugged in.")
+    );
+
+    public static final Section[] SECTIONS = {GAME, LAUNCHER, THEME, SYSTEMUI};
 
     public static List<Feature> all() {
         List<Feature> l = new ArrayList<>();

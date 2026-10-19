@@ -51,6 +51,7 @@ public final class Entry implements IXposedHookLoadPackage, IXposedHookZygoteIni
                 case "com.zte.fingerprints":     FingerprintHooks.installThemeApp(lp.classLoader); break;
                 case "com.fingerprint.sensorservice": FingerprintHooks.installSensorService(lp.classLoader); break;
                 case "com.zte.mifavor.launcher": LauncherHooks.install(lp.classLoader); break;
+                case "com.android.systemui":     SystemUiHooks.install(lp.classLoader); break;
                 default: return;
             }
             Lx.i("hooks installed in " + (System.currentTimeMillis() - t0) + " ms; settings=" + Cfg.dump());
